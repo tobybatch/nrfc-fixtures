@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ fixture | fixtureSummary }}{% endblock %}
+{% block page_title %}{{ fixture | fixtureSummary }}{% endblock %}
+
+{% block body %}
+    <table class="table">
+        {% if fixture.competition.value != "None" %}
+            <thead>
+                <tr>
+                    <th colspan="2">{{ fixture.format }}</th>
+                </tr>
+            </thead>
+        {% endif %}
+        <tbody>
+        <tr>
+            <th class="text-left pr-2">Date</th>
+            <td class="text-left">{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>
+        </tr>
+        <tr>
+            <th class="text-left pr-2">Kick off</th>
+            <td class="text-left">
+                {% if fixture.date is not defined or dateIsNotSet(fixture.date) %}
+                    TBA
+                {% else %}
+                    {{ fixture.date|date('H:i') }}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th class="text-left pr-2">Venue</th>
+            <td class="text-left">
+                {% if fixture.homeAway.value == "H" %}
+                    Norwich Rugby Club
+                {% elseif fixture.homeAway.value == "A" and fixture.club is defined %}
+                    <a class="underline font-bold text-blue-600" href="{{ path('app_club_show', {'id': fixture.club.id}) }}">{{ fixture.club.name }}</a>
+                {% else %}
+                    To be arranged.
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th class="text-left pr-2">Team</th>
+            <td class="text-left">
+                {{ fixture.team.value }}
+            </td>
+        </tr>
+        <tr>
+            <th class="text-left pr-2">Competition</th>
+            <td class="text-left">
+                {{ fixture.competition.value }}
+            </td>
+        </tr>
+        {% if fixture.notes %}
+        <tr>
+            <th class="text-left pr-2">Notes</th>
+            <td class="text-left">
+                {{ fixture.notes }}
+            </td>
+        </tr>
+        {% endif %}
+        {% if fixture.homeAway.value == "A" %}
+        <tr>
+            <td colspan="2" class="text-center">
+                {{ makeMap(fixture.club) }}
+            </td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+        <!-- Back to List Button -->
+        <a href="{{ path('app_fixture_index') }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back to list
+        </a>
+
+        {% if app.user is not null and 'ROLE_EDITOR' in app.user.roles %}
+            <!-- Edit Button -->
+            <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}"
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Edit
+            </a>
+
+            <!-- Delete Form -->
+            <div class="inline-flex">
+                {% include 'fixture/_delete_form.html.twig' with { 'button_text': 'Delete' } %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

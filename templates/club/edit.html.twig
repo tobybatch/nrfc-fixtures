@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'form/tailwind_theme.html.twig' %}
+
+{% block title %}Editing {{ club.name }}{% endblock %}
+{% block page_title %}Editing {{ club.name }}{% endblock %}
+
+{% block body %}
+
+    {{ include('club/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+        <!-- Back to List Button -->
+        <a href="{{ path('app_club_index') }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back to list
+        </a>
+
+        <!-- Back to View Button -->
+        <a href="{{ path('app_club_show', {'id': club.id}) }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back to view
+        </a>
+
+        <!-- Delete Form -->
+        <div class="inline-flex">
+            {% include 'club/_delete_form.html.twig' with { 'button_text': 'Delete' } %}
+        </div>
+    </div>
+
+{% endblock %}

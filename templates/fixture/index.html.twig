@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All{% endblock %}
+
+{% block body %}
+    <div data-controller="collapsible">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-primary text-2xl font-bold">{% if teams|length == 1 %}{{ teams.0.name }} {% endif %}
+                Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}
+            </h1>
+
+            <div class="flex justify-end space-x-4">
+                <button
+                        data-action="click->collapsible#toggle"
+                        aria-expanded="false"
+                        aria-controls="collapse-content"
+                        class="bg-blue-500 text-white pt-0.5 pb-0.5 pl-1 pr-1 rounded-lg flex justify-between items-center focus:outline-none"
+                >
+                    <span>Display options</span>
+                    <svg
+                            data-collapsible-target="icon"
+                            class="w-5 h-5 transform transition-transform duration-300"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                {% if app.user is not null and 'ROLE_EDITOR' in app.user.roles %}
+                    <a
+                            href="{{ path('app_fixture_new') }}"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
+                             fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                  clip-rule="evenodd"></path>
+                        </svg>
+                        Create New
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="justify-start">
+            <div
+                    id="collapse-content"
+                    data-collapsible-target="content"
+                    class="flex flex-row max-h-0 overflow-hidden transition-all duration-300 bg-gray-100 rounded-lg mt-2 w-auto"
+            >
+                <div class="w-auto min-w-0 flex-shrink-0">
+                    {% include 'components/fixtures_display_options.html.twig' with {'form': teamsForm} %}
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                <thead class="bg-tertiary text-white">
+                <tr>
+                    <th class="py-3 px-4 text-left">
+                        Date
+                    </th>
+                    {% for team in teams %}
+                        <th class="py-3 px-4 text-left underline">
+                            <a href="{{ path('app_fixture_index') }}?team={{ team.value }}">
+                                {{ team.value }}
+                            </a>
+                        </th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                {% for fixture_date, fixtures_on_date in fixtures %}
+                    {% if fixtures_on_date | length > 0 %}
+                        <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
+                            <td class="py-3 px-4 whites`pace-nowrap underline">
+                                <a class="nrfc-date-link"
+                                   href="{{ path('app_fixture_byDate', parameters = {date: fixture_date|date('Ymd')}) }}">
+                                    {{ fixture_date|date('j M y') }}
+                                </a>
+                            </td>
+                            {# each col is a different team #}
+                            {% for fixtures_by_team in fixtures_on_date %}
+                                <td class="py-3 px-4">
+                                    {# each date for a team, may have multiple fixtures #}
+                                    {% for fixture in fixtures_by_team %}
+                                        <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
+                                           class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                            {{ fixture }}
+                                        </a>
+                                    {% endfor %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

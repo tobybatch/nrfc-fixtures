@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+         convertDeprecationsToExceptions="false"
+>
+    <php>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+        <server name="APP_ENV" value="test" force="true"/>
+        <server name="SHELL_VERBOSITY" value="-1"/>
+        <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
+        <server name="SYMFONY_PHPUNIT_VERSION" value="9.5"/>
+        <env name="PANTHER_CHROME_DRIVER_BINARY" value="/usr/lib/chromium-browser/chromedriver"/>
+        <env name="PANTHER_WEB_SERVER_PORT" value="5003"/>
+<!--        <env name="PANTHER_NO_HEADLESS" value="1"/>-->
+        <env name="DATABASE_URL" value="postgresql://nrfc:nrfc@127.0.0.1:5002/nrfc_test"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Unit Test Suite">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="E2E Test Suite">
+            <directory>tests/E2E</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory>src/DataFixtures</directory>
+            <directory>src/Controller</directory>
+            <file>src/Kernel.php</file>
+        </exclude>
+        <report>
+            <clover outputFile="/home/tobias/usr/nrfc/nrfc-fixtures/var/clover.xml"/>
+            <cobertura outputFile="var/cobertura.xml"/>
+            <crap4j outputFile="var/crap4j.xml" threshold="50"/>
+            <html outputDirectory="var/coverage-html" lowUpperBound="50" highLowerBound="90"/>
+            <php outputFile="var/coverage.php"/>
+            <text outputFile="var/coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+            <xml outputDirectory="var/coverage-xml"/>
+        </report>
+    </coverage>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+    </listeners>
+
+    <extensions>
+        <extension class="Symfony\Component\Panther\ServerExtension"/>
+        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
+</phpunit>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NRFC Fixtures: {% block title %}Home{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#731018',
+                        secondary: '#115938',
+                        tertiary: '#1C402C',
+                        accent: '#F2921D',
+                        light: '#F2F2F2',
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        window.AppData = {{ app_data.data|json_encode|raw }};
+    </script>
+    {% block stylesheets %}{{ encore_entry_link_tags('app') }}{% endblock %}
+    {% block javascripts %}{{ encore_entry_script_tags('app') }}{% endblock %}
+</head>
+<body class="bg-light text-gray-800 font-sans leading-relaxed">
+
+<!-- Header -->
+{% include 'components/header.html.twig' %}
+
+<!-- Navigation -->
+{% include 'components/navbar.html.twig' %}
+
+{% for message in app.flashes('success') %}
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+        {{ message }}
+    </div>
+{% endfor %}
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-6 min-h-[calc(100vh-180px)]">
+    {% block body %}{% endblock %}
+</main>
+
+<!-- Footer -->
+{% include 'components/footer.html.twig' %}
+
+
+</body>
+</html>

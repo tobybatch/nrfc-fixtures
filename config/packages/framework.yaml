@@ -5,8 +5,13 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        message_bus: false
     #esi: true
     #fragments: true
+    trusted_proxies: ['127.0.0.1', 'REMOTE_ADDR']
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
 
 when@test:
     framework:

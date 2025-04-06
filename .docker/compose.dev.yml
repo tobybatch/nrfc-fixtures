@@ -1,0 +1,46 @@
+services:
+
+  sqldb:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    container_name: nrfc-fixtures-dev-db
+    env_file:
+      - path: ./dev.env
+        required: true
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+  nrfcfixtures:
+    image: nrfc-fixtures:apache-dev
+    build:
+      context: ..
+      target: dev
+      args:
+        BASE: apache
+    container_name: nrfc-fixtures-dev
+    env_file:
+      - path: ./dev.env
+        required: true
+    volumes:
+      - ..:/opt/nrfcfixtures
+    ports:
+      - 8001:8001 # If you change the external port the debug toolbar will break
+    depends_on: [sqldb]
+    restart: unless-stopped
+
+  encore:
+    image: node
+    volumes:
+      - ..:/opt/nrfcfixtures
+    working_dir: /opt/nrfcfixtures
+    entrypoint: "/opt/nrfcfixtures/bin/watch.sh"
+    depends_on: [nrfcfixtures]
+
+
+volumes:
+  database_data:
+    name: nrfc-fixtures-dev-dbdata

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fixtures for {{ date }}{% endblock %}
+
+{% block body %}
+
+<main class="container mx-auto px-4 py-8 min-h-[calc(100vh-180px)]">
+    <!-- Date Header -->
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-primary mb-2">Fixtures for <span class="text-accent">{{ date }}</span></h1>
+        <div class="w-24 h-1 bg-secondary mx-auto"></div>
+    </div>
+
+    <!-- Fixtures Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 nrfc-by-date-items">
+        <!-- Home Fixtures -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-secondary">
+            <div class="bg-secondary px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">Home Fixtures</h2>
+            </div>
+            <div class="p-4 space-y-3">
+                {% for fixture in fixtures.HOME %}
+                <div class="p-3 bg-gray-50 rounded-md border-l-2 border-primary hover:bg-gray-100 transition">
+                    {% include 'fixture/show_limited.html.twig' %}
+                </div>
+
+        {% endfor %}
+            </div>
+        </div>
+
+        <!-- Training -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-gray-400">
+            <div class="bg-gray-500 px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">Training</h2>
+            </div>
+        {% for fixture in fixtures.TRAINING %}
+            <div class="p-4">
+            {% include 'fixture/show_limited.html.twig' %}
+            </div>
+        {% endfor %}
+        </div>
+
+        <!-- Away Fixtures -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-tertiary">
+            <div class="bg-tertiary px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">Away Fixtures</h2>
+            </div>
+            <div class="p-4 space-y-3">
+        {% for fixture in fixtures.AWAY %}
+                <div class="p-3 bg-gray-50 rounded-md border-l-2 border-primary hover:bg-gray-100 transition">
+            {% include 'fixture/show_limited.html.twig' %}
+                </div>
+        {% endfor %}
+            </div>
+        </div>
+
+        <!-- TBA/Not known -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-accent">
+            <div class="bg-accent px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">TBA/Not known</h2>
+            </div>
+            <div class="p-4 space-y-3">
+        {% for fixture in fixtures.TBA %}
+                <div class="p-3 bg-gray-50 rounded-md border-l-2 border-primary hover:bg-gray-100 transition">
+            {% include 'fixture/show_limited.html.twig' %}
+                </div>
+        {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

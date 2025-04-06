@@ -1,0 +1,65 @@
+<!-- start templates/form/fixtures_display_options_theme.html.twig -->
+
+{% use 'form/tailwind_theme.html.twig' %}
+
+{%- block form_row -%}
+    {# Check if the field is a multiple, expanded choice field (or any field you want to apply this to) #}
+    {% if form.vars.expanded and form.vars.multiple and 'choice' in form.vars.block_prefixes %}
+        {# Apply a specific class to the label for these types of fields #}
+        <div class="form-row-custom-choice-label">
+            {{- form_label(form, null, {'label_attr': {'class': 'choice-group-label font-bold p-8'}}) -}}
+            {{- form_widget(form) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        </div>
+    {% else %}
+        <div>
+            {{- form_label(form) -}}
+            {{- form_widget(form) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        </div>
+    {% endif %}
+{%- endblock form_row -%}
+
+{%- block form_label -%}
+    {% if label is empty %}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {% endif %}
+
+    {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' pl-2')|trim}) %}
+    <label for="{{ id }}"
+        {% for attrname, attrvalue in label_attr %}
+            {{ attrname }}="{{ attrvalue|escape('html_attr') }}"
+        {% endfor %}
+    >
+    {{ label }}
+    </label>
+{%- endblock form_label -%}
+
+{%- block checkbox_widget -%}
+    {% if form.vars.name == 'showPastDates' %}
+        {# Customize checkbox for showPastDates field #}
+        <input type="checkbox"
+               id="{{ id }}"
+               name="{{ full_name }}"
+               {% if value is defined %} value="{{ value }}"{% endif %}
+               {% if checked %} checked="checked"{% endif %}
+               {% if attr %}
+                   {% set attr = attr|merge({'class': (attr.class|default('') ~ ' form-checkbox h-4 w-4 bg-gray-50 border border-gray-300 text-gray-900 rounded focus:ring-blue-500 focus:border-blue-500')|trim}) %}
+                   {% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue|escape('html_attr') }}"{% endfor %}
+               {% endif %}
+        >
+    {% else %}
+        {# Fallback to parent theme for other checkboxes #}
+        {{ parent() }}
+    {% endif %}
+{%- endblock checkbox_widget -%}
+<!-- end templates/form/fixtures_display_options_theme.html.twig -->

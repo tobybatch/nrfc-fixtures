@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+    <div class="flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-primary">
+                    Sign in to your account
+                </h2>
+            </div>
+            {% if error %}
+                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="mb-3">
+                    You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                </div>
+            {% endif %}
+
+            <div class="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+
+                {{ form_start(loginForm, {attr: {class: 'mb-0 space-y-6'}}) }}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                {{ form_row(loginForm._username) }}
+                {{ form_row(loginForm._password, {
+                    label: 'Password'
+                }) }}
+
+                <div class="text-sm">
+                    <a href="{{ path('app_magic_login') }}" class="font-medium text-accent hover:text-accent-dark">
+                        Send me a magic link...
+                    </a>
+                </div>
+
+                <div>
+                    <button type="submit" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded text-sm">
+                        Login
+                    </button>
+                </div>
+
+{#                <div>#}
+{#                    <a href="{{ path('app_register') }}" class="bg-secondary hover:bg-tertiary text-white font-bold py-2 px-4 rounded text-sm">#}
+{#                        Register#}
+{#                    </a>#}
+{#                </div>#}
+                {{ form_end(loginForm) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

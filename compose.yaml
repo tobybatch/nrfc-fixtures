@@ -1,0 +1,48 @@
+# DEVELOPMENT COMPOSER
+
+services:
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    ports:
+      - "5001:5432"
+    environment:
+      POSTGRES_DB: nrfc
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: nrfc
+      POSTGRES_USER: nrfc
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "nrfc", "-U", "nrfc"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    # volumes:
+      # - database_data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+  database_test:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: nrfc_test
+      POSTGRES_PASSWORD: nrfc
+      POSTGRES_USER: nrfc
+    ports:
+      - "5002:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "nrfc", "-U", "nrfc"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  ###> symfony/mailer ###
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+###< symfony/mailer ###

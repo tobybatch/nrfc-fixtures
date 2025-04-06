@@ -1,0 +1,4 @@
+workers:
+    tailwind:
+        cmd: ['./bin/watch.sh']
+        terminate: ['bash', '-c', 'kill $(cat /tmp/tailwind-watch.pid)']

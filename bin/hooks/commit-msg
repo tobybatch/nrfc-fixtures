@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Is commitlint missing
+if ! command -v "commitlint" >/dev/null 2>&1; then
+  echo "commitlint is missing, you'll need to install it."
+  echo "Either see the SETUP.md or install it mannually:"
+  echo "  https://keisukeyamashita.github.io/commitlint-rs/setup/install/"
+  echo
+  exit 1
+fi
+
+commitlint-rs --edit "$1"
