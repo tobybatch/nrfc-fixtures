@@ -5,11 +5,11 @@ namespace App\Command;
 
 use App\Config\Competition;
 use App\Config\HomeAway;
-use App\Entity\Team;
-use App\Repository\TeamRepository;
+use App\Config\Team;
+use App\Entity\Club;
+use App\Repository\ClubRepository;
 use DateTime;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
@@ -31,13 +31,13 @@ class NrfcFixturesImportCommand extends Command
 {
 
     private ObjectManager $em;
-    private TeamRepository $teamRepository;
+    private ClubRepository $clubRepository;
 
-    public function __construct(EntityManagerInterface $em, TeamRepository $teamRepository)
+    public function __construct(EntityManagerInterface $em, ClubRepository $clubRepository)
     {
         parent::__construct();
         $this->em = $em;
-        $this->teamRepository = $teamRepository;
+        $this->clubRepository = $clubRepository;
     }
 
     protected function configure(): void
@@ -131,35 +131,32 @@ class NrfcFixturesImportCommand extends Command
      */
     private function processRow(array $row): void
     {
-        $date = DateTimeImmutable::createFromMutable(DateTime::createFromFormat('j-M-y', $row[0]));
-        if (!$date) {
-            throw new Exception(sprintf('Invalid date format: %s', $row[0]));
-        }
+        $date = DateTimeImmutable::createFromMutable(
+            DateTime::createFromFormat('j-M-y', $row[0])
+        )->setTime(12, 0, 0);
 
-        $this->createFixture("Minis", $date, $row[2]);
-        $this->createFixture("U13B", $date, $row[3]);
-        $this->createFixture("U14B", $date, $row[4]);
-        $this->createFixture("U15B", $date, $row[5]);
-        $this->createFixture("U16B", $date, $row[6]);
-        $this->createFixture("Colts", $date, $row[7]);
-        $this->createFixture("U12G", $date, $row[9]);
-        $this->createFixture("U14G", $date, $row[10]);
-        $this->createFixture("U16G", $date, $row[11]);
-        $this->createFixture("U18G", $date, $row[12]);
+        $this->createFixture(Team::Minis, $date, $row[2]);
+        $this->createFixture(Team::U13B, $date, $row[3]);
+        $this->createFixture(Team::U14B, $date, $row[4]);
+        $this->createFixture(Team::U15B, $date, $row[5]);
+        $this->createFixture(Team::U16B, $date, $row[6]);
+        $this->createFixture(Team::U18B, $date, $row[7]);
+        $this->createFixture(Team::U12G, $date, $row[9]);
+        $this->createFixture(Team::U14G , $date, $row[10]);
+        $this->createFixture(Team::U16G, $date, $row[11]);
+        $this->createFixture(Team::U18G, $date, $row[12]);
     }
 
-    private function createFixture(string $name, DateTimeImmutable $date, mixed $detail): void
+    private function createFixture(Team $team, DateTimeImmutable $date, mixed $detail): void
     {
-        $team = $this->teamRepository->findOneBy(['name' => $name]);
-        if (!$team) {
-            $team = new Team();
-            $team->setName($name);
-            $this->em->persist($team);
-            $this->em->flush();
-        }
         $fixture = new FixtureEntity();
-        list($sessionName, $comp, $home) = $this->parseDetail($detail);
-        $fixture->setName($sessionName);
+        list($sessionName, $comp, $home, $club) = $this->parseDetail($detail);
+        $fixture->setTeam($team);
+        if ($club) {
+            $fixture->setClub($club);
+        } else {
+            $fixture->setName($sessionName);
+        }
         $fixture->setCompetition($comp);
         $fixture->setHomeAway($home);
         $fixture->setDate($date);
@@ -170,39 +167,54 @@ class NrfcFixturesImportCommand extends Command
 
     private function parseDetail(string $detail)
     {
-        if (strtolower(trim($detail)) === 'training') {
-            return ["Training", Competition::None, HomeAway::Home];
+        if (in_array(strtolower(trim($detail)), ['training', 'skills session'])) {
+            return ["Training", Competition::None, HomeAway::Home, null];
         }
 
         // is CB or Pathway
-        if (str_starts_with(trim($detail), "CB") || str_contains(trim($detail), "pathway") || str_contains(trim($detail), "academy")) {
-            return [$detail, Competition::Pathway, HomeAway::TBA];
+        if (
+            str_starts_with(trim($detail), "CB")
+            || str_contains(strtolower(trim($detail)), "pathway")
+            || str_contains(strtolower(trim($detail)), "academy")
+        ) {
+            return [$detail, Competition::Pathway, HomeAway::TBA, null];
         }
         // is county cup / colts cup
-        if (str_starts_with(trim($detail), "county cup") || str_contains(trim($detail), "colts cup")) {
-            return [$detail, Competition::CountyCup, HomeAway::TBA];
+        if (
+            str_starts_with(strtolower(trim($detail)), "county cup")
+            || str_contains(strtolower(trim($detail)), "colts cup")
+            || str_contains(strtolower(trim($detail)), "norfolk finals")
+        ) {
+            return [ucfirst($detail), Competition::CountyCup, HomeAway::TBA, null];
         }
         // is festival
-        if (str_contains(trim($detail), "festival")) {
-            return [$detail, Competition::Festival, HomeAway::TBA];
+        if (str_contains(strtolower(trim($detail)), "festival")) {
+            return [ucfirst($detail), Competition::Festival, HomeAway::TBA, null];
         }
         // is nat cup
-        if (str_contains(trim($detail), "nat cup")) {
-            return [$detail, Competition::NationalCup, HomeAway::TBA];
+        if (str_contains(strtolower(trim($detail)), "nat cup")) {
+            return [ucfirst($detail), Competition::NationalCup, HomeAway::TBA, null];
         }
         // is norfolk 10s
         if (str_contains(trim($detail), "Norfolk10s")) {
-            return [$detail, Competition::Norfolk10s, HomeAway::TBA];
+            return [$detail, Competition::Norfolk10s, HomeAway::TBA, null];
         }
         // is Conference
-        if (str_contains(trim($detail), "conference")) {
-            return [$detail, Competition::Conference, HomeAway::TBA];
+        if (str_contains(strtolower(trim($detail)), "conference")) {
+            return [ucfirst($detail), Competition::Conference, HomeAway::TBA, null];
+        }
+        // is special day
+        if (in_array(strtolower(trim($detail)), ["mothering sunday", "christmas", "easter", "out of season"])) {
+            return [ucfirst($detail), Competition::None, HomeAway::TBA, null];
         }
 
+        // we've got this far, we think it's a club game
+        $club = $this->findClub(preg_replace('/\s*\([^)]*\)/', '', $detail));
         return [
-            preg_replace('/\s*\([^)]*\)/', '', $detail),
-            Competition::None,
-            $this->isHomeOrAway($detail)
+            ucfirst($detail),
+            Competition::Friendly,
+            $this->isHomeOrAway($detail),
+            $club
         ];
     }
 
@@ -215,5 +227,31 @@ class NrfcFixturesImportCommand extends Command
             return HomeAway::Away;
         }
         return HomeAway::TBA;
+    }
+
+    private function findClub($name)
+    {
+        $n = ucwords(trim(strtolower($name)));
+        if (empty($n)) {
+            return null;
+        }
+
+        switch ($n) {
+            case "W Norfolk":
+                $n = "West Norfolk";
+            case "N Walsham":
+                $n = "North Walsham";
+        }
+
+        $club = $this->clubRepository->findOneBy(['name' => $n]);
+        if ($club != null) {
+            return $club;
+        }
+
+        $club = new Club();
+        $club->setName($n);
+        $this->em->persist($club);
+        $this->em->flush();
+        return $club;
     }
 }

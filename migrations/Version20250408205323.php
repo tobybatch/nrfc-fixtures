@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250407192705 extends AbstractMigration
+final class Version20250408205323 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -24,17 +24,11 @@ final class Version20250407192705 extends AbstractMigration
             CREATE TABLE club (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE fixture (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, club_id INTEGER DEFAULT NULL, team_id INTEGER NOT NULL, date DATETIME NOT NULL --(DC2Type:datetime_immutable)
-            , name VARCHAR(255) NOT NULL, home_away VARCHAR(255) NOT NULL, competition VARCHAR(255) NOT NULL, CONSTRAINT FK_5E540EE61190A32 FOREIGN KEY (club_id) REFERENCES club (id) NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_5E540EE296CD8AE FOREIGN KEY (team_id) REFERENCES team (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
+            CREATE TABLE fixture (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, club_id INTEGER DEFAULT NULL, date DATETIME NOT NULL --(DC2Type:datetime_immutable)
+            , home_away VARCHAR(255) NOT NULL, competition VARCHAR(255) NOT NULL, team INTEGER NOT NULL, CONSTRAINT FK_5E540EE61190A32 FOREIGN KEY (club_id) REFERENCES club (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
         SQL);
         $this->addSql(<<<'SQL'
             CREATE INDEX IDX_5E540EE61190A32 ON fixture (club_id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            CREATE INDEX IDX_5E540EE296CD8AE ON fixture (team_id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            CREATE TABLE team (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL)
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE messenger_messages (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, body CLOB NOT NULL, headers CLOB NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL --(DC2Type:datetime_immutable)
@@ -61,9 +55,6 @@ final class Version20250407192705 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE fixture
-        SQL);
-        $this->addSql(<<<'SQL'
-            DROP TABLE team
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE messenger_messages

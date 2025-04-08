@@ -6,6 +6,7 @@ use App\Repository\FixtureRepository;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Config\HomeAway;
 use \App\Config\Competition;
+use \App\Config\Team;
 
 #[ORM\Entity(repositoryClass: FixtureRepository::class)]
 class Fixture
@@ -16,25 +17,24 @@ class Fixture
     private ?int $id = null;
 
     #[ORM\Column]
+    #[ORM\OrderBy(['date' => 'DESC'])]
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'fixtures')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Club $club = null;
 
-    #[ORM\ManyToOne(inversedBy: 'fixtures')]
-    #[ORM\JoinColumn(nullable: false)]
-    private Team $team;
-
-    #[ORM\Column(length: 255)]
-    #[ORM\JoinColumn(nullable: false)]
-    private string $name;
-
     #[ORM\Column(enumType: HomeAway::class)]
     private HomeAway $homeAway;
 
     #[ORM\Column(enumType: Competition::class)]
     private Competition $competition;
+
+    #[ORM\Column(enumType: Team::class)]
+    private ?Team $team = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
 
     public function getId(): ?int
     {
@@ -65,29 +65,6 @@ class Fixture
         return $this;
     }
 
-    public function getTeam(): ?Team
-    {
-        return $this->team;
-    }
-
-    public function setTeam(?Team $team): static
-    {
-        $this->team = $team;
-
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
 
     public function getHomeAway(): ?HomeAway
     {
@@ -109,6 +86,30 @@ class Fixture
     public function setCompetition(?Competition $competition): static
     {
         $this->competition = $competition;
+
+        return $this;
+    }
+
+    public function getTeam(): ?Team
+    {
+        return $this->team;
+    }
+
+    public function setTeam(Team $team): static
+    {
+        $this->team = $team;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }

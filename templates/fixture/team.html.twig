@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello FixtureController!{% endblock %}
+
+{% block body %}
+
+    {{ dump() }}
+    <div>
+        <table border="1">
+            {% for fixture in fixtures %}
+                {% include './fixture/fixture_detail.html.twig' %}
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
