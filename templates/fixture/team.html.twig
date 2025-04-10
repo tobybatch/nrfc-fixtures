@@ -3,12 +3,12 @@
 {% block title %}Hello FixtureController!{% endblock %}
 
 {% block body %}
-
-    {{ dump() }}
     <div>
-        <table border="1">
-            {% for fixture in fixtures %}
-                {% include './fixture/fixture_detail.html.twig' %}
+        <table>
+            {% for fixture in fixtures %}<tr>
+                <td>{{ fixture.date | date('j M y') }}</td>
+                    <td>{% include './fixture/fixture_detail.html.twig' %}</td>
+                </tr>
             {% endfor %}
         </table>
     </div>

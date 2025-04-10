@@ -177,7 +177,7 @@ class NrfcFixturesImportCommand extends Command
             || str_contains(strtolower(trim($detail)), "pathway")
             || str_contains(strtolower(trim($detail)), "academy")
         ) {
-            return [$detail, Competition::Pathway, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::Pathway, HomeAway::TBA, null];
         }
         // is county cup / colts cup
         if (
@@ -185,15 +185,15 @@ class NrfcFixturesImportCommand extends Command
             || str_contains(strtolower(trim($detail)), "colts cup")
             || str_contains(strtolower(trim($detail)), "norfolk finals")
         ) {
-            return [ucfirst($detail), Competition::CountyCup, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::CountyCup, HomeAway::TBA, null];
         }
         // is festival
         if (str_contains(strtolower(trim($detail)), "festival")) {
-            return [ucfirst($detail), Competition::Festival, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::Festival, HomeAway::TBA, null];
         }
         // is nat cup
         if (str_contains(strtolower(trim($detail)), "nat cup")) {
-            return [ucfirst($detail), Competition::NationalCup, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::NationalCup, HomeAway::TBA, null];
         }
         // is norfolk 10s
         if (str_contains(trim($detail), "Norfolk10s")) {
@@ -201,17 +201,17 @@ class NrfcFixturesImportCommand extends Command
         }
         // is Conference
         if (str_contains(strtolower(trim($detail)), "conference")) {
-            return [ucfirst($detail), Competition::Conference, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::Conference, HomeAway::TBA, null];
         }
         // is special day
         if (in_array(strtolower(trim($detail)), ["mothering sunday", "christmas", "easter", "out of season"])) {
-            return [ucfirst($detail), Competition::None, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::None, HomeAway::TBA, null];
         }
 
         // we've got this far, we think it's a club game
         $club = $this->findClub(preg_replace('/\s*\([^)]*\)/', '', $detail));
         return [
-            ucfirst($detail),
+            ucwords($detail),
             Competition::Friendly,
             $this->isHomeOrAway($detail),
             $club

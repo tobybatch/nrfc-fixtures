@@ -5,7 +5,7 @@
 {% block body %}
 
     <div>
-        <table border="1">
+        <table>
             <tr>
                 <th>Date</th>
                 <th>Minis</th>
@@ -19,19 +19,16 @@
                 <th>U16G</th>
                 <th>U18G</th>
             </tr>
-            {% for fixture in fixtures %}
+            {% for date, _fixtures in fixtures %}
                 <tr>
-                    <td>{{ fixture.date|date('j M y') }}</td>
-                    <td>{{ fixture.fixture_1 }}</td>
-                    <td>{{ fixture.fixture_2 }}</td>
-                    <td>{{ fixture.fixture_3 }}</td>
-                    <td>{{ fixture.fixture_4 }}</td>
-                    <td>{{ fixture.fixture_5 }}</td>
-                    <td>{{ fixture.fixture_6 }}</td>
-                    <td>{{ fixture.fixture_7 }}</td>
-                    <td>{{ fixture.fixture_8 }}</td>
-                    <td>{{ fixture.fixture_9 }}</td>
-                    <td>{{ fixture.fixture_10 }}</td>
+                    <td>{{ date|date('j M y') }}</td>
+                    {% for fixture_list_for_team in _fixtures %}
+                        <td>
+                            {% for f in fixture_list_for_team %}
+                                 {% include './fixture/fixture_detail.html.twig' with { 'fixture': f } %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
                 </tr>
             {% endfor %}
         </table>

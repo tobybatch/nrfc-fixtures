@@ -1,8 +1,5 @@
-<tr>
-    <td>{{ fixture.date | date('j M y') }}</td>
-    <td>Club: {{ fixture.club.name | default("") }}</td>
-    <td>Name: {{ fixture.name }}</td>
-    <td>Home/Away: {{ fixture.homeAway.value }}</td>
-    <td>Comp: {{ fixture.competition.value }}</td>
-    <td>Team: {{ fixture.team.value }}</td>
-</tr>
+{% if fixture.club is not null %}
+    {{ fixture.club.name }} ({{ fixture.homeAway.value }}) {{ fixture.competition | shortCompetition }}
+{% else %}
+    {{ fixture.name }} {{ fixture.competition | shortCompetition }}
+{% endif %}

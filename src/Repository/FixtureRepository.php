@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Config\Team;
 use App\Entity\Fixture;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -12,44 +13,48 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class FixtureRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Fixture::class);
+        $this->entityManager = $entityManager;
     }
 
-    public function getFixturesForTeam(Team $team): array
+    public function getDates(): array
     {
-        return $this->createQueryBuilder('f')
+        $results = $this->entityManager->createQueryBuilder()
+            ->select('d.date')
+            ->from('App\Entity\Fixture', 'd')
+            ->getQuery()
+            ->getResult();
+
+        $uniqueDates = array_values(array_unique(array_map(
+            function($row) {
+                return $row['date']->format('Y-m-d');
+            },
+            $results
+        )));
+
+        sort($uniqueDates); // Optional sorting
+        return $uniqueDates;
+    }
+
+    public function getFixturesForTeam(Team $team, $date = null): array
+    {
+        $statement = $this->createQueryBuilder('f')
             ->leftJoin('f.club', 'c')
             ->addSelect('c')
             ->where('f.team = :team')
-            ->setParameter('team', $team)
-            ->orderBy('f.date', 'ASC')
+            ->setParameter('team', $team);
+
+        if ($date) {
+            $statement = $statement->andWhere('f.date = :date')
+            ->setParameter(':date', $date . " 12:00:00");
+        }
+
+        return $statement->orderBy('f.date', 'ASC')
             ->getQuery()
             ->getResult();
     }
-    //    /**
-    //     * @return Fixture[] Returns an array of Fixture objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Fixture
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
