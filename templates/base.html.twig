@@ -4,14 +4,29 @@
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <!-- block stylesheets -->
         {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
         {% endblock %}
-
+        <!-- end block stylesheets -->
+        <!-- block js -->
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {{ encore_entry_script_tags('app') }}
         {% endblock %}
+        <!-- end block js -->
     </head>
     <body>
+
+    <h1 class="text-3xl font-bold underline">
+        Hello world!
+    </h1>
+    <div class="mx-auto flex max-w-sm items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+        <img class="size-12 shrink-0" src="/img/logo.svg" alt="ChitChat Logo" />
+        <div>
+            <div class="text-xl font-medium text-black dark:text-white">ChitChat</div>
+            <p class="text-gray-500 dark:text-gray-400">You have a new message!</p>
+        </div>
+    </div>
         {% block body %}{% endblock %}
     </body>
 </html>
