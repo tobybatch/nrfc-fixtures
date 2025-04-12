@@ -19,13 +19,16 @@
                 <th>U16G</th>
                 <th>U18G</th>
             </tr>
-            {% for date, _fixtures in fixtures %}
+            {# fixtures are in a grid, rows by date, cols by team #}
+            {% for date, fixtures_on_date in fixtures %}
                 <tr>
                     <td>{{ date|date('j M y') }}</td>
-                    {% for fixture_list_for_team in _fixtures %}
+                    {# each col is a different team #}
+                    {% for fixtures_by_team in fixtures_on_date %}
                         <td>
-                            {% for f in fixture_list_for_team %}
-                                 {% include './fixture/fixture_detail.html.twig' with { 'fixture': f } %}
+                            {# each date for a team, may have multiple fixtures #}
+                            {% for fixture in fixtures_by_team %}
+                                 {{ fixture }}
                             {% endfor %}
                         </td>
                     {% endfor %}

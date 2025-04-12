@@ -3,13 +3,20 @@
 {% block title %}Hello FixtureController!{% endblock %}
 
 {% block body %}
-    <div>
-        <table>
-            {% for fixture in fixtures %}<tr>
-                <td>{{ fixture.date | date('j M y') }}</td>
-                    <td>{% include './fixture/fixture_detail.html.twig' %}</td>
-                </tr>
-            {% endfor %}
-        </table>
+<div class="min-h-screen max-w-screen-md overflow-x-auto">
+    <!-- Repeating Rows -->
+    <div class="grid min-w-max" style="grid-template-columns: 120px 1fr 50px 120px 65px;">
+        <!-- Header Row -->
+        <div class="bg-gray-200 p-2 border sticky left-0">Date</div>
+        <div class="bg-gray-200 p-2 border break-words">Fixture</div>
+        <div class="bg-gray-200 p-2 border sticky right-0">H/A</div>
+        <div class="bg-gray-200 p-2 border sticky right-0">Competition</div>
+        <div class="bg-gray-200 p-2 border sticky right-0">Score</div>
+
+        {% for fixture in fixtures %}
+            {% include "fixture/fixture_blocks.html.twig" %}
+        {% endfor %}
+
     </div>
+</div>
 {% endblock %}

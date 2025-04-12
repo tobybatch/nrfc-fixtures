@@ -113,4 +113,31 @@ class Fixture
 
         return $this;
     }
+
+    public function __toString() {
+        return $this->format();
+    }
+    public function format(
+        $incHA = true,
+        $incComp = false
+    ): string{
+        $text = "";
+        if (empty($this->getName()) && empty($this->getClub())) {
+            return "";
+        }
+
+        if ($this->getClub() != null) {
+            $text = $this->getClub()->getName();
+        } else {
+            $text = $this->getName();
+        }
+        if ($incHA && $this->getCompetition() != Competition::None) {
+            $text .= " (" . $this->getHomeAway()->value . ")";
+        }
+        if ($incComp) {
+            $text .= " [" . $this->getCompetition()->shortValue() . "]";
+        }
+
+        return $text;
+    }
 }

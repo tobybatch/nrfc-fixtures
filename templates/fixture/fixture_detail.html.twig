@@ -1,5 +1,0 @@
-{% if fixture.club is not null %}
-    {{ fixture.club.name }} ({{ fixture.homeAway.value }}) {{ fixture.competition | shortCompetition }}
-{% else %}
-    {{ fixture.name }} {{ fixture.competition | shortCompetition }}
-{% endif %}

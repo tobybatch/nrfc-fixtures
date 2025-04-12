@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Config\Competition;
+use App\Entity\Fixture;
 use DateTimeImmutable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -15,28 +16,12 @@ class FixtureExtension extends AbstractExtension
         return [
             new TwigFunction('dateIsNew', [$this, 'dateIsNew']),
             new TwigFilter('shortCompetition', [$this, 'shortCompetition']),
+            new TwigFilter('fixtureToString', [$this, 'fixtureToString']),
         ];
     }
 
     public function dateIsNew(DateTimeImmutable $d1, DateTimeImmutable $d2): bool
     {
         return $d1->format('Y-m-d') === $d2->format('Y-m-d');
-    }
-
-    public function shortCompetition(Competition $competition): string
-    {
-        switch ($competition) {
-            case Competition::CountyCup:
-                return "(CC)";
-            case Competition::NationalCup:
-                return "(NC)";
-            case Competition::Pathway:
-            case Competition::Festival:
-            case Competition::Norfolk10s:
-            case Competition::Conference:
-            case Competition::None:
-            case Competition::Friendly:
-                return "";
-        }
     }
 }
