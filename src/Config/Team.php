@@ -15,6 +15,22 @@ enum Team: int
     case U16G = 8;
     case U18G = 9;
 
+    public static function toString(Team $team): string
+    {
+        return match($team) {
+            Team::Minis => "Minis",
+            Team::U13B => "U13B",
+            Team::U14B => "U14B",
+            Team::U15B => "U15B",
+            Team::U16B => "U16B",
+            Team::U18B => "U18B",
+            Team::U12G => "U12G",
+            Team::U14G => "U14G",
+            Team::U16G => "U16G",
+            Team::U18G => "U18G"
+        };
+    }
+
     public static function fromInt(int $int): Team
     {
         return match ($int) {
