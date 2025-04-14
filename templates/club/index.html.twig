@@ -1,27 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Club index{% endblock %}
+{% block title %}All Clubs{% endblock %}
+{% block page_title %}All Clubs{% endblock %}
+
+{% block header %}
+    <a href="{{ path('app_club_new') }}"
+       class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+        Create a new club
+    </a>
+    <a href="#"
+       class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+        Back to listing
+    </a>
+{% endblock %}
 
 {% block body %}
-    <h1>Club index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>actions</th>
-            </tr>
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+        <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+            </th>
+            <th scope="col" class="px-6 py-3 content-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Edit
+            </th>
+            <th scope="col" class="px-6 py-3 content-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Delete
+            </th>
+        </tr>
         </thead>
-        <tbody>
+        <tbody class="bg-white divide-y divide-gray-200">
         {% for club in clubs %}
-            <tr>
-                <td>{{ club.id }}</td>
-                <td>{{ club.name }}</td>
-                <td>
-                    <a href="{{ path('app_club_show', {'id': club.id}) }}">show</a>
-                    <a href="{{ path('app_club_edit', {'id': club.id}) }}">edit</a>
-                </td>
+            {% if loop.index is even %}
+                <tr class="bg-white hover:bg-gray-50">
+            {% else %}
+                <tr class="bg-gray-50 hover:bg-gray-100">
+            {% endif %}
+            <td class="px-6 py-4 whitespace-nowrap">
+                <a href="{{ path('app_club_show', {'id': club.id}) }}"
+                   class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                    {{ club.name }}
+                </a>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <a href="{{ path('app_club_index', {'id': club.id}) }}"
+                   class="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1 rounded-md" title="Edit">✎</a>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-gray-500 text-center">
+                {{ include('club/_delete_form.html.twig') }}
+            </td>
             </tr>
         {% else %}
             <tr>
@@ -31,5 +58,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_club_new') }}">Create new</a>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

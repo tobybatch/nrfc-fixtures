@@ -248,10 +248,6 @@ class NrfcFixturesImportCommand extends Command
             return $club;
         }
 
-        $club = new Club();
-        $club->setName($n);
-        $this->em->persist($club);
-        $this->em->flush();
-        return $club;
+        return false;
     }
 }

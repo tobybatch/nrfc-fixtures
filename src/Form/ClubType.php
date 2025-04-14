@@ -6,6 +6,7 @@ use App\Entity\Club;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ClubType extends AbstractType
 {
@@ -13,6 +14,7 @@ class ClubType extends AbstractType
     {
         $builder
             ->add('name')
+            ->add('address', TextAreaType::class )
         ;
     }
 
