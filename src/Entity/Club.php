@@ -24,6 +24,9 @@ class Club
     #[ORM\OneToMany(targetEntity: Fixture::class, mappedBy: 'club', orphanRemoval: true)]
     private Collection $fixtures;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
+
     public function __construct()
     {
         $this->fixtures = new ArrayCollection();
@@ -72,6 +75,18 @@ class Club
                 $fixture->setClub(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): static
+    {
+        $this->address = $address;
 
         return $this;
     }
