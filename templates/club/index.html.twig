@@ -43,7 +43,7 @@
                 </a>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-center">
-                <a href="{{ path('app_club_index', {'id': club.id}) }}"
+                <a href="{{ path('app_club_edit', {'id': club.id}) }}"
                    class="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1 rounded-md" title="Edit">✎</a>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-500 text-center">
@@ -60,5 +60,3 @@
 
 {% endblock %}
 
-{% block footer %}
-{% endblock %}

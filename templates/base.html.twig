@@ -45,8 +45,11 @@
             </div>
             <div class="p-4 bg-green-50 rounded-lg">
                 {% block footer %}
-                    <h3 class="font-medium text-green-800">Feature Two</h3>
-                    <p class="text-sm text-green-600">Description of this feature goes here.</p>
+                    <h3 class="font-medium text-green-800">Links</h3>
+                    <p class="text-sm text-green-600">
+                        <a href="{{ path('app_fixture_index') }}">Fixtures</a>
+                        <a href="{{ path('app_club_index') }}">Clubs</a>
+                    </p>
                 {% endblock %}
             </div>
         </div>
