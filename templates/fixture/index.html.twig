@@ -3,13 +3,18 @@
 {% block title %}Fixtures{% endblock %}
 {% block page_title %}Fixtures{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/collapse.js"></script>
+{% endblock %}
+
 {% block header %}
     <a href="{{ path('app_fixture_new') }}"
        class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
         Create a new Fixture
     </a>
     <div>
-        FILTER OPTIONS
+
     </div>
 {% endblock %}
 
@@ -60,19 +65,19 @@
             {% else %}
                 <tr class="bg-gray-50 hover:bg-gray-100">
             {% endif %}
-                <td class="px-6 py-4 whitespace-nowrap">{{ date|date('j M y') }}</td>
-                {# each col is a different team #}
-                {% for fixtures_by_team in fixtures_on_date %}
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {# each date for a team, may have multiple fixtures #}
-                        {% for fixture in fixtures_by_team %}
-                            <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
-                               class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                                {{ fixture }}
-                            </a>
-                        {% endfor %}
-                    </td>
-                {% endfor %}
+            <td class="px-6 py-4 whitespace-nowrap">{{ date|date('j M y') }}</td>
+            {# each col is a different team #}
+            {% for fixtures_by_team in fixtures_on_date %}
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {# each date for a team, may have multiple fixtures #}
+                    {% for fixture in fixtures_by_team %}
+                        <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
+                           class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                            {{ fixture }}
+                        </a>
+                    {% endfor %}
+                </td>
+            {% endfor %}
             </tr>
         {% endfor %}
         </tbody>

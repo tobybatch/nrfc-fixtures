@@ -22,13 +22,20 @@ class FixtureType extends AbstractType
             ->add('date', null, [
                 'widget' => 'single_text',
             ])
-            ->add('homeAway', EnumType::class, ['class' => HomeAway::class])
+            ->add('homeAway', EnumType::class, [
+                'class' => HomeAway::class,
+                'placeholder' => HomeAway::TBA->value,
+            ])
             ->add('competition', EnumType::class, ['class' => Competition::class])
-            ->add('team', EnumType::class, ['class' => Team::class])
-            ->add('name')
+            ->add('team', EnumType::class, [
+                'class' => Team::class,
+                'placeholder' => "-- choose team --",
+                'label' => 'Age group'
+            ])
             ->add('club', EntityType::class, [
                 'class' => Club::class,
                 'choice_label' => 'name',
+                'placeholder' => "-- choose club --",
             ])
         ;
     }
