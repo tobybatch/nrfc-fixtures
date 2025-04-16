@@ -1,13 +1,36 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Fixture{% endblock %}
+{% block title %}
+    Edit: {{ fixture | fixtureSummary }}
+    {{ fixture.date|date('Y-m-d') }}
+{% endblock %}
+{% block page_title %}
+    Edit: {{ fixture | fixtureSummary }}
+    {{ fixture.date|date('Y-m-d') }}
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Fixture</h1>
-
     {{ include('fixture/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_fixture_index') }}">back to list</a>
 
-    {{ include('fixture/_delete_form.html.twig') }}
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+        <!-- Back to List Button -->
+        <a href="{{ path('app_fixture_index') }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back to list
+        </a>
+
+        <!-- Back to View Button -->
+        <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back to view
+        </a>
+
+        <!-- Delete Form -->
+        <div class="inline-flex">
+            {% include 'fixture/_delete_form.html.twig' with { 'button_text': 'Delete' } %}
+        </div>
+    </div>
+
 {% endblock %}

@@ -12,12 +12,12 @@
         </tr>
                 {% endif %}
         <tr>
-            <th>Date</th>
-            <td>{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>
+            <th class="text-left pr-2">Date</th>
+            <td class="text-left">{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>
         </tr>
         <tr>
-            <th>Kick off</th>
-            <td>
+            <th class="text-left pr-2">Kick off</th>
+            <td class="text-left">
                 {% if fixture.date is not defined or dateIsNotSet(fixture.date) %}
                     TBA
                 {% else %}
@@ -26,8 +26,8 @@
             </td>
         </tr>
             <tr>
-                <th>Venue</th>
-                <td>
+                <th class="text-left pr-2">Venue</th>
+                <td class="text-left">
                     {% if fixture.homeAway.value == "H" %}
                         Norwich Rugby Club
                     {% elseif fixture.homeAway.value == "A" and fixture.club is defined %}

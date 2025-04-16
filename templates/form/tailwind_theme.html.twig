@@ -17,7 +17,7 @@
 
 {%- block form_label -%}
     {%- set label_attr = label_attr|default({})|merge({
-        class: (label_attr.class|default('') ~ ' block mb-2 text-sm font-medium text-gray-900 dark:text-white')|trim
+        class: (label_attr.class|default('') ~ ' block mb-2 text-sm font-bold text-gray-900 dark:text-white')|trim
     }) -%}
     {{- parent() -}}
 {%- endblock form_label -%}

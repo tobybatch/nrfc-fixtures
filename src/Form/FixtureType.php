@@ -9,6 +9,7 @@ use App\Entity\Club;
 use App\Entity\Fixture;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,7 +28,7 @@ class FixtureType extends AbstractType
             ->add('name')
             ->add('club', EntityType::class, [
                 'class' => Club::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
             ])
         ;
     }
