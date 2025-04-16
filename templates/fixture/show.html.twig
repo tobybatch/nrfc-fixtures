@@ -1,42 +1,62 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Fixture{% endblock %}
+{% block title %}{{ fixture | fixtureSummary }}{% endblock %}
+{% block page_title %}{{ fixture | fixtureSummary }}{% endblock %}
 
 {% block body %}
-    <h1>Fixture</h1>
-
     <table class="table">
         <tbody>
+        {% if fixture.competition.value != "None" %}
+        <tr>
+            <th colspan="2">{{ fixture.competition.value }}</th>
+        </tr>
+                {% endif %}
+        <tr>
+            <th>Date</th>
+            <td>{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>
+        </tr>
+        <tr>
+            <th>Kick off</th>
+            <td>
+                {% if fixture.date is not defined or dateIsNotSet(fixture.date) %}
+                    TBA
+                {% else %}
+                    {{ fixture.date|date('H:i') }}
+                {% endif %}
+            </td>
+        </tr>
             <tr>
-                <th>Id</th>
-                <td>{{ fixture.id }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ fixture.date ? fixture.date|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>HomeAway</th>
-                <td>{{ fixture.homeAway }}</td>
-            </tr>
-            <tr>
-                <th>Competition</th>
-                <td>{{ fixture.competition }}</td>
-            </tr>
-            <tr>
-                <th>Team</th>
-                <td>{{ fixture.team }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ fixture.name }}</td>
+                <th>Venue</th>
+                <td>
+                    {% if fixture.homeAway.value == "H" %}
+                        Norwich Rugby Club
+                    {% elseif fixture.homeAway.value == "A" and fixture.club is defined %}
+                        {{ fixture.club.name }}
+                    {% else %}
+                        To be arranged.
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_fixture_index') }}">back to list</a>
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+        <!-- Back to List Button -->
+        <a href="{{ path('app_fixture_index') }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back to list
+        </a>
 
-    <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}">edit</a>
+        <!-- Edit Button -->
+        <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}"
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Edit
+        </a>
 
-    {{ include('fixture/_delete_form.html.twig') }}
+        <!-- Delete Form -->
+        <div class="inline-flex">
+            {% include 'fixture/_delete_form.html.twig' with { 'button_text': 'Delete' } %}
+        </div>
+    </div>
 {% endblock %}

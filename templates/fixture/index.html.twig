@@ -1,43 +1,81 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Fixture index{% endblock %}
+{% block title %}Fixtures{% endblock %}
+{% block page_title %}Fixtures{% endblock %}
+
+{% block header %}
+    <a href="{{ path('app_fixture_new') }}"
+       class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+        Create a new Fixture
+    </a>
+    <div>
+        FILTER OPTIONS
+    </div>
+{% endblock %}
 
 {% block body %}
-    <h1>Fixture index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>HomeAway</th>
-                <th>Competition</th>
-                <th>Team</th>
-                <th>Name</th>
-                <th>actions</th>
-            </tr>
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+        <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Minis
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U13B
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U14B
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U15B
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U16B
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U18B
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U12G
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U14G
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U16G
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                U18G
+            </th>
+        </tr>
         </thead>
-        <tbody>
-        {% for fixture in fixtures %}
-            <tr>
-                <td>{{ fixture.id }}</td>
-                <td>{{ fixture.date ? fixture.date|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ fixture.homeAway.value }}</td>
-                <td>{{ fixture.competition.value }}</td>
-                <td>{{ fixture.team | teamName }}</td>
-                <td>{{ fixture.name }}</td>
-                <td>
-                    <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}">show</a>
-                    <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
+        <tbody class="bg-white divide-y divide-gray-200">
+        {# fixtures are in a grid, rows by date, cols by team #}
+        {% for date, fixtures_on_date in fixtures %}
+            {% if loop.index is even %}
+                <tr class="bg-white hover:bg-gray-50">
+            {% else %}
+                <tr class="bg-gray-50 hover:bg-gray-100">
+            {% endif %}
+                <td class="px-6 py-4 whitespace-nowrap">{{ date|date('j M y') }}</td>
+                {# each col is a different team #}
+                {% for fixtures_by_team in fixtures_on_date %}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {# each date for a team, may have multiple fixtures #}
+                        {% for fixture in fixtures_by_team %}
+                            <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
+                               class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                {{ fixture }}
+                            </a>
+                        {% endfor %}
+                    </td>
+                {% endfor %}
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_fixture_new') }}">Create new</a>
 {% endblock %}

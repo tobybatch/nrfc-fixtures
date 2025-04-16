@@ -31,7 +31,7 @@ class Fixture
     private Competition $competition;
 
     #[ORM\Column(enumType: Team::class)]
-    private ?Team $team = null;
+    private Team $team;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name = null;

@@ -12,13 +12,18 @@ use Twig\TwigFunction;
 
 class FixtureExtension extends AbstractExtension
 {
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('teamName', [$this, 'teamName']),
+            new TwigFilter('fixtureSummary', [$this, 'fixtureSummary']),
+        ];
+    }
+    public function getFunctions(): array
+    {
+        return [
             new TwigFunction('dateIsNew', [$this, 'dateIsNew']),
-            new TwigFilter('shortCompetition', [$this, 'shortCompetition']),
-            new TwigFilter('fixtureToString', [$this, 'fixtureToString']),
+            new TwigFunction('dateIsNotSet', [$this, 'dateIsNotSet']),
         ];
     }
 
@@ -30,5 +35,36 @@ class FixtureExtension extends AbstractExtension
     public function dateIsNew(DateTimeImmutable $d1, DateTimeImmutable $d2): bool
     {
         return $d1->format('Y-m-d') === $d2->format('Y-m-d');
+    }
+
+    /**
+     * Default tim eof a date is set to 1 minute past midnight, it the time is still
+     * 12:01 then it has not been set, return true. If it's been changed then assume
+     * that is deliberate and return false.
+     *
+     * @param DateTimeImmutable $date
+     * @return bool
+     */
+    public function dateIsNotSet(DateTimeImmutable $date): bool
+    {
+        return $date->format('H:i') != '12:01';
+    }
+
+    public function fixtureSummary(Fixture $fixture): string
+    {
+        if ($fixture->getCompetition() === Competition::None) {
+            return Team::toString($fixture->getTeam()) . ' Training';
+        }
+        elseif ($fixture->getClub() != null) {
+            return sprintf(
+                "%s vs %s (%s)",
+                Team::toString($fixture->getTeam()),
+                $fixture->getClub()->getName(),
+                $fixture->getHomeAway()->value,
+            );
+        }
+        else {
+            return $fixture;
+        }
     }
 }

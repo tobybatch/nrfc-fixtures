@@ -133,7 +133,7 @@ class NrfcFixturesImportCommand extends Command
     {
         $date = DateTimeImmutable::createFromMutable(
             DateTime::createFromFormat('j-M-y', $row[0])
-        )->setTime(12, 0, 0);
+        )->setTime(0, 1, 0);
 
         $this->createFixture(Team::Minis, $date, $row[2]);
         $this->createFixture(Team::U13B, $date, $row[3]);
