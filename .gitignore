@@ -1,0 +1,26 @@
+# DDEV
+.ddev/.ssh
+.ddev/config.*.yaml
+.ddev/commands/.gitignore
+
+# Drupal
+/web/sites/*/settings.local.php
+/web/sites/*/files/
+/web/sites/*/private/
+/web/core
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+
+# Composer
+/vendor/
+/composer.lock
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
