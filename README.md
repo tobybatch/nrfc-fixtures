@@ -7,3 +7,7 @@ xdebug.start_with_request=trigger  # or "yes" if you want it always on
 xdebug.client_port=9003  # Default is 9003 in Xdebug 3
 xdebug.client_host=127.0.0.1
 ```
+
+```
+./bin/console doctrine:fixtures:load
+```

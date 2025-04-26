@@ -34,7 +34,7 @@ class Fixtures extends Fixture
     {
         $commandName = "nrfc:fixtures:import";
         $arguments = [
-            'file' => 'var/fixtures.csv',
+            'file' => 'assets/fixtures.csv',
             '--skip-first' => true,
         ];
 
