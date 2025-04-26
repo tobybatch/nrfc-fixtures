@@ -30,7 +30,7 @@ class FixtureRepository extends ServiceEntityRepository
             ->getResult();
 
         $uniqueDates = array_values(array_unique(array_map(
-            function($row) {
+            function ($row) {
                 return $row['date']->format('Y-m-d');
             },
             $results
@@ -49,8 +49,9 @@ class FixtureRepository extends ServiceEntityRepository
             ->setParameter('team', $team);
 
         if ($date) {
-            $statement = $statement->andWhere('f.date = :date')
-            ->setParameter(':date', $date . " 12:00:00");
+            $statement->andWhere('f.date BETWEEN :start AND :end')
+                ->setParameter('start', $date . " 00:00:00")
+                ->setParameter('end', $date . " 23:59:59");
         }
 
         return $statement->orderBy('f.date', 'ASC')

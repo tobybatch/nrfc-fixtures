@@ -23,24 +23,28 @@ final class FixtureController extends AbstractController
     }
 
     #[Route(name: 'app_fixture_index', methods: ['GET'])]
-    public function index(FixtureRepository $fixtureRepository): Response
+    public function index(Request $request): Response
     {
+        $teams = $request->query->get('teams');
+        if ($teams == null) {
+            // If no teams where passed show them all, this could be neater
+            $teams = range(0,9);
+        } elseif (!is_array($teams)) {
+            $teams = [$teams];
+        }
+
         $fixtures = [];
 
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
-            $fixtures[$date] = [
-                Team::Minis->value => $this->fixtureRepository->getFixturesForTeam(Team::Minis, $date),
-                Team::U13B->value => $this->fixtureRepository->getFixturesForTeam(Team::U13B, $date),
-                Team::U14B->value => $this->fixtureRepository->getFixturesForTeam(Team::U14B, $date),
-                Team::U15B->value => $this->fixtureRepository->getFixturesForTeam(Team::U15B, $date),
-                Team::U16B->value => $this->fixtureRepository->getFixturesForTeam(Team::U16B, $date),
-                Team::U18B->value => $this->fixtureRepository->getFixturesForTeam(Team::U18B, $date),
-                Team::U12G->value => $this->fixtureRepository->getFixturesForTeam(Team::U12G, $date),
-                Team::U14G->value => $this->fixtureRepository->getFixturesForTeam(Team::U14G, $date),
-                Team::U16G->value => $this->fixtureRepository->getFixturesForTeam(Team::U16G, $date),
-                Team::U18G->value => $this->fixtureRepository->getFixturesForTeam(Team::U18G, $date),
-            ];
+            $fixture = [];
+            foreach ($teams as $team) {
+                $fixture[$team] = $this->fixtureRepository->getFixturesForTeam(
+                    Team::fromInt($team),
+                    $date
+                );
+            }
+            $fixtures[$date] = $fixture;
         }
         return $this->render('fixture/index.html.twig', [
             'fixtures' => $fixtures,
