@@ -15,6 +15,21 @@ enum Team: string
     case U16G = "U16G";
     case U18G = "U18G";
 
+    public static function getBy($value): ?Team
+    {
+        return match ($value) {
+            "Minis" => self::Minis,
+            "U13B" => self::U13B,
+            "U14B" => self::U14B,
+            "U15B" => self::U15B,
+            "U16B" => self::U16B,
+            "U18B" => self::U18B,
+            "U12G" => self::U12G,
+            "U14G" => self::U14G,
+            "U16G" => self::U16G,
+            "U18G" => self::U18G,
+        };
+    }
 //    public static function toString(Team $team): string
 //    {
 //        return match($team) {

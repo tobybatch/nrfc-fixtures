@@ -32,7 +32,7 @@ final class FixtureController extends AbstractController
             // If no teams where passed show them all
             $teams = Team::cases();
         } elseif (!is_array($teams)) {
-            $teams = [$teams];
+            $teams = [Team::getBy($teams)];
         }
 
         // build the select form
@@ -42,6 +42,7 @@ final class FixtureController extends AbstractController
         }
         $teamChoseForm = $this->createForm(TeamVisibilityType::class, null, [
             'teams' => $teamChoices,
+            'data' => array_map(function($t) { return $t->value; }, $teams),
         ]);
 
         $fixtures = [];

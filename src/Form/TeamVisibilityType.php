@@ -14,14 +14,16 @@ class TeamVisibilityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $teams = $options['teams'];
+        $data = $options['data'];
 
         $builder
             ->add('teams', ChoiceType::class, [
                 'label' => 'Select teams to display ≡',
-                'choices' => array_flip($teams),
+                'choices' => $teams,
                 'multiple' => true,
                 'expanded' => true,
                 'required' => false,
+                'data' => $data,
             ]);
     }
 
