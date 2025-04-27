@@ -15,7 +15,7 @@ class FixtureExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('teamName', [$this, 'teamName']),
+//            new TwigFilter('teamName', [$this, 'teamName']),
             new TwigFilter('fixtureSummary', [$this, 'fixtureSummary']),
         ];
     }
@@ -27,13 +27,10 @@ class FixtureExtension extends AbstractExtension
         ];
     }
 
-    public function teamName(Team|int $team): string
-    {
-        if (is_int($team)) {
-            $team = Team::fromInt($team);
-        }
-        return Team::toString($team);
-    }
+//    public function teamName(Team $team): string
+//    {
+//        return $team->value;
+//    }
 
     public function dateIsNew(DateTimeImmutable $d1, DateTimeImmutable $d2): bool
     {
@@ -56,12 +53,12 @@ class FixtureExtension extends AbstractExtension
     public function fixtureSummary(Fixture $fixture): string
     {
         if ($fixture->getCompetition() === Competition::None) {
-            return Team::toString($fixture->getTeam()) . ' Training';
+            return $fixture->getTeam()->value . ' Training';
         }
         elseif ($fixture->getClub() != null) {
             return sprintf(
                 "%s vs %s (%s)",
-                Team::toString($fixture->getTeam()),
+                $fixture->getTeam()->value,
                 $fixture->getClub()->getName(),
                 $fixture->getHomeAway()->value,
             );

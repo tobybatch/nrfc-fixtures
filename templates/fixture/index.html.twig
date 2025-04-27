@@ -29,7 +29,9 @@
             </th>
             {% for team in teams %}
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ team | teamName }}
+                <a href="{{ path('app_fixture_index') }}?team={{ team.value }}">
+                    {{ team.value }}
+                </a>
             </th>
             {% endfor %}
         </tr>

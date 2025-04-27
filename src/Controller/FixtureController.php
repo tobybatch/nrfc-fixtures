@@ -30,7 +30,7 @@ final class FixtureController extends AbstractController
         $teams = $request->query->get('team');
         if ($teams == null) {
             // If no teams where passed show them all
-            $teams = range(0, count(Team::cases())-1);
+            $teams = Team::cases();
         } elseif (!is_array($teams)) {
             $teams = [$teams];
         }
@@ -49,10 +49,7 @@ final class FixtureController extends AbstractController
         foreach ($dates as $date) {
             $fixture = [];
             foreach ($teams as $team) {
-                $t = Team::fromInt($team);
-                if ($t != null) {
-                    $fixture[$team] = $this->fixtureRepository->getFixturesForTeam($t, $date);
-                }
+                $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
             }
             $fixtures[$date] = $fixture;
         }
