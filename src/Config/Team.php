@@ -31,7 +31,7 @@ enum Team: int
         };
     }
 
-    public static function fromInt(int $int): Team
+    public static function fromInt(int $int): Team|null
     {
         return match ($int) {
             0 => Team::Minis,

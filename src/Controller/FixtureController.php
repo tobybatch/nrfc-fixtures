@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Config\Team;
 use App\Entity\Fixture;
 use App\Form\FixtureType;
+use App\Form\TeamVisibilityType;
 use App\Repository\FixtureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,31 +23,42 @@ final class FixtureController extends AbstractController
         $this->fixtureRepository = $fixtureRepository;
     }
 
-    #[Route(name: 'app_fixture_index', methods: ['GET'])]
+    #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
-        $teams = $request->query->get('teams');
+        // Get teams that are selected to shown
+        $teams = $request->query->get('team');
         if ($teams == null) {
-            // If no teams where passed show them all, this could be neater
-            $teams = range(0,9);
+            // If no teams where passed show them all
+            $teams = range(0, count(Team::cases())-1);
         } elseif (!is_array($teams)) {
             $teams = [$teams];
         }
 
-        $fixtures = [];
+        // build the select form
+        $teamChoices = [];
+        foreach (Team::cases() as $t) {
+            $teamChoices[$t->value] = $t->name;
+        }
+        $teamChoseForm = $this->createForm(TeamVisibilityType::class, null, [
+            'teams' => $teamChoices,
+        ]);
 
+        $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
             $fixture = [];
             foreach ($teams as $team) {
-                $fixture[$team] = $this->fixtureRepository->getFixturesForTeam(
-                    Team::fromInt($team),
-                    $date
-                );
+                $t = Team::fromInt($team);
+                if ($t != null) {
+                    $fixture[$team] = $this->fixtureRepository->getFixturesForTeam($t, $date);
+                }
             }
             $fixtures[$date] = $fixture;
         }
         return $this->render('fixture/index.html.twig', [
+            'teamChoseForm' => $teamChoseForm,
+            'teams' => $teams,
             'fixtures' => $fixtures,
         ]);
     }

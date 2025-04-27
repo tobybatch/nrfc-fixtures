@@ -27,8 +27,11 @@ class FixtureExtension extends AbstractExtension
         ];
     }
 
-    public function teamName(Team $team): string
+    public function teamName(Team|int $team): string
     {
+        if (is_int($team)) {
+            $team = Team::fromInt($team);
+        }
         return Team::toString($team);
     }
 
