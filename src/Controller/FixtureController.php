@@ -26,24 +26,18 @@ final class FixtureController extends AbstractController
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
-        // Get teams that are selected to shown
-        $teams = $request->query->get('team');
-        if ($teams == null) {
-            // If no teams where passed show them all
-            $teams = Team::cases();
-        } elseif (!is_array($teams)) {
-            $teams = [Team::getBy($teams)];
+        $teams = [];
+
+        if ($request->isMethod('GET')) {
+            $team = $request->query->get('team');
+            if ($team !== null) {
+                $teams = [Team::getBy($team)];
+            }
         }
 
-        // build the select form
-        $teamChoices = [];
-        foreach (Team::cases() as $t) {
-            $teamChoices[$t->value] = $t->name;
+        if (count($teams) === 0) {
+            $teams = Team::cases();
         }
-        $teamChoseForm = $this->createForm(TeamVisibilityType::class, null, [
-            'teams' => $teamChoices,
-            'data' => array_map(function($t) { return $t->value; }, $teams),
-        ]);
 
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
@@ -55,7 +49,6 @@ final class FixtureController extends AbstractController
             $fixtures[$date] = $fixture;
         }
         return $this->render('fixture/index.html.twig', [
-            'teamChoseForm' => $teamChoseForm,
             'teams' => $teams,
             'fixtures' => $fixtures,
         ]);

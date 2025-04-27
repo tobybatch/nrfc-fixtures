@@ -1,4 +1,5 @@
 @import url("tailwindcss");
+@import url("flowbite");
 
 body {
     background-color: lightgray;

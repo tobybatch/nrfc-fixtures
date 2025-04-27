@@ -9,15 +9,18 @@
 {% endblock %}
 
 {% block header %}
-    <a href="{{ path('app_fixture_new') }}">
-        {% include '_shared/blue_button.html.twig' with { 'button_text': 'Create a new Fixture' } %}
-    </a>
-    <div>
-        {% form_theme teamChoseForm 'form/team_slector_form.html.twig' %}
-        {{ form_start(teamChoseForm) }}
-        {{ form(teamChoseForm) }}
-        {{ form_end(teamChoseForm) }}
+    <div class="mb-2">
+        <a href="{{ path('app_fixture_new') }}">
+            {% include '_shared/blue_button.html.twig' with { 'button_text': 'Create a new Fixture' } %}
+        </a>
     </div>
+    {%  if teams | length == 1 %}
+    <div class="mb-2">
+        <a href="{{ path('app_fixture_index') }}">
+            {% include '_shared/white_button.html.twig' with { 'button_text': 'Show all fixtures' } %}
+        </a>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
