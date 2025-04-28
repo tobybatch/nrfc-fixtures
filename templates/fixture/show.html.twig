@@ -7,10 +7,10 @@
     <table class="table">
         <tbody>
         {% if fixture.competition.value != "None" %}
-        <tr>
-            <th colspan="2">{{ fixture.competition.value }}</th>
-        </tr>
-                {% endif %}
+            <tr>
+                <th colspan="2">{{ fixture.competition.value }}</th>
+            </tr>
+        {% endif %}
         <tr>
             <th class="text-left pr-2">Date</th>
             <td class="text-left">{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>
@@ -25,18 +25,18 @@
                 {% endif %}
             </td>
         </tr>
-            <tr>
-                <th class="text-left pr-2">Venue</th>
-                <td class="text-left">
-                    {% if fixture.homeAway.value == "H" %}
-                        Norwich Rugby Club
-                    {% elseif fixture.homeAway.value == "A" and fixture.club is defined %}
-                        {{ fixture.club.name }}
-                    {% else %}
-                        To be arranged.
-                    {% endif %}
-                </td>
-            </tr>
+        <tr>
+            <th class="text-left pr-2">Venue</th>
+            <td class="text-left">
+                {% if fixture.homeAway.value == "H" %}
+                    Norwich Rugby Club
+                {% elseif fixture.homeAway.value == "A" and fixture.club is defined %}
+                    {{ fixture.club.name }}
+                {% else %}
+                    To be arranged.
+                {% endif %}
+            </td>
+        </tr>
         </tbody>
     </table>
 
@@ -48,15 +48,17 @@
             Back to list
         </a>
 
-        <!-- Edit Button -->
-        <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}"
-           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Edit
-        </a>
+        {% if app.user is not null and 'ROLE_ADMIN' in app.user.roles %}
+            <!-- Edit Button -->
+            <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}"
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Edit
+            </a>
 
-        <!-- Delete Form -->
-        <div class="inline-flex">
-            {% include 'fixture/_delete_form.html.twig' with { 'button_text': 'Delete' } %}
-        </div>
+            <!-- Delete Form -->
+            <div class="inline-flex">
+                {% include 'fixture/_delete_form.html.twig' with { 'button_text': 'Delete' } %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

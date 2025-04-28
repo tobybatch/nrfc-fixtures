@@ -4,13 +4,14 @@ namespace App\Controller;
 
 use App\Config\Team;
 use App\Entity\Fixture;
+use App\Entity\User;
 use App\Form\FixtureType;
-use App\Form\TeamVisibilityType;
 use App\Repository\FixtureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/fixture')]
