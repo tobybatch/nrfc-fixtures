@@ -1,8 +1,10 @@
 <header class="bg-primary text-white py-4 shadow-md">
     <div class="container mx-auto px-4 flex justify-between items-center">
         <div class="text-center">
-            <div class="text-2xl font-bold mb-1">{% block logo %}Your Logo{% endblock %}</div>
-            <div class="text-sm">{% block tagline %}Fixtures for {{ date('Y') }}/{{ date('y') }}{% endblock %}</div>
+            <div class="text-2xl font-bold mb-1">
+                <img class="inline" src="{{ asset('/static/images/LionHead-h50.png') }}" alt="Lion head" />
+                <span class="text-sm inline">Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}</span>
+            </div>
         </div>
 
         <div class="flex items-center space-x-4">
