@@ -2,6 +2,8 @@
 // src/Controller/LoginController.php
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\LoginFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,9 +18,11 @@ class LoginController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        $loginForm = $this->createForm(LoginFormType::class, null);
+
         return $this->render('login/index.html.twig', [
             'controller_name' => 'LoginController',
-            'last_username' => $lastUsername,
+            'loginForm' => $loginForm,
             'error' => $error,
         ]);
     }
