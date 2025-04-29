@@ -36,7 +36,7 @@ security:
     access_control:
         - { path: .*/new\b$, roles: ROLE_ADMIN }
         - { path: .*/edit\b$, roles: ROLE_ADMIN }
-        - { path: ^.*$, roles: ROLE_ADMIN, methods: [PATCH, POST, PUT, DELETE] }
+        - { path: ^.*$, roles: ROLE_ADMIN, methods: [DELETE] }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 

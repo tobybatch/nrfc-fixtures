@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>NRFC Fixtures: {% block title %}Welcome!{% endblock %}</title>
@@ -10,7 +10,6 @@
             rel="stylesheet"
     />
 
-    <!-- Font Awesome Link -->
     <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
@@ -30,11 +29,38 @@
 </head>
 <body class="min-h-screen bg-gray-50 flex flex-col">
 
+<header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
+            <!-- Logo/Title -->
+            <div class="flex justify-start lg:w-0 lg:flex-1">
+                <h1 class="text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
+                    NRFC Fixtures
+                </h1>
+            </div>
 
-<!-- Optional Header -->
-<header class="bg-white shadow-sm py-4">
-    <div class="container mx-auto px-4">
-        <h1 class="text-2xl font-bold text-gray-800">NRFC Fixtures</h1>
+            <!-- Login/Logout Button -->
+            <div class="flex items-center justify-end md:flex-1 lg:w-0">
+                {% if app.user is null %}
+                    <a href="{{ path('app_login') }}">
+                    <button class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+                        Login
+                    </button>
+                    </a>
+                    <a href="{{ path('app_register') }}">
+                        <button class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+                        Register
+                    </button>
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_logout') }}">
+                        <button class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+                        Logout
+                    </button>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </header>
 
