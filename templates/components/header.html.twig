@@ -1,0 +1,26 @@
+<header class="bg-primary text-white py-4 shadow-md">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="text-center">
+            <div class="text-2xl font-bold mb-1">{% block logo %}Your Logo{% endblock %}</div>
+            <div class="text-sm">{% block tagline %}Company Tagline{% endblock %}</div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            {% if app.user %}
+                <div class="hidden md:block text-sm">
+                    Welcome, {{ app.user.userIdentifier }}
+                </div>
+                <a href="{{ path('app_logout') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded text-sm">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded text-sm">
+                    Login
+                </a>
+                <a href="{{ path('app_register') }}" class="hidden md:block bg-secondary hover:bg-tertiary text-white font-bold py-2 px-4 rounded text-sm">
+                    Register
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</header>

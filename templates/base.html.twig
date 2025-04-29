@@ -2,103 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NRFC Fixtures: {% block title %}Welcome!{% endblock %}</title>
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-    <link
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            rel="stylesheet"
-    />
-
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-            integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
-            crossorigin="anonymous"
-    />
-    <!-- block stylesheets -->
-    {% block stylesheets %}
-        {{ encore_entry_link_tags('app') }}
-    {% endblock %}
-    <!-- end block stylesheets -->
-    <!-- block js -->
-    {% block javascripts %}
-        {{ encore_entry_script_tags('app') }}
-    {% endblock %}
-    <!-- end block js -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Data Display App{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#731018',
+                        secondary: '#115938',
+                        tertiary: '#1C402C',
+                        accent: '#F2921D',
+                        light: '#F2F2F2',
+                    }
+                }
+            }
+        }
+    </script>
+    {% block stylesheets %}{% endblock %}
 </head>
-<body class="min-h-screen bg-gray-50 flex flex-col">
+<body class="bg-light text-gray-800 font-sans leading-relaxed">
 
-<header class="bg-white shadow-sm sticky top-0 z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
-            <!-- Logo/Title -->
-            <div class="flex justify-start lg:w-0 lg:flex-1">
-                <h1 class="text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
-                    NRFC Fixtures
-                </h1>
-            </div>
-
-            <!-- Login/Logout Button -->
-            <div class="flex items-center justify-end md:flex-1 lg:w-0">
-                {% if app.user is null %}
-                    <a href="{{ path('app_login') }}">
-                    <button class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
-                        Login
-                    </button>
-                    </a>
-                    <a href="{{ path('app_register') }}">
-                        <button class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
-                        Register
-                    </button>
-                    </a>
-                {% else %}
-                    <a href="{{ path('app_logout') }}">
-                        <button class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
-                        Logout
-                    </button>
-                    </a>
-                {% endif %}
-            </div>
-        </div>
+{% for message in app.flashes('success') %}
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+        {{ message }}
     </div>
-</header>
-
-<!-- Main Content Area -->
-<main class="flex-grow flex items-center mx-auto justify-center p-4">
-    <div class="w-full mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 sm:p-8">
-        <!-- Content goes here -->
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">
-            {% block page_title %}Title here{% endblock %}
-        </h2>
-        <p class="text-gray-600 mb-6">
-            {% block header %}{% endblock %}
-        </p>
-        <div class="space-y-4">
-            <div class="p-4 bg-blue-50 rounded-lg">
-                {% block body %}
-                    <h3 class="font-medium text-blue-800">Feature One</h3>
-                    <p class="text-sm text-blue-600">Description of this feature goes here.</p>
-                {% endblock %}
-            </div>
-            <div class="p-4 bg-green-50 rounded-lg">
-                {% block footer %}
-                    <h3 class="font-medium text-green-800">Links</h3>
-                    <p class="text-sm text-green-600">
-                        <a href="{{ path('app_fixture_index') }}">Fixtures</a>
-                        <a href="{{ path('app_club_index') }}">Clubs</a>
-                    </p>
-                {% endblock %}
-            </div>
-        </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+        {{ message }}
     </div>
+{% endfor %}
+
+<!-- Header -->
+{% include 'components/header.html.twig' %}
+
+<!-- Navigation -->
+{% include 'components/navbar.html.twig' %}
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-6 min-h-[calc(100vh-180px)]">
+    {% block body %}{% endblock %}
 </main>
 
-<!-- Optional Footer -->
-<footer class="bg-gray-100 py-4">
-    <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-        &copy; 2023 Your Company. All rights reserved.
-    </div>
-</footer>
+<!-- Footer -->
+{% include 'components/footer.html.twig' %}
+
+
+{% block javascripts %}{% endblock %}
 </body>
 </html>

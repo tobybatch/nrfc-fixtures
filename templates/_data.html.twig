@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Data Overview{% endblock %}
+
+{% block body %}
+    <h1 class="text-primary text-2xl font-bold mb-6 text-center">Data Overview</h1>
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-primary text-2xl font-bold">Data Overview</h1>
+        <a href="{{ path('app_data_new') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Create New
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+            <thead class="bg-tertiary text-white">
+            <tr>
+                <th class="py-3 px-4 text-left">ID</th>
+                <th class="py-3 px-4 text-left">Name</th>
+                <th class="py-3 px-4 text-left">Category</th>
+                <th class="py-3 px-4 text-left">Value</th>
+                <th class="py-3 px-4 text-left">Status</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+            {% for item in data %}
+                <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
+                    <td class="py-3 px-4">{{ item.id }}</td>
+                    <td class="py-3 px-4">{{ item.name }}</td>
+                    <td class="py-3 px-4">{{ item.category }}</td>
+                    <td class="py-3 px-4">{{ item.value }}</td>
+                    <td class="py-3 px-4
+                            {% if item.status == 'Active' %}text-green-600
+                            {% elseif item.status == 'Completed' %}text-blue-600
+                            {% else %}text-yellow-600{% endif %}">
+                        {{ item.status }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

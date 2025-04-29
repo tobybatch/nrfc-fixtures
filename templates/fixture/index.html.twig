@@ -1,71 +1,55 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Fixtures{% endblock %}
-{% block page_title %}Fixtures{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/collapse.js"></script>
-{% endblock %}
-
-{% block header %}
-    {% if app.user is not null and 'ROLE_ADMIN' in app.user.roles %}
-        <div class="mb-2">
-            <a href="{{ path('app_fixture_new') }}">
-                {% include '_shared/blue_button.html.twig' with { 'button_text': 'Create a new Fixture' } %}
-            </a>
-        </div>
-    {% endif %}
-    {% if teams | length == 1 %}
-        <div class="mb-2">
-            <a href="{{ path('app_fixture_index') }}">
-                {% include '_shared/white_button.html.twig' with { 'button_text': 'Show all fixtures' } %}
-            </a>
-        </div>
-    {% endif %}
-{% endblock %}
 
 {% block body %}
-    {{ dump(app.user) }}
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-        <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-            </th>
-            {% for team in teams %}
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <a href="{{ path('app_fixture_index') }}?team={{ team.value }}">
-                        {{ team.value }}
-                    </a>
-                </th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-        {# fixtures are in a grid, rows by date, cols by team #}
-        {% for date, fixtures_on_date in fixtures %}
-            {% if loop.index is even %}
-                <tr class="bg-white hover:bg-gray-50">
-            {% else %}
-                <tr class="bg-gray-50 hover:bg-gray-100">
-            {% endif %}
-            <td class="px-6 py-4 whitespace-nowrap">{{ date|date('j M y') }}</td>
-            {# each col is a different team #}
-            {% for fixtures_by_team in fixtures_on_date %}
-                <td class="px-6 py-4 whitespace-nowrap">
-                    {# each date for a team, may have multiple fixtures #}
-                    {% for fixture in fixtures_by_team %}
-                        <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
-                           class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                            {{ fixture }}
-                        </a>
-                    {% endfor %}
-                </td>
-            {% endfor %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-primary text-2xl font-bold">Data Overview</h1>
+        <a href="" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                      clip-rule="evenodd"/>
+            </svg>
+            Create New
+        </a>
+    </div>
 
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+            <thead class="bg-tertiary text-white">
+            <tr>
+                <th class="py-3 px-4 text-left">
+                    Date
+                </th>
+                {% for team in teams %}
+                    <th class="py-3 px-4 text-left underline">
+                        <a href="{{ path('app_fixture_index') }}?team={{ team.value }}">
+                            {{ team.value }}
+                        </a>
+                    </th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+            {% for date, fixtures_on_date in fixtures %}
+                <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
+                    <td class="py-3 px-4 no-wrap">{{ date|date('j M y') }}</td>
+                    {# each col is a different team #}
+                    {% for fixtures_by_team in fixtures_on_date %}
+                        <td class="py-3 px-4">
+                            {# each date for a team, may have multiple fixtures #}
+                            {% for fixture in fixtures_by_team %}
+                                <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
+                                   class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                    {{ fixture }}
+                                </a>
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
