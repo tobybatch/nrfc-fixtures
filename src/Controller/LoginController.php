@@ -73,6 +73,7 @@ class LoginController extends AbstractController
                 ->from(new Address('no-reply@norwichrugby.com', 'Norwich Rugby admin bot'))
                 ->to((string) $user->getEmail())
                 ->subject('Login to NRFC Fixture')
+                ->text(sprintf('Follow this link to login automatically: %s', $loginLink))
                 ->htmlTemplate('login/magic_login_link_email.html.twig')
                 ->context([
                         'loginLink' => $loginLink
