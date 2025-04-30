@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+
+    <div>Success, check your email to verify you email address.</div>
+    <div>You can login right away
+        <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="{{ path("app_login") }}">here</a>.
+    </div>
+
+{% endblock %}
