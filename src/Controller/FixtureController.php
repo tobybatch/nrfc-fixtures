@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/fixture')]
+#[Route('/')]
 final class FixtureController extends AbstractController
 {
     private FixtureRepository $fixtureRepository;
