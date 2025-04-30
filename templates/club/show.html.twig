@@ -5,9 +5,24 @@
 
 {% block body %}
     <!-- Club Address -->
-    <div class="text-gray-600 mb-6 flex items-start">
+    <div class="text-gray-600 mb-6">
 
-        {{ club.address }}
+        <div class="flex-row mb-10">
+            {{ club.address }}
+            <a href="https://www.google.com/maps/search/?api=1&query={{ club.address | url_encode }}" target='_blank'
+               class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                ↗️
+            </a>
+        </div>
+
+        <div class="flex-row">
+        {% if map %}
+            <div>
+                {{ ux_map(map, { style: 'height: 300px; width: 300px' }) }}
+            </div>
+        {% endif %}
+        </div>
+
     </div>
 
     <!-- Action Buttons -->

@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\UX\Map\Map;
+use Symfony\UX\Map\Marker;
+use Symfony\UX\Map\Point;
 
 #[Route('/club')]
 final class ClubController extends AbstractController
@@ -45,8 +48,19 @@ final class ClubController extends AbstractController
     #[Route('/{id}', name: 'app_club_show', methods: ['GET'])]
     public function show(Club $club): Response
     {
+        $myMap = false;
+        if ($club->getLatitude() && $club->getLongitude()) {
+            $point = new Point($club->getLatitude(), $club->getLongitude());
+            $myMap = (new Map())->center($point)
+                ->zoom(10)
+                ->addMarker(new Marker(
+                    position: $point,
+                    title: $club->getName(),
+                ));
+        }
         return $this->render('club/show.html.twig', [
             'club' => $club,
+            'map' => $myMap,
         ]);
     }
 
@@ -71,7 +85,7 @@ final class ClubController extends AbstractController
     #[Route('/{id}', name: 'app_club_delete', methods: ['POST'])]
     public function delete(Request $request, Club $club, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$club->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $club->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($club);
             $entityManager->flush();
         }

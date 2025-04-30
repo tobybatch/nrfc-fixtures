@@ -15,6 +15,9 @@ Encore
     // only needed for CDN's or subdirectory deploy
     //.setManifestKeyPrefix('build/')
 
+    .addAliases({
+      'leaflet/dist/leaflet.min.css': 'leaflet/dist/leaflet.css',
+    })
     /*
      * ENTRY CONFIG
      *

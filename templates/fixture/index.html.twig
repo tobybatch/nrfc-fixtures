@@ -4,8 +4,9 @@
 
 {% block body %}
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-primary text-2xl font-bold">Data Overview</h1>
-        <a href="" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-center">
+        <h1 class="text-primary text-2xl font-bold">Fixtures</h1>
+        {% if app.user is not null and 'ROLE_ADMIN' in app.user.roles %}
+        <a href="{{ path('app_fixture_new') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd"
                       d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
@@ -13,6 +14,7 @@
             </svg>
             Create New
         </a>
+        {% endif %}
     </div>
 
     <div class="overflow-x-auto">
@@ -34,7 +36,7 @@
             <tbody class="divide-y divide-gray-200">
             {% for date, fixtures_on_date in fixtures %}
                 <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
-                    <td class="py-3 px-4 no-wrap">{{ date|date('j M y') }}</td>
+                    <td class="py-3 px-4 whitespace-nowrap">{{ date|date('j M y') }}</td>
                     {# each col is a different team #}
                     {% for fixtures_by_team in fixtures_on_date %}
                         <td class="py-3 px-4">

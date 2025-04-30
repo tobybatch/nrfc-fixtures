@@ -36,5 +36,4 @@ symfony serve
 # TODO
 
  1. Fix route name
- 2. Fix route mount points
-3. check magic link detail in security.yaml, https://symfony.com/doc/current/security/login_link.html
+ 2. check magic link detail in security.yaml, https://symfony.com/doc/current/security/login_link.html

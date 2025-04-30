@@ -1,14 +1,16 @@
 <nav class="bg-secondary py-2">
-    <ul class="flex justify-left sm:flex-row flex-col items-center">
-        <li><a href=""
-               class="text-white px-4 py-2 rounded hover:bg-tertiary transition block w-full text-center">
-                Fixtures
-            </a>
-        </li>
-        <li><a href=""
-               class="text-white px-4 py-2 rounded hover:bg-tertiary transition block w-full text-center">
-                Clubs
-            </a>
-        </li>
-    </ul>
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <ul class="flex justify-left sm:flex-row flex-col items-center">
+            <li><a href="{{ path('app_fixture_index') }}"
+                   class="text-white px-4 py-2 rounded hover:bg-tertiary transition block w-full text-center">
+                    Fixtures
+                </a>
+            </li>
+            <li><a href="{{ path('app_club_index') }}"
+                   class="text-white px-4 py-2 rounded hover:bg-tertiary transition block w-full text-center">
+                    Clubs
+                </a>
+            </li>
+        </ul>
+    </div>
 </nav>
