@@ -16,9 +16,13 @@ class LoginFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('_username', TextType::class, [ 'label' => 'Email' ])
+            ->add('_username', TextType::class, [
+                'label' => 'Email',
+                'attr' => ['autocomplete' => 'username email']
+            ])
             ->add('_password', PasswordType::class, [
                 'mapped' => false,
+                'attr' => ['autocomplete' => 'current-password'],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
@@ -32,6 +36,13 @@ class LoginFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'csrf_field_name' => '_csrf_token',
+            'csrf_token_id' => 'authenticate',
         ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return ''; // This removes the form name prefix entirely
     }
 }

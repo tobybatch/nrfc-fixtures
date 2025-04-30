@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<form action="{{ path('app_magic_login') }}" method="POST">
+    <label for="email">Email:
+        <input type="email" name="email">
+    </label>
+    <button type="submit">Send Login Link</button>
+</form>
+{% endblock %}

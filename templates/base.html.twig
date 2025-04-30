@@ -24,6 +24,12 @@
 </head>
 <body class="bg-light text-gray-800 font-sans leading-relaxed">
 
+<!-- Header -->
+{% include 'components/header.html.twig' %}
+
+<!-- Navigation -->
+{% include 'components/navbar.html.twig' %}
+
 {% for message in app.flashes('success') %}
     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
         {{ message }}
@@ -34,12 +40,6 @@
         {{ message }}
     </div>
 {% endfor %}
-
-<!-- Header -->
-{% include 'components/header.html.twig' %}
-
-<!-- Navigation -->
-{% include 'components/navbar.html.twig' %}
 
 <!-- Main Content -->
 <main class="container mx-auto px-4 py-6 min-h-[calc(100vh-180px)]">
