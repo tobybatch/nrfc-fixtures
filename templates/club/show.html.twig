@@ -15,12 +15,20 @@
             </a>
         </div>
 
-        <div class="flex-row">
-        {% if map %}
-            <div>
-                {{ ux_map(map, { style: 'height: 300px; width: 300px' }) }}
+        {% if club.notes %}
+            <div class="mb-6">
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200 whitespace-pre-wrap">
+                    {{ club.notes }}
+                </div>
             </div>
         {% endif %}
+
+        <div class="flex-row">
+            {% if map %}
+                <div>
+                    {{ ux_map(map, { style: 'height: 300px; width: 300px' }) }}
+                </div>
+            {% endif %}
         </div>
 
     </div>
