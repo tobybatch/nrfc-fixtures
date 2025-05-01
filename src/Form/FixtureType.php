@@ -33,9 +33,11 @@ class FixtureType extends AbstractType
                 'label' => 'Age group'
             ])
             ->add('club', EntityType::class, [
+                'label' => 'Opponent/Training',
                 'class' => Club::class,
+                'required' => false,
                 'choice_label' => 'name',
-                'placeholder' => "-- choose club --",
+                'placeholder' => "Training",
             ])
         ;
     }
