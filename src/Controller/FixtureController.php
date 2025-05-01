@@ -75,7 +75,7 @@ final class FixtureController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_fixture_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_fixture_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(Fixture $fixture): Response
     {
         return $this->render('fixture/show.html.twig', [

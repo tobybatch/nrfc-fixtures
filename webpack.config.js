@@ -7,6 +7,9 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 }
 
 Encore
+    .addAliases({
+        'leaflet/dist/leaflet.min.css': 'leaflet/dist/leaflet.css',
+    })
     .enablePostCssLoader()
     // directory where compiled assets will be stored
     .setOutputPath('public/build/')
@@ -15,9 +18,7 @@ Encore
     // only needed for CDN's or subdirectory deploy
     //.setManifestKeyPrefix('build/')
 
-    .addAliases({
-      'leaflet/dist/leaflet.min.css': 'leaflet/dist/leaflet.css',
-    })
+
     /*
      * ENTRY CONFIG
      *
