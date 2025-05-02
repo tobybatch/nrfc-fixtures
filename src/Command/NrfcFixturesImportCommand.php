@@ -168,7 +168,7 @@ class NrfcFixturesImportCommand extends Command
     private function parseDetail(string $detail)
     {
         if (in_array(strtolower(trim($detail)), ['training', 'skills session'])) {
-            return ["Training", Competition::None, HomeAway::Home, null];
+            return ["Training", Competition::Training, HomeAway::Home, null];
         }
 
         // is CB or Pathway

@@ -64,7 +64,7 @@ class FixtureExtension extends AbstractExtension
             );
         }
         else {
-            return $fixture;
+            return $fixture->getTeam()->value . " " . $fixture;
         }
     }
 }

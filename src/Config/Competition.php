@@ -5,6 +5,7 @@ namespace App\Config;
 enum Competition: string
 {
     case None = 'None';
+    case Training = 'Training';
     case Friendly = 'Friendly';
     case CountyCup = 'CountyCup';
     case Pathway = 'Pathway';

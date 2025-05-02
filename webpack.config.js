@@ -7,9 +7,6 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 }
 
 Encore
-    .addAliases({
-        'leaflet/dist/leaflet.min.css': 'leaflet/dist/leaflet.css',
-    })
     .enablePostCssLoader()
     // directory where compiled assets will be stored
     .setOutputPath('public/build/')
@@ -86,7 +83,10 @@ Encore
             "**/vendor",
             "**/*.log",
         ];
+    })
+    .addAliases({
+        'leaflet/dist/leaflet.min.css': 'leaflet/dist/leaflet.css',
     });
-;
+
 
 module.exports = Encore.getWebpackConfig();

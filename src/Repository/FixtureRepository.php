@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Config\Team;
 use App\Entity\Fixture;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -58,4 +59,22 @@ class FixtureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param DateTimeImmutable $startDate
+     * @param DateTimeImmutable $endDate
+     * @return Fixture[] Returns an array of Fixture objects
+     */
+    public function findByDateRange(
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate
+    ): array
+{
+    return $this->createQueryBuilder('f')
+        ->where('f.date BETWEEN :start AND :end')
+        ->setParameter('start', $startDate)
+        ->setParameter('end', $endDate)
+        ->getQuery()
+        ->getResult();
+}
 }
