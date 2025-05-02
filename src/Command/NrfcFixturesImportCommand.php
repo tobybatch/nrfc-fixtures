@@ -25,7 +25,7 @@ use App\Entity\Fixture as FixtureEntity;
 
 #[AsCommand(
     name: 'nrfc:fixtures:import',
-    description: 'Add a short description for your command',
+    description: 'Import data from CSV file and create entities'
 )]
 class NrfcFixturesImportCommand extends Command
 {
@@ -44,6 +44,7 @@ class NrfcFixturesImportCommand extends Command
     {
         $this
             ->setDescription('Import data from CSV file and create entities')
+            ->setHelp('This command allows you to import fixture data from a CSV file and create corresponding entities in the database.')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the CSV file')
             ->addOption('delimiter', 'd', InputOption::VALUE_OPTIONAL, 'CSV delimiter', ',')
             ->addOption('skip-first', 's', InputOption::VALUE_NONE, 'Skip first row (header)')
@@ -57,6 +58,11 @@ class NrfcFixturesImportCommand extends Command
         $delimiter = $input->getOption('delimiter');
         $skipFirstRow = $input->getOption('skip-first');
         $batchSize = (int)$input->getOption('batch-size');
+
+        // Skip validation for help command
+        if ($input->hasOption('help') && $input->getOption('help')) {
+            return Command::SUCCESS;
+        }
 
         // Validate file exists
         if (!file_exists($filePath)) {
@@ -131,6 +137,10 @@ class NrfcFixturesImportCommand extends Command
      */
     private function processRow(array $row): void
     {
+        if (empty($row[0]) || !DateTime::createFromFormat('j-M-y', $row[0])) {
+            return;
+        }
+
         $date = DateTimeImmutable::createFromMutable(
             DateTime::createFromFormat('j-M-y', $row[0])
         )->setTime(0, 1, 0);

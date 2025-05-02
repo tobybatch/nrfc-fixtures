@@ -32,6 +32,12 @@ final class NrfcFixturesVersionCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $version = '0.0.1';
 
+        if ($input->hasOption('help') && $input->getOption('help')) {
+            $io->writeln('Receive version information');
+            $io->writeln('This command allows you to fetch various version information about the app');
+            return Command::SUCCESS;
+        }
+
         $io->writeln($version);
 
         return Command::SUCCESS;

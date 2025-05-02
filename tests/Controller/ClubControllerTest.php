@@ -2,112 +2,201 @@
 
 namespace App\Tests\Controller;
 
+use App\Controller\ClubController;
 use App\Entity\Club;
+use App\Form\ClubType;
+use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Templating\EngineInterface;
+use Symfony\UX\Map\Map;
+use Symfony\UX\Map\Marker;
+use Symfony\UX\Map\Point;
+use Twig\Environment;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-final class ClubControllerTest extends WebTestCase
+class ClubControllerTest extends TestCase
 {
-    private KernelBrowser $client;
-    private EntityManagerInterface $manager;
-    private EntityRepository $clubRepository;
-    private string $path = '/club/';
+    private ClubController $controller;
+    private ClubRepository $clubRepository;
+    private EntityManagerInterface $entityManager;
+    private FormFactoryInterface $formFactory;
+    private Environment $twig;
+    private Security $security;
+    private UrlGeneratorInterface $urlGenerator;
+    private ContainerInterface $container;
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
-        $this->manager = static::getContainer()->get('doctrine')->getManager();
-        $this->clubRepository = $this->manager->getRepository(Club::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->clubRepository = $this->createMock(ClubRepository::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->twig = $this->createMock(Environment::class);
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
-        foreach ($this->clubRepository->findAll() as $object) {
-            $this->manager->remove($object);
-        }
+        $this->controller = new ClubController();
+        
+        // Set the container using reflection
+        $reflection = new \ReflectionClass($this->controller);
+        $containerProperty = $reflection->getProperty('container');
+        $containerProperty->setAccessible(true);
+        $containerProperty->setValue($this->controller, $this->container);
 
-        $this->manager->flush();
+        $this->container->method('get')
+            ->willReturnMap([
+                ['doctrine.orm.entity_manager', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->entityManager],
+                ['form.factory', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->formFactory],
+                ['twig', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->twig],
+                ['router', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->urlGenerator],
+            ]);
     }
 
     public function testIndex(): void
     {
-        $this->client->followRedirects();
-        $crawler = $this->client->request('GET', $this->path);
+        $clubs = [new Club()];
+        $this->clubRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($clubs);
 
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Club index');
+        $this->twig->expects($this->once())
+            ->method('render')
+            ->with('club/index.html.twig', ['clubs' => $clubs])
+            ->willReturn('rendered content');
 
-        // Use the $crawler to perform additional assertions e.g.
-        // self::assertSame('Some text on the page', $crawler->filter('.p')->first());
+        $response = $this->controller->index($this->clubRepository);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('rendered content', $response->getContent());
     }
 
     public function testNew(): void
     {
-        $this->markTestIncomplete();
-        $this->client->request('GET', sprintf('%snew', $this->path));
+        $request = new Request();
+        $club = new Club();
+        $form = $this->createMock(FormInterface::class);
 
-        self::assertResponseStatusCodeSame(200);
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with('App\Form\ClubType', $club)
+            ->willReturn($form);
 
-        $this->client->submitForm('Save', [
-            'club[name]' => 'Testing',
-        ]);
+        $form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
 
-        self::assertResponseRedirects($this->path);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
 
-        self::assertSame(1, $this->clubRepository->count([]));
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($club);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('app_club_index', [], Response::HTTP_SEE_OTHER)
+            ->willReturn('/club');
+
+        $response = $this->controller->new($request, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('/club', $response->getTargetUrl());
     }
 
     public function testShow(): void
     {
-        $this->markTestIncomplete();
-        $fixture = new Club();
-        $fixture->setName('My Title');
+        $club = new Club();
+        $club->setName('Test Club');
+        $club->setLatitude(52.6309);
+        $club->setLongitude(1.2974);
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+        $this->twig->expects($this->once())
+            ->method('render')
+            ->with('club/show.html.twig', $this->callback(function($parameters) {
+                return isset($parameters['club']) && isset($parameters['map']);
+            }))
+            ->willReturn('rendered content');
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Club');
-
-        // Use assertions to check that the properties are properly displayed.
+        $response = $this->controller->show($club);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('rendered content', $response->getContent());
     }
 
     public function testEdit(): void
     {
-        $this->markTestIncomplete();
-        $fixture = new Club();
-        $fixture->setName('Value');
+        $request = new Request();
+        $club = new Club();
+        $form = $this->createMock(FormInterface::class);
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with('App\Form\ClubType', $club)
+            ->willReturn($form);
 
-        $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
+        $form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
 
-        $this->client->submitForm('Update', [
-            'club[name]' => 'Something New',
-        ]);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
 
-        self::assertResponseRedirects('/club/');
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
-        $fixture = $this->clubRepository->findAll();
+        $this->entityManager->expects($this->once())
+            ->method('flush');
 
-        self::assertSame('Something New', $fixture[0]->getName());
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('app_club_index', [], Response::HTTP_SEE_OTHER)
+            ->willReturn('/club');
+
+        $response = $this->controller->edit($request, $club, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('/club', $response->getTargetUrl());
     }
 
-    public function testRemove(): void
+    public function testDelete(): void
     {
-        $this->markTestIncomplete();
-        $fixture = new Club();
-        $fixture->setName('Value');
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->request->set('_token', 'valid_token');
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+        $club = new Club();
+        // Use reflection to set the id property
+        $reflection = new \ReflectionClass($club);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($club, 1);
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-        $this->client->submitForm('Delete');
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('app_club_index', [], Response::HTTP_SEE_OTHER)
+            ->willReturn('/club');
 
-        self::assertResponseRedirects('/club/');
-        self::assertSame(0, $this->clubRepository->count([]));
+        $this->entityManager->expects($this->once())
+            ->method('remove')
+            ->with($club);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $response = $this->controller->delete($request, $club, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('/club', $response->getTargetUrl());
     }
-}
+} 

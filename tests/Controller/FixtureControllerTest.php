@@ -2,142 +2,289 @@
 
 namespace App\Tests\Controller;
 
+use App\Config\Team;
+use App\Controller\FixtureController;
 use App\Entity\Fixture;
+use App\Repository\FixtureRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Security;
+use Twig\Environment;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use App\Config\Competition;
+use App\Config\HomeAway;
 
-final class FixtureControllerTest extends WebTestCase
+class FixtureControllerTest extends TestCase
 {
-    private KernelBrowser $client;
-    private EntityManagerInterface $manager;
-    private EntityRepository $fixtureRepository;
-    private string $path = '/fixture/';
+    private FixtureController $controller;
+    private FixtureRepository $fixtureRepository;
+    private EntityManagerInterface $entityManager;
+    private FormFactoryInterface $formFactory;
+    private Environment $twig;
+    private UrlGeneratorInterface $urlGenerator;
+    private \Symfony\Bundle\SecurityBundle\Security $security;
+    private ContainerInterface $container;
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
-        $this->manager = static::getContainer()->get('doctrine')->getManager();
-        $this->fixtureRepository = $this->manager->getRepository(Fixture::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->fixtureRepository = $this->createMock(FixtureRepository::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->twig = $this->createMock(Environment::class);
+        $this->security = $this->createMock(\Symfony\Bundle\SecurityBundle\Security::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
 
-        foreach ($this->fixtureRepository->findAll() as $object) {
-            $this->manager->remove($object);
-        }
+        $this->controller = new FixtureController($this->fixtureRepository);
+        
+        // Set the container using reflection
+        $reflection = new \ReflectionClass($this->controller);
+        $containerProperty = $reflection->getProperty('container');
+        $containerProperty->setAccessible(true);
+        $containerProperty->setValue($this->controller, $this->container);
 
-        $this->manager->flush();
+        $this->container->method('get')
+            ->willReturnMap([
+                ['doctrine.orm.entity_manager', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->entityManager],
+                ['form.factory', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->formFactory],
+                ['twig', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->twig],
+                ['security.helper', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->security],
+                ['router', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->urlGenerator],
+            ]);
     }
 
     public function testIndex(): void
     {
-        $this->client->followRedirects();
-        $crawler = $this->client->request('GET', $this->path);
+        $request = new Request();
+        $date = '2023-01-01';
+        $team = Team::Minis;
 
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Fixture index');
+        $this->fixtureRepository->expects($this->once())
+            ->method('getDates')
+            ->willReturn([$date]);
 
-        // Use the $crawler to perform additional assertions e.g.
-        // self::assertSame('Some text on the page', $crawler->filter('.p')->first());
+        $this->fixtureRepository->expects($this->exactly(count(Team::cases())))
+            ->method('getFixturesForTeam')
+            ->willReturn([]);
+
+        $this->twig->expects($this->once())
+            ->method('render')
+            ->with('fixture/index.html.twig', [
+                'teams' => Team::cases(),
+                'fixtures' => [
+                    $date => array_combine(
+                        array_map(fn($team) => $team->value, Team::cases()),
+                        array_fill(0, count(Team::cases()), [])
+                    ),
+                ],
+            ])
+            ->willReturn('rendered content');
+
+        $response = $this->controller->index($request);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('rendered content', $response->getContent());
     }
 
     public function testNew(): void
     {
-        $this->markTestIncomplete();
-        $this->client->request('GET', sprintf('%snew', $this->path));
+        $request = new Request();
+        $fixture = new Fixture();
+        $form = $this->createMock(FormInterface::class);
 
-        self::assertResponseStatusCodeSame(200);
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with('App\Form\FixtureType', $fixture)
+            ->willReturn($form);
 
-        $this->client->submitForm('Save', [
-            'fixture[date]' => 'Testing',
-            'fixture[homeAway]' => 'Testing',
-            'fixture[competition]' => 'Testing',
-            'fixture[team]' => 'Testing',
-            'fixture[name]' => 'Testing',
-            'fixture[club]' => 'Testing',
-        ]);
+        $form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
 
-        self::assertResponseRedirects($this->path);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
 
-        self::assertSame(1, $this->fixtureRepository->count([]));
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($fixture);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('app_fixture_index', [], Response::HTTP_SEE_OTHER)
+            ->willReturn('/');
+
+        $response = $this->controller->new($request, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('/', $response->getTargetUrl());
     }
 
     public function testShow(): void
     {
-        $this->markTestIncomplete();
         $fixture = new Fixture();
-        $fixture->setDate('My Title');
-        $fixture->setHomeAway('My Title');
-        $fixture->setCompetition('My Title');
-        $fixture->setTeam('My Title');
-        $fixture->setName('My Title');
-        $fixture->setClub('My Title');
+        // Use reflection to set the id property
+        $reflection = new \ReflectionClass($fixture);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($fixture, 1);
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+        // Set required properties
+        $fixture->setCompetition(Competition::Conference);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setTeam(Team::Minis);
+        $fixture->setDate(new \DateTimeImmutable());
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
+        $this->twig->expects($this->once())
+            ->method('render')
+            ->with('fixture/show.html.twig', [
+                'fixture' => $fixture,
+            ])
+            ->willReturn('rendered content');
 
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Fixture');
-
-        // Use assertions to check that the properties are properly displayed.
+        $response = $this->controller->show($fixture);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('rendered content', $response->getContent());
     }
 
     public function testEdit(): void
     {
-        $this->markTestIncomplete();
+        $request = new Request();
         $fixture = new Fixture();
-        $fixture->setDate('Value');
-        $fixture->setHomeAway('Value');
-        $fixture->setCompetition('Value');
-        $fixture->setTeam('Value');
-        $fixture->setName('Value');
-        $fixture->setClub('Value');
+        // Use reflection to set the id property
+        $reflection = new \ReflectionClass($fixture);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($fixture, 1);
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+        // Set required properties
+        $fixture->setCompetition(Competition::Conference);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setTeam(Team::Minis);
+        $fixture->setDate(new \DateTimeImmutable());
 
-        $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
+        $form = $this->createMock(FormInterface::class);
 
-        $this->client->submitForm('Update', [
-            'fixture[date]' => 'Something New',
-            'fixture[homeAway]' => 'Something New',
-            'fixture[competition]' => 'Something New',
-            'fixture[team]' => 'Something New',
-            'fixture[name]' => 'Something New',
-            'fixture[club]' => 'Something New',
-        ]);
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with('App\Form\FixtureType', $fixture)
+            ->willReturn($form);
 
-        self::assertResponseRedirects('/fixture/');
+        $form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
 
-        $fixture = $this->fixtureRepository->findAll();
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
 
-        self::assertSame('Something New', $fixture[0]->getDate());
-        self::assertSame('Something New', $fixture[0]->getHomeAway());
-        self::assertSame('Something New', $fixture[0]->getCompetition());
-        self::assertSame('Something New', $fixture[0]->getTeam());
-        self::assertSame('Something New', $fixture[0]->getName());
-        self::assertSame('Something New', $fixture[0]->getClub());
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('app_fixture_index', [], Response::HTTP_SEE_OTHER)
+            ->willReturn('/');
+
+        $response = $this->controller->edit($request, $fixture, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('/', $response->getTargetUrl());
     }
 
-    public function testRemove(): void
+    public function testDelete(): void
     {
-        $this->markTestIncomplete();
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->request->set('_token', 'valid_token');
+
         $fixture = new Fixture();
-        $fixture->setDate('Value');
-        $fixture->setHomeAway('Value');
-        $fixture->setCompetition('Value');
-        $fixture->setTeam('Value');
-        $fixture->setName('Value');
-        $fixture->setClub('Value');
+        // Use reflection to set the id property
+        $reflection = new \ReflectionClass($fixture);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($fixture, 1);
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+        // Set required properties
+        $fixture->setCompetition(Competition::Conference);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setTeam(Team::Minis);
+        $fixture->setDate(new \DateTimeImmutable());
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-        $this->client->submitForm('Delete');
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('app_fixture_index', [], Response::HTTP_SEE_OTHER)
+            ->willReturn('/');
 
-        self::assertResponseRedirects('/fixture/');
-        self::assertSame(0, $this->fixtureRepository->count([]));
+        $this->entityManager->expects($this->once())
+            ->method('remove')
+            ->with($fixture);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $response = $this->controller->delete($request, $fixture, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('/', $response->getTargetUrl());
     }
-}
+
+    public function testByDate(): void
+    {
+        $date = '20240101';
+        $dateObj = \DateTimeImmutable::createFromFormat('Ymd', $date);
+        $startOfDay = $dateObj->setTime(0, 0, 0);
+        $endOfDay = $dateObj->setTime(23, 59, 59);
+
+        $fixture = new Fixture();
+        // Set required properties
+        $fixture->setCompetition(Competition::Conference);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setTeam(Team::Minis);
+        $fixture->setDate($dateObj);
+
+        $this->fixtureRepository->expects($this->once())
+            ->method('findByDateRange')
+            ->with($startOfDay, $endOfDay)
+            ->willReturn([$fixture]);
+
+        $this->twig->expects($this->once())
+            ->method('render')
+            ->with('fixture/byDate.html.twig', [
+                'date' => $dateObj->format('Y-m-d'),
+                'fixtures' => [
+                    'TRAINING' => [],
+                    'HOME' => [$fixture],
+                    'AWAY' => [],
+                    'TBA' => [],
+                ],
+            ])
+            ->willReturn('rendered content');
+
+        $response = $this->controller->byDate($date, $this->fixtureRepository);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('rendered content', $response->getContent());
+    }
+
+    public function testByDateInvalidFormat(): void
+    {
+        $date = 'invalid-date';
+
+        $response = $this->controller->byDate($date, $this->fixtureRepository);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+} 

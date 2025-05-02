@@ -4,6 +4,7 @@
         "@babel/preset-env": "^7.16.0",
         "@hotwired/stimulus": "^3.0.0",
         "@hotwired/turbo": "^7.1.1 || ^8.0",
+        "@playwright/test": "^1.42.1",
         "@symfony/stimulus-bridge": "^3.2.0 || ^4.0.0",
         "@symfony/ux-leaflet-map": "file:vendor/symfony/ux-leaflet-map/assets",
         "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
@@ -23,7 +24,12 @@
     "scripts": {
         "dev": "encore dev",
         "watch": "encore dev --watch",
-        "build": "encore production --progress"
+        "build": "encore production --progress",
+        "test": "playwright test",
+        "test:ui": "playwright test --ui",
+        "test:debug": "playwright test --debug",
+        "test:report": "playwright test --reporter=html",
+        "playwright:install": "playwright install"
     },
     "dependencies": {
         "@material-tailwind/html": "^3.0.0-beta.7",

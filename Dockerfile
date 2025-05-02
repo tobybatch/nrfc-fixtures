@@ -284,9 +284,9 @@ COPY .docker /assets
 # do the composer deps installation
 RUN \
     export COMPOSER_HOME=/composer && \
+    touch /opt/nrfcfixtures/.env && \
     composer --no-ansi install --working-dir=/opt/nrfcfixtures --optimize-autoloader && \
     composer --no-ansi clearcache && \
-    composer --no-ansi require --working-dir=/opt/nrfcfixtures laminas/laminas-ldap && \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
     chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
@@ -303,12 +303,11 @@ FROM base AS prod
 COPY --from=git-prod --chown=www-data:www-data /opt/nrfcfixtures /opt/nrfcfixtures
 COPY .docker /assets
 # do the composer deps installation
-RUN \
-    export COMPOSER_HOME=/composer && \
-    composer --no-ansi install --working-dir=/opt/nrfcfixtures --no-dev --optimize-autoloader && \
-    composer --no-ansi clearcache && \
-    composer --no-ansi require --update-no-dev --working-dir=/opt/nrfcfixtures laminas/laminas-ldap && \
-    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
+RUN export COMPOSER_HOME=/composer && \
+    touch /opt/nrfcfixtures/.env
+RUN composer --no-ansi install --working-dir=/opt/nrfcfixtures --no-dev --optimize-autoloader
+RUN composer --no-ansi clearcache && \
+       cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
     sed -i "s/expose_php = On/expose_php = Off/g" /usr/local/etc/php/php.ini && \
     sed -i "s/;opcache.enable=1/opcache.enable=1/g" /usr/local/etc/php/php.ini && \
     sed -i "s/;opcache.memory_consumption=128/opcache.memory_consumption=256/g" /usr/local/etc/php/php.ini && \

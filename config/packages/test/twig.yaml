@@ -1,0 +1,10 @@
+twig:
+    strict_variables: true
+    debug: true
+    exception_controller: null
+    globals:
+        app: '@twig.app_variable'
+    form_themes:
+        - 'form/tailwind_theme.html.twig'
+    paths:
+        '%kernel.project_dir%/templates': ~ 
