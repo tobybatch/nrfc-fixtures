@@ -1,14 +1,26 @@
 <?php
-$DATABASE_HOST = urldecode($argv[1]);
-$DATABASE_BASE = urldecode($argv[2]);
-$DATABASE_PORT = $argv[3];
-$DATABASE_USER = urldecode($argv[4]);
-$DATABASE_PASS = urldecode($argv[5]);
+// Get the database URL from environment variables
+$databaseUrl = getenv('DATABASE_URL');
+
+// Parse the URL to extract connection details
+$dbParts = parse_url($databaseUrl);
+
+// Extract components
+$dbHost = $dbParts['host'];
+$dbPort = $dbParts['port'] ?? ''; // Handle case where port might not be specified
+$dbUser = $dbParts['user'];
+$dbPass = $dbParts['pass'];
+$dbName = ltrim($dbParts['path'], '/'); // Remove leading slash from path
+
+// Construct DSN (Data Source Name)
+$dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=$dbName";
+echo $databaseUrl;
+echo $dsn;
 
 echo "Testing DB:";
 
 try {
-    $pdo = new \PDO("mysql:host=$DATABASE_HOST;dbname=$DATABASE_BASE;port=$DATABASE_PORT", "$DATABASE_USER", "$DATABASE_PASS", [
+    $pdo = new \PDO($dsn, $dbUser, $dbPass, [
         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
     ]);
 } catch(\Exception $ex) {
@@ -18,13 +30,13 @@ try {
             echo 'Access denied (1045)';
             die(1);
         case 1049:
-            // error "Unknown database (1049)" can be ignored, the database will be created by Kimai
+            // error "Unknown database (1049)" can be ignored, the database will be created by nrfcfixtures
             return;
         // a lot of errors share the same meaningless error code zero
         case 0:
             // this error includes the database name, so we can only search for the static part of the error message
             if (stripos($ex->getMessage(), 'SQLSTATE[HY000] [1049] Unknown database') !== false) {
-                // error "Unknown database (1049)" can be ignored, the database will be created by Kimai
+                // error "Unknown database (1049)" can be ignored, the database will be created by nrfcfixtures
                 return;
             }
             switch ($ex->getMessage()) {

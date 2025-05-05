@@ -5,8 +5,8 @@
 # ---------------------------------------------------------------------
 # For local testing by maintainer:
 #
-# docker build --no-cache -t nrfrc-fixtures-fpm --build-arg BASE=fpm .
-# docker build --no-cache -t nrfrc-fixtures-apache --build-arg BASE=apache .
+# docker build --no-cache -t nrfc/fixtures:fpm --build-arg BASE=fpm .
+# docker build --no-cache -t nrfc/fixtures:apache --build-arg BASE=apache .
 # docker run -d --name nrfrc-fixtures-apache-app nrfrc-fixtures-apache
 # docker exec -ti nrfrc-fixtures-apache-app /bin/bash
 # ---------------------------------------------------------------------
@@ -55,6 +55,7 @@ RUN apk add --no-cache \
     mpfr4 \
     musl-dev \
     perl \
+    postgresql \
     re2c \
     # gd
     freetype-dev \
@@ -79,7 +80,9 @@ RUN apt-get update && \
         libpng-dev \
         libzip-dev \
         libxslt1-dev \
-        libfreetype6-dev
+        libfreetype6-dev \
+        libpq-dev \
+        postgresql
 
 # php extension gd - 13.86s
 FROM ${BASE}-php-ext-base AS php-ext-gd
@@ -97,8 +100,9 @@ RUN docker-php-ext-configure ldap && \
     docker-php-ext-install -j$(nproc) ldap
 
 # php extension pdo_mysql : 6.14s
-FROM ${BASE}-php-ext-base AS php-ext-pdo_mysql
-RUN docker-php-ext-install -j$(nproc) pdo_mysql
+FROM ${BASE}-php-ext-base AS php-ext-pdo_pgsql
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql && \
+    docker-php-ext-install -j$(nproc) pgsql pdo pdo_pgsql
 
 # php extension zip : 8.18s
 FROM ${BASE}-php-ext-base AS php-ext-zip
@@ -130,6 +134,8 @@ RUN apk add --no-cache \
         libzip \
         libxslt-dev \
         fcgi \
+        npm \
+        nodejs \
         tzdata && \
     touch /use_fpm && \
     sed -i "s/;ping.path/ping.path/g" /usr/local/etc/php-fpm.d/www.conf && \
@@ -160,6 +166,9 @@ RUN apt-get update && \
         libzip4 \
         libxslt1.1 \
         libfreetype6 \
+        libpq5 \
+        npm \
+        nodejs \
         unzip && \
     echo "Listen 8001" > /etc/apache2/ports.conf && \
     a2enmod rewrite && \
@@ -193,9 +202,12 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 # PHP extension xsl
 COPY --from=php-ext-xsl /usr/local/etc/php/conf.d/docker-php-ext-xsl.ini /usr/local/etc/php/conf.d/docker-php-ext-xsl.ini
 COPY --from=php-ext-xsl /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xsl.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xsl.so
-# PHP extension pdo_mysql
-COPY --from=php-ext-pdo_mysql /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini
-COPY --from=php-ext-pdo_mysql /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_mysql.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_mysql.so
+# PHP extension pdo_pgsql
+COPY --from=php-ext-pdo_pgsql /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini
+COPY --from=php-ext-pdo_pgsql /usr/local/etc/php/conf.d/docker-php-ext-pgsql.ini /usr/local/etc/php/conf.d/docker-php-ext-pgsql.ini
+COPY --from=php-ext-pdo_pgsql /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_pgsql.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_pgsql.so
+COPY --from=php-ext-pdo_pgsql /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pgsql.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pgsql.so
+COPY --from=php-ext-pdo_pgsql /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo.so
 # PHP extension zip
 COPY --from=php-ext-zip /usr/local/etc/php/conf.d/docker-php-ext-zip.ini /usr/local/etc/php/conf.d/docker-php-ext-zip.ini
 COPY --from=php-ext-zip /usr/local/lib/php/extensions/no-debug-non-zts-20230831/zip.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/zip.so
@@ -220,7 +232,6 @@ ARG VERSION
 ARG TIMEZONE
 # the convention in the nrfrc-fixtures repository is: tags are always version numbers, branch names always start with a letter
 # if the nrfrc-fixtures variable starts with a number (e.g. 2.24.0) we assume its a tag, otherwise its a branch
-RUN echo https://github.com/nrfc/fixtures/archive/refs/heads/0.0.1.tar.gz
 RUN [[ $VERSION =~ ^[0-9] ]] && export REF='tags' || export REF='heads' && \
     wget -O "/opt/nrfcfixtures.tar.gz" "https://github.com/tobybatch/nrfc-fixtures/archive/refs/${REF}/${VERSION}.tar.gz" && \
     tar -xpzf /opt/nrfcfixtures.tar.gz -C /opt/ && \
@@ -253,6 +264,7 @@ RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} >
 # copy startup script & DB checking script
 COPY .docker/dbtest.php /dbtest.php
 COPY .docker/entrypoint.sh /entrypoint.sh
+WORKDIR /opt/nrfcfixtures
 
 ENV DATABASE_URL="mysql://app:app@127.0.0.1:3306/app?charset=utf8mb4&serverVersion=8.3"
 ENV APP_SECRET=change_this_to_something_unique
@@ -260,6 +272,9 @@ ENV APP_SECRET=change_this_to_something_unique
 ENV TRUSTED_PROXIES=nginx,localhost,127.0.0.1
 ENV MAILER_FROM=no-reply@norwichrugby.com
 ENV MAILER_URL=null://localhost
+ENV MESSENGER_TRANSPORT_DSN="doctrine://default?auto_setup=0"
+ENV MAILER_DSN=""
+ENV UX_MAP_DSN=leaflet://default
 ENV ADMINPASS=""
 ENV ADMINMAIL=""
 ENV USER_ID=""
@@ -291,8 +306,10 @@ RUN \
     chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
-    sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console && \
-    /opt/nrfcfixtures/bin/console nrfc:fixtures:version | awk '{print $2}' > /opt/nrfcfixtures/version.txt
+    sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console
+RUN npm i && \
+    npm run build && \
+    /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
 ENV memory_limit=512M
@@ -302,6 +319,8 @@ FROM base AS prod
 # copy nrfcfixtures production source
 COPY --from=git-prod --chown=www-data:www-data /opt/nrfcfixtures /opt/nrfcfixtures
 COPY .docker /assets
+ENV APP_ENV=prod
+WORKDIR /opt/nrfcfixtures
 # do the composer deps installation
 RUN export COMPOSER_HOME=/composer && \
     touch /opt/nrfcfixtures/.env
@@ -317,8 +336,10 @@ RUN composer --no-ansi clearcache && \
     sed -i "s/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 604800/g" /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
-    /opt/nrfcfixtures/bin/console nrfc:fixtures:version | awk '{print $2}' > /opt/nrfcfixtures/version.txt
+    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini
+RUN npm i && \
+    npm run build && \
+    /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=prod
 ENV DATABASE_URL=""
 ENV memory_limit=512M

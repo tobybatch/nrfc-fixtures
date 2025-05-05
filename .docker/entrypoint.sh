@@ -1,23 +1,10 @@
-#!/bin/bash -x
+#!/bin/bash
 
-KIMAI=$(cat /opt/kimai/version.txt)
-echo $KIMAI
+NRFCFIXTURES=$(cat /opt/nrfcfixtures/version.txt)
 
 function waitForDB() {
-  # Parse sql connection data
-  DATABASE_USER=$(awk -F '[/:@]' '{print $4}' <<< "$DATABASE_URL")
-  DATABASE_PASS=$(awk -F '[/:@]' '{print $5}' <<< "$DATABASE_URL")
-  DATABASE_HOST=$(awk -F '[/:@]' '{print $6}' <<< "$DATABASE_URL")
-  DATABASE_PORT=$(awk -F '[/:@]' '{print $7}' <<< "$DATABASE_URL")
-  DATABASE_BASE=$(awk -F '[/?]' '{print $4}' <<< "$DATABASE_URL")
-
-  re='^[0-9]+$'
-  if ! [[ $DATABASE_PORT =~ $re ]] ; then
-     DATABASE_PORT=3306
-  fi
-
   echo "Wait for database connection ..."
-  until php /dbtest.php "$DATABASE_HOST" "$DATABASE_BASE" "$DATABASE_PORT" "$DATABASE_USER" "$DATABASE_PASS"; do
+  until php /dbtest.php "$DATABASE_URL"; do
     echo Checking DB: $?
     sleep 3
   done
@@ -30,7 +17,7 @@ function handleStartup() {
     memory_limit=512M
   fi
   sed -i "s/memory_limit.*/memory_limit=$memory_limit/g" /usr/local/etc/php/php.ini
-  cp /assets/monolog.yaml /opt/kimai/config/packages/monolog.yaml
+  cp /assets/monolog.yaml /opt/nrfcfixtures/config/packages/monolog.yaml
 
   if [ -z "$USER_ID" ]; then
     USER_ID=$(id -u www-data)
@@ -43,7 +30,7 @@ function handleStartup() {
   if grep -w "$GROUP_ID" /etc/group &>/dev/null; then
     echo Group already exists
   else
-    echo www-kimai:x:"$GROUP_ID": >> /etc/group
+    echo www-nrfcfixtures:x:"$GROUP_ID": >> /etc/group
     grpconv
   fi
 
@@ -51,7 +38,7 @@ function handleStartup() {
   if id "$USER_ID" &>/dev/null; then
     echo User already exists
   else
-    echo www-kimai:x:"$USER_ID":"$GROUP_ID":www-kimai:/var/www:/usr/sbin/nologin >> /etc/passwd
+    echo www-nrfcfixtures:x:"$USER_ID":"$GROUP_ID":www-nrfcfixtures:/var/www:/usr/sbin/nologin >> /etc/passwd
     pwconv
   fi
 
@@ -73,20 +60,20 @@ function handleStartup() {
   fi
 }
 
-function prepareKimai() {
+function prepare() {
   # These are idempotent, so we can run them on every start-up
-  /opt/kimai/bin/console -n kimai:install
+  /opt/nrfcfixtures/bin/console doctrine:migrations:migrate --no-interaction
   if [ ! -z "$ADMINPASS" ] && [ ! -a "$ADMINMAIL" ]; then
-    /opt/kimai/bin/console kimai:user:create admin "$ADMINMAIL" ROLE_SUPER_ADMIN "$ADMINPASS"
+    echo CREATE AN ADMIN USER HERE
+    # /opt/nrfcfixtures/bin/console nrfcfixtures:user:create admin "$ADMINMAIL" ROLE_SUPER_ADMIN "$ADMINPASS"
   fi
-  echo "$KIMAI" > /opt/kimai/var/installed
-  echo "Kimai is ready"
+  echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
+  echo "NRFC Fixtures is ready"
 }
 
 function runServer() {
   # Just while I'm fixing things
-  /opt/kimai/bin/console kimai:reload --env="$APP_ENV"
-  chown -R $USER_ID:$GROUP_ID /opt/kimai/var
+  chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures/var
   if [ -e /use_apache ]; then
     exec /usr/sbin/apache2 -D FOREGROUND
   elif [ -e /use_fpm ]; then
@@ -98,5 +85,5 @@ function runServer() {
 
 waitForDB
 handleStartup
-prepareKimai
+prepare
 runServer
