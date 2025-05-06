@@ -12,4 +12,4 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
 
 $_SERVER['APP_ENV'] = 'test';
 $_SERVER['APP_DEBUG'] = '0';
-$_SERVER['KERNEL_CLASS'] = 'App\Tests\Kernel';
+$_SERVER['KERNEL_CLASS'] = 'App\Tests\unit\Kernel';
