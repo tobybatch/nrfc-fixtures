@@ -36,13 +36,18 @@ class Fixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
+        $console = new ConsoleOutput();
         foreach ($this->rows as $row) {
             $date = DateTimeImmutable::createFromMutable(
                 DateTime::createFromFormat('j-M-y', $row['date'])
             )->setTime(0, 1, 0);
+            $console->writeln('Creating fixtures for ' . $date->format('d-m-Y'));
             foreach (Team::cases() as $team) {
                 if ($row[$team->value]) {
+                    $console->writeln('  Creating fixture for ' . $date->format('d-m-Y') . " / " . $team->value);
                     $this->fixtureService->createFixture($team, $date, $row[$team->value]);
+                } else {
+                    $console->writeln('  No fixture for ' . $date->format('d-m-Y') . " / " . $team->value);
                 }
             }
         }

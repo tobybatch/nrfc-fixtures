@@ -43,13 +43,6 @@ npm run test:debug
 npm run test:report
 ```
 
-## Test Structure
-
-- `fixtures.spec.ts`: Tests for fixture management
-- `login.spec.ts`: Tests for authentication
-- `clubs.spec.ts`: Tests for club management
-- `profile.spec.ts`: Tests for user profile management
-
 ## Configuration
 
 The Playwright configuration is in `playwright.config.ts`. Key settings:

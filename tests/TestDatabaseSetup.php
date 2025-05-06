@@ -11,19 +11,6 @@ $kernel->boot();
 $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
 $application->setAutoExit(false);
 
-// Drop and recreate database
-$application->run(new \Symfony\Component\Console\Input\ArrayInput([
-    'command' => 'doctrine:database:drop',
-    '--force' => true,
-    '--if-exists' => true,
-    '--env' => 'test',
-]));
-
-$application->run(new \Symfony\Component\Console\Input\ArrayInput([
-    'command' => 'doctrine:database:create',
-    '--env' => 'test',
-]));
-
 // Run migrations
 $application->run(new \Symfony\Component\Console\Input\ArrayInput([
     'command' => 'doctrine:migrations:migrate',

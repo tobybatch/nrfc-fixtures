@@ -64,3 +64,13 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+
+        providers:
+            users_in_memory:
+                memory:
+                    users:
+                        test@example.com:
+                            password: '$2y$13$j9OqoQ7vyZt8JQ5f5Q5Q5e'
+                            roles: ['ROLE_USER']
+
+

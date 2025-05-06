@@ -22,12 +22,8 @@
     <table class="bg-white rounded-lg overflow-hidden">
         <thead class="bg-tertiary text-white">
         <tr>
-            <th class="py-3 px-4 text-left">
-                Name
-            </th>
-            <th class="py-3 px-4 text-left">
-                Address
-            </th>
+            <th class="py-3 px-4 text-left">Name</th>
+            <th class="py-3 px-4 text-left">Address</th>
             {% if app.user is not null and 'ROLE_ADMIN' in app.user.roles %}
             <th class="py-3 px-4 text-center">
                 Edit

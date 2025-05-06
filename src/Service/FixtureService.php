@@ -40,6 +40,7 @@ class FixtureService
         $fixture->setTeam($team);
 
         $this->em->persist($fixture);
+        $this->em->flush();
     }
 
     public function makeFixtureFromString(string $detail): array
