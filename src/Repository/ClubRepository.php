@@ -20,6 +20,29 @@ class ClubRepository extends ServiceEntityRepository
         return $this->findBy(array(), array('name' => 'ASC'));
     }
 
+    public function fuzzyFind(string $name)
+     {
+        $n = ucwords(trim(strtolower($name)));
+        if (empty($n)) {
+            return null;
+        }
+
+        switch ($n) {
+            case "W Norfolk":
+                $n = "West Norfolk";
+                break;
+            case "N Walsham":
+                $n = "North Walsham";
+        }
+
+        $club = $this->findOneBy(['name' => $n]);
+        if ($club != null) {
+            return $club;
+        }
+
+        return false;
+    }
+
     //    /**
     //     * @return Club[] Returns an array of Club objects
     //     */

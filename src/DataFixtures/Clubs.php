@@ -44,28 +44,6 @@ class Clubs extends Fixture
             ['name' => "Woodbridge", 'addr' => "Hatchley Barn, Orford Rd, Bromeswell, Woodbridge IP12 2PP", 'lat' => 52.1029813, 'lon' => 1.3760001], // Woodbridge RFC
             ['name' => "Wymondham", 'addr' => "Barnard Fields, off Bray Dr, Reeve Way, Wymondham NR18 0GQ", 'lat' => 52.5900641, 'lon' => 1.1401406], // Wymondham RFC
         ];
-//        $clubs = [
-//            ['name' => "Beccles", 'addr' => "Beef Meadow, Common Ln, Beccles NR34 9RH", 'lat' => 52.4591023, 'lon' => 1.5720259],
-//            ['name' => "Bury", 'addr' => "The GK IPA Haberden, Southgate Grn, Bury Saint Edmunds IP33 2BL", 'lat' => null, 'lon' => null],
-//            ['name' => "Cambridge", 'addr' => "Fields, Ellgia, Grantchester Rd, Cambridge CB3 9ED", 'lat' => null, 'lon' => null],
-//            ['name' => "Colchester", 'addr' => "Raven Park, Cuckoo Farm Way, Colchester CO4 5YX", 'lat' => null, 'lon' => null],
-//            ['name' => "Crusaders", 'addr' => "Beckhithe, Little Melton Rd, Hethersett, Norwich NR9 3NP", 'lat' => null, 'lon' => null],
-//            ['name' => "Diss", 'addr' => "Bellrope Ln, Roydon, Diss IP22 5RG", 'lat' => null, 'lon' => null],
-//            ['name' => "Fakenham", 'addr' => "Eckersley Dr, Fakenham NR21 9RZ", 'lat' => null, 'lon' => null],
-//            ['name' => "Haverhill", 'addr' => "School Ln, Haverhill CB9 9DE", 'lat' => null, 'lon' => null],
-//            ['name' => "Holt", 'addr' => "Bridge Rd, Holt NR25 6QT", 'lat' => null, 'lon' => null],
-//            ['name' => "Ipswich", 'addr' => "Humber Doucy Lane, Ipswich IP4 3PZ", 'lat' => null, 'lon' => null],
-//            ['name' => "L&Y", 'addr' => "Old Ln, Corton, Lowestoft NR32 5HE", 'lat' => null, 'lon' => null],
-//            ['name' => "Newmarket", 'addr' => "Pavilion, Scatlback, Elizabeth Ave, Newmarket CB8 0DJ", 'lat' => null, 'lon' => null],
-//            ['name' => "North Walsham", 'addr' => "Road, The Clubhouse, Scottow, Norwich NR10 5BU", 'lat' => null, 'lon' => null],
-//            ['name' => "Shelford", 'addr' => "The Davey Field, Cambridge Rd, Great Shelford, Cambridge CB22 5JJ", 'lat' => null, 'lon' => null],
-//            ['name' => "Southwold", 'addr' => "The Common, Southwold IP18 6TB", 'lat' => null, 'lon' => null],
-//            ['name' => "Stowmarket", 'addr' => "Chilton Fields, Chilton Way, Stowmarket IP14 1SZ", 'lat' => null, 'lon' => null],
-//            ['name' => "West Norfolk", 'addr' => "Gate House/Gate House La, King's Lynn PE30 3RJ", 'lat' => null, 'lon' => null],
-//            ['name' => "Wisbech", 'addr' => "Chapel Rd, Wisbech PE13 1RG", 'lat' => null, 'lon' => null],
-//            ['name' => "Woodbridge", 'addr' => "Hatchley Barn, Orford Rd, Bromeswell, Woodbridge IP12 2PP", 'lat' => null, 'lon' => null],
-//            ['name' => "Wymondham", 'addr' => "Barnard Fields, off Bray Dr, Reeve Way, Wymondham NR18 0GQ", 'lat' => null, 'lon' => null],
-//        ];
 
         foreach ($clubs as $club) {
             $c = new Club();
