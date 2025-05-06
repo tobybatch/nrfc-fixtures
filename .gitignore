@@ -26,3 +26,4 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 .env
 test-results/
+playwright-report/
