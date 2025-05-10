@@ -11,6 +11,8 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
 }
 
 $commands = [
+    'doctrine:database:drop -n',
+    'doctrine:database:create -n',
     'doctrine:migrations:migrate -n',
     'doctrine:fixtures:load -n',
 ];
@@ -23,8 +25,8 @@ foreach ($commands as $command) {
         $command
     ));
 }
-// executes the "php bin/console cache:clear" command
 
+// Create users
 
 $_SERVER['APP_ENV'] = 'test';
 $_SERVER['APP_DEBUG'] = '0';

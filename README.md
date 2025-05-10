@@ -1,5 +1,13 @@
 
+## Set up deps
+
+```
+sudo apt install php-xdebug php8.3-pgsql
+```
+
 ## Set up xdebug
+
+`sudo vi /etc/php/8.3/mods-available/xdebug.ini`
 
 ```
 zend_extension=xdebug.so  # or xdebug.dll on Windows
@@ -9,11 +17,12 @@ xdebug.client_port=9003  # Default is 9003 in Xdebug 3
 xdebug.client_host=127.0.0.1
 ```
 
-## Set uop the app
+## Set up the app
 
 ```
+touch .env
 composer install
-npm i
+yarn
 docker compose up -d
 symfony serve
 ```
@@ -31,6 +40,12 @@ symfony serve
 ```
 ./bin/console make:migration
 ./bin/console doctrine:migrations:migrate
+```
+
+## Set up testing
+
+```
+vendor/bin/bdi detect drivers
 ```
 
 # TODO
