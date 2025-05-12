@@ -33,6 +33,12 @@ symfony serve
 ./bin/console doctrine:migrations:migrate
 ```
 
+## Panther
+
+```
+sudo apt install chromium-browser chromium-chromedriver firefox
+```
+
 # TODO
 
  1. Fix route name
