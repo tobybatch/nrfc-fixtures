@@ -55,8 +55,10 @@ RUN apk add --no-cache \
     mpfr4 \
     musl-dev \
     perl \
-    postgresql \
     re2c \
+    # postgres
+    libpq-dev \
+    postgresql \
     # gd
     freetype-dev \
     libpng-dev \
@@ -131,12 +133,14 @@ RUN apk add --no-cache \
         icu-data-full \
         libldap \
         libpng \
+        libpq-dev \
         libzip \
         libxslt-dev \
         fcgi \
         npm \
         nodejs \
-        tzdata && \
+        tzdata \
+        yarn && \
     touch /use_fpm && \
     sed -i "s/;ping.path/ping.path/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i "s/;access.suppress_path\[\] = \/ping/access.suppress_path\[\] = \/ping/g" /usr/local/etc/php-fpm.d/www.conf
@@ -169,7 +173,9 @@ RUN apt-get update && \
         libpq5 \
         npm \
         nodejs \
-        unzip && \
+        unzip \
+        yarnpkg && \
+    ln -s /usr/bin/yarnpkg /usr/bin/yarn && \
     echo "Listen 8001" > /etc/apache2/ports.conf && \
     a2enmod rewrite && \
     touch /use_apache
@@ -307,8 +313,8 @@ RUN \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console
-RUN npm i && \
-    npm run build && \
+RUN yarn && \
+    yarn run build && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
@@ -337,8 +343,8 @@ RUN composer --no-ansi clearcache && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini
-RUN npm i && \
-    npm run build && \
+RUN yarn && \
+    yarn run build && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=prod
 ENV DATABASE_URL=""

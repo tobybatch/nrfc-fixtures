@@ -1,0 +1,35 @@
+services:
+
+  sqldb:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    container_name: nrfc-fixtures-dev-db
+    env_file:
+      - path: ./dev.env
+        required: true
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+  nrfcfixtures:
+    image: ghcr.io/tobybatch/nrfc-fixtures:apache-dev
+    container_name: nrfc-fixtures-dev
+    env_file:
+      - path: ./dev.env
+        required: true
+    volumes:
+      - ..:/opt/nrfcfixtures
+    ports:
+      - 8001:8001
+    restart: unless-stopped
+
+volumes:
+  database_data:
+    name: nrfc-fixtures-dev-dbdata
+  public:
+    name: nrfc-fixtures-dev-public
+  var:
+    name: nrfc-fixtures-dev-var
