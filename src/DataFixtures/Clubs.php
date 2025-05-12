@@ -10,13 +10,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class Clubs extends Fixture
 {
-    private KernelInterface $kernel;
-
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
     /**
      * @throws Exception
      */

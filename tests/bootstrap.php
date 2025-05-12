@@ -11,6 +11,7 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
 }
 
 $commands = [
+    'doctrine:schema:drop -n',
     'doctrine:migrations:migrate -n',
     'doctrine:fixtures:load -n',
 ];

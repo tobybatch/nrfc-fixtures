@@ -3,7 +3,7 @@
         <div class="text-center">
             <div class="text-2xl font-bold mb-1">
                 <img class="inline" src="{{ asset('/static/images/LionHead-h50.png') }}" alt="Lion head" />
-                <span class="text-sm inline">Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}</span>
+                <span class="text-2xl inline">NRFC Fixtures</span>
             </div>
         </div>
 
@@ -15,7 +15,7 @@
                 <a href="{{ path('app_logout') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded text-sm">
                     Logout
                 </a>
-            {% else %}
+            {% elseif hide_top_login is not defined or not hide_top_login %}
                 <a href="{{ path('app_login') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded text-sm">
                     Login
                 </a>

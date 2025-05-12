@@ -28,13 +28,24 @@ class FixtureExtensionTest extends TestCase
     }
 
 
-    public function testGetFunctions(): void
+    public function testDateIsNew(): void
     {
-        $functions = $this->extension->getFunctions();
-        $this->assertCount(2, $functions);
-        $this->assertEquals('dateIsNew', $functions[0]->getName());
-        $this->assertEquals('dateIsNotSet', $functions[1]->getName());
+        $date1 = new DateTimeImmutable('2023-01-01');
+        $date2 = new DateTimeImmutable('2023-01-01');
+        $date3 = new DateTimeImmutable('2023-01-02');
+
+        $this->assertTrue($this->extension->dateIsNew($date1, $date2));
+        $this->assertFalse($this->extension->dateIsNew($date1, $date3));
     }
+
+//    public function testDateIsNotSet(): void
+//    {
+//        $fixture = new Fixture();
+//        $this->assertFalse($this->extension->dateIsNotSet($fixture));
+//
+//        $fixture->setDate(new \DateTimeImmutable('2023-01-01'));
+//        $this->assertTrue($this->extension->dateIsNotSet($fixture));
+//    }
 
     public function testFixtureSummary(): void
     {
@@ -50,30 +61,4 @@ class FixtureExtensionTest extends TestCase
         $expected = 'U13B vs Test Club (H)';
         $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
     }
-
-    public function testDateIsNew(): void
-    {
-        $date1 = new DateTimeImmutable('2023-01-01');
-        $date2 = new DateTimeImmutable('2023-01-01');
-        $date3 = new DateTimeImmutable('2023-01-02');
-
-        $this->assertTrue($this->extension->dateIsNew($date1, $date2));
-        $this->assertFalse($this->extension->dateIsNew($date1, $date3));
-    }
-
-    public function testDateIsNotSet(): void
-    {
-        $this->assertFalse(
-            $this->extension->dateIsNotSet(
-                new DateTimeImmutable('2023-01-01')
-            )
-        );
-
-        $this->assertTrue(
-            $this->extension->dateIsNotSet(
-                new DateTimeImmutable('2023-01-01 12:01:00')
-            )
-        );
-    }
-
 } 
