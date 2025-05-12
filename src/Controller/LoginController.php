@@ -27,12 +27,13 @@ class LoginController extends AbstractController
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
+        // TODO - pass this in
+        // $lastUsername = $authenticationUtils->getLastUsername();
 
         $loginForm = $this->createForm(LoginFormType::class, null);
 
         return $this->render('login/index.html.twig', [
-            'controller_name' => 'LoginController',
+            'hide_top_login' => true,
             'loginForm' => $loginForm,
             'error' => $error,
         ]);
@@ -44,6 +45,9 @@ class LoginController extends AbstractController
         throw new \LogicException('This code should never be reached');
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/magic_login', name: 'app_magic_login')]
     public function requestLoginLink(
         NotifierInterface $notifier,
@@ -72,8 +76,12 @@ class LoginController extends AbstractController
 
             $mailer->send($email);
 
-            // render a "Login link is sent!" page
-            return $this->render('login/login_link_sent.html.twig');
+            $this->addFlash(
+                'success', // The type (can be anything: success, error, warning, etc.)
+                'Check your email for a magic login link' // The message
+            );
+
+            return $this->redirectToRoute('app_login');
         }
 
         // if it's not submitted, render the form to request the "login link"

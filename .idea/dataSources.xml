@@ -8,11 +8,18 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/var/data.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="app@localhost" uuid="f4d1bbd7-4db5-4b54-8917-f257bb4858fc">
+    <data-source source="LOCAL" name="nrfc@127.0.0.1" uuid="fc568c7b-bc42-4709-a2a5-8ce86142f6c6">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/app</jdbc-url>
+      <jdbc-url>jdbc:postgresql://127.0.0.1:5432/nrfc</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="nrfc@127.0.0.1 [test]" uuid="8bbd4294-b174-4859-a591-d64b33b154ab">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://127.0.0.1:55432/nrfc_test</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
