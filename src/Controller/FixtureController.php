@@ -6,18 +6,16 @@ use App\Config\Competition;
 use App\Config\HomeAway;
 use App\Config\Team;
 use App\Entity\Fixture;
-use App\Entity\User;
 use App\Form\FixtureType;
 use App\Repository\FixtureRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Constraints\Date;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/')]
 final class FixtureController extends AbstractController
@@ -36,12 +34,12 @@ final class FixtureController extends AbstractController
 
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
-            if ($team !== null) {
+            if (null !== $team) {
                 $teams = [Team::getBy($team)];
             }
         }
 
-        if (count($teams) === 0) {
+        if (0 === count($teams)) {
             $teams = Team::cases();
         }
 
@@ -50,10 +48,13 @@ final class FixtureController extends AbstractController
         foreach ($dates as $date) {
             $fixture = [];
             foreach ($teams as $team) {
-                $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                if ($team) {
+                    $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                }
             }
             $fixtures[$date] = $fixture;
         }
+
         return $this->render('fixture/index.html.twig', [
             'teams' => $teams,
             'fixtures' => $fixtures,
@@ -117,14 +118,13 @@ final class FixtureController extends AbstractController
         return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/byDate/{date}', name: 'app_fixture_bydate', methods: ['GET'])]
+    #[Route('/byDate/{date}', name: 'app_fixture_byDate', methods: ['GET'])]
     public function byDate(
         string $date,
-        FixtureRepository $fixtureRepository
-    ): Response
-    {
+        FixtureRepository $fixtureRepository,
+    ): Response {
         // Manually validate the date format
-        $dateObj = \DateTimeImmutable::createFromFormat('Ymd', $date);
+        $dateObj = DateTimeImmutable::createFromFormat('Ymd', $date);
 
         if (!$dateObj || $dateObj->format('Ymd') !== $date) {
             return $this->json([
@@ -134,45 +134,44 @@ final class FixtureController extends AbstractController
 
         try {
             // Create DateTimeImmutable from the input string
-            $dateObj = \DateTimeImmutable::createFromFormat('Ymd', $date);
+            $dateObj = DateTimeImmutable::createFromFormat('Ymd', $date);
 
             if (!$dateObj) {
-                throw new \InvalidArgumentException('Invalid date');
+                throw new InvalidArgumentException('Invalid date');
             }
 
             // Set the start and end of the day
-            $startOfDay = $dateObj->setTime(0, 0, 0);
+            $startOfDay = $dateObj->setTime(0, 0);
             $endOfDay = $dateObj->setTime(23, 59, 59);
 
             // Find fixtures between start and end of day
             $_fixtures = $fixtureRepository->findByDateRange($startOfDay, $endOfDay);
             $fixtures = [
-                "TRAINING" => [],
-                "HOME" => [],
-                "AWAY" => [],
-                "TBA" => [],
+                'TRAINING' => [],
+                'HOME' => [],
+                'AWAY' => [],
+                'TBA' => [],
             ];
             foreach ($_fixtures as $fixture) {
-                if ($fixture->getCompetition() == Competition::Training ||$fixture->getCompetition() == Competition::None) {
-                    $fixtures["TRAINING"][] = $fixture;
-                } elseif ($fixture->getHomeAway() == HomeAway::Away) {
-                    $fixtures["AWAY"][] = $fixture;
-                } elseif ($fixture->getHomeAway() == HomeAway::Home) {
-                    $fixtures["HOME"][] = $fixture;
-                } elseif ($fixture->getHomeAway() == HomeAway::TBA) {
-                    $fixtures["TBA"][] = $fixture;
+                if (Competition::Training == $fixture->getCompetition() || Competition::None == $fixture->getCompetition()) {
+                    $fixtures['TRAINING'][] = $fixture;
+                } elseif (HomeAway::Away == $fixture->getHomeAway()) {
+                    $fixtures['AWAY'][] = $fixture;
+                } elseif (HomeAway::Home == $fixture->getHomeAway()) {
+                    $fixtures['HOME'][] = $fixture;
                 } else {
-                    $fixtures["TBA"][] = $fixture;
+                    $fixtures['TBA'][] = $fixture;
                 }
             }
 
             // now sort into training, home games, away games, TBA
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->json([
                 'error' => 'An error occurred while processing your request.',
                 'details' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
         return $this->render('fixture/byDate.html.twig', [
             'date' => $dateObj->format('Y-m-d'),
             'fixtures' => $fixtures,

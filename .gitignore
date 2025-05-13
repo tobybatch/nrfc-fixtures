@@ -27,3 +27,7 @@ yarn-error.log
 .env
 playwright-report
 test-results
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

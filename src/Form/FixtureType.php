@@ -9,11 +9,13 @@ use App\Entity\Club;
 use App\Entity\Fixture;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Fixture>
+ */
 class FixtureType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -29,15 +31,15 @@ class FixtureType extends AbstractType
             ->add('competition', EnumType::class, ['class' => Competition::class])
             ->add('team', EnumType::class, [
                 'class' => Team::class,
-                'placeholder' => "-- choose team --",
-                'label' => 'Age group'
+                'placeholder' => '-- choose team --',
+                'label' => 'Age group',
             ])
             ->add('club', EntityType::class, [
                 'label' => 'Opponent/Training',
                 'class' => Club::class,
                 'required' => false,
                 'choice_label' => 'name',
-                'placeholder' => "Training",
+                'placeholder' => 'Training',
             ])
         ;
     }

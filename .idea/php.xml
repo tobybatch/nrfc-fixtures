@@ -4,11 +4,19 @@
     <option name="transferred" value="true" />
   </component>
   <component name="PHPCSFixerOptionsConfiguration">
+    <option name="codingStandard" value="Custom" />
+    <option name="rulesetPath" value="$PROJECT_DIR$/.php-cs-fixer.dist.php" />
     <option name="transferred" value="true" />
   </component>
   <component name="PHPCodeSnifferOptionsConfiguration">
     <option name="highlightLevel" value="WARNING" />
     <option name="transferred" value="true" />
+  </component>
+  <component name="PhpCSFixer">
+    <phpcsfixer_settings>
+      <phpcs_fixer_by_interpreter asDefaultInterpreter="true" deletedFromTheList="true" interpreter_id="8b3e935e-810e-4c43-b43a-9d60267d5aa8" tool_path="/home/tobias/usr/nrfc/nrfc-fixtures/vendor/bin/php-cs-fixer" timeout="30000" />
+      <PhpCSFixerConfiguration deletedFromTheList="true" tool_path="$PROJECT_DIR$/vendor/bin/php-cs-fixer" />
+    </phpcsfixer_settings>
   </component>
   <component name="PhpCodeSniffer">
     <phpcs_settings>
@@ -163,15 +171,21 @@
       <path value="$PROJECT_DIR$/vendor/dama/doctrine-test-bundle" />
       <path value="$PROJECT_DIR$/vendor/php-webdriver/webdriver" />
       <path value="$PROJECT_DIR$/vendor/symfony/panther" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/extension-installer" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/phpstan" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/phpstan-symfony" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.3" />
   <component name="PhpStan">
     <PhpStan_settings>
-      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="8b3e935e-810e-4c43-b43a-9d60267d5aa8" timeout="60000" />
+      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="8b3e935e-810e-4c43-b43a-9d60267d5aa8" tool_path="$PROJECT_DIR$/vendor/bin/phpstan" timeout="60000" />
+      <PhpStanConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpstan" />
     </PhpStan_settings>
   </component>
   <component name="PhpStanOptionsConfiguration">
+    <option name="config" value="$PROJECT_DIR$/phpstan.dist.neon" />
+    <option name="level" value="8" />
     <option name="transferred" value="true" />
   </component>
   <component name="PhpUnit">

@@ -4,11 +4,9 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Uuid;
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -18,20 +16,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * @var string[] The user roles
      */
     #[ORM\Column]
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var ?string The hashed password
      */
     #[ORM\Column]
     private ?string $password = null;
@@ -60,13 +58,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        if ($this->email) {
+            return $this->email;
+        }
+        return (string) "User " . $this->id;
     }
 
     /**
      * @see UserInterface
      *
-     * @return list<string>
+     * @return string[]
      */
     public function getRoles(): array
     {
@@ -78,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @param list<string> $roles
+     * @param string[] $roles
      */
     public function setRoles(array $roles): static
     {

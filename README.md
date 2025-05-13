@@ -9,7 +9,14 @@ xdebug.client_port=9003  # Default is 9003 in Xdebug 3
 xdebug.client_host=127.0.0.1
 ```
 
-## Set uop the app
+## Tooling
+
+```
+curl -o .git/hooks/pre-commit https://raw.githubusercontent.com/tobybatch/bashdotdee/refs/heads/main/bin/commit-lint.sh
+chmod 755 .git/hooks/pre-commit
+```
+
+## Set up the app
 
 ```
 composer install

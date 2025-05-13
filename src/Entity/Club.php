@@ -13,7 +13,7 @@ class Club
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -102,7 +102,11 @@ class Club
         return $this;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
+        if (null == $this->name) {
+            return '???';
+        }
         return $this->name;
     }
 

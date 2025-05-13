@@ -1,5 +1,7 @@
 <?php
+
 // src/Controller/ProfileController.php
+
 namespace App\Controller;
 
 use App\Entity\User; // Replace with your User entity
@@ -17,7 +19,7 @@ class ProfileController extends AbstractController
     public function index(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHashTool,
     ): Response {
         $user = $this->getUser();
 
@@ -32,8 +34,9 @@ class ProfileController extends AbstractController
             $currentPassword = $form->get('currentPassword')->getData();
 
             // Verify current password
-            if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+            if (!$passwordHashTool->isPasswordValid($user, $currentPassword)) {
                 $this->addFlash('error', 'Your current password is incorrect.');
+
                 return $this->redirectToRoute('app_profile');
             }
 
@@ -43,13 +46,14 @@ class ProfileController extends AbstractController
             // Update password if provided
             $newPassword = $form->get('newPassword')->getData();
             if ($newPassword) {
-                $user->setPassword($passwordHasher->hashPassword($user, $newPassword));
+                $user->setPassword($passwordHashTool->hashPassword($user, $newPassword));
             }
 
             $entityManager->persist($user);
             $entityManager->flush();
 
             $this->addFlash('success', 'Your profile has been updated successfully!');
+
             return $this->redirectToRoute('app_profile');
         }
 

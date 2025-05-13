@@ -22,6 +22,9 @@ class FixtureRepository extends ServiceEntityRepository
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @return string[]
+     */
     public function getDates(): array
     {
         $results = $this->entityManager->createQueryBuilder()
@@ -38,10 +41,17 @@ class FixtureRepository extends ServiceEntityRepository
         )));
 
         sort($uniqueDates); // Optional sorting
+
         return $uniqueDates;
     }
 
-    public function getFixturesForTeam(Team $team, $date = null): array
+
+    /**
+     * @param Team $team
+     * @param string|null $date
+     * @return array{Fixture}
+     */
+    public function getFixturesForTeam(Team $team, string $date = null): array
     {
         $statement = $this->createQueryBuilder('f')
             ->leftJoin('f.club', 'c')
@@ -51,8 +61,8 @@ class FixtureRepository extends ServiceEntityRepository
 
         if ($date) {
             $statement->andWhere('f.date BETWEEN :start AND :end')
-                ->setParameter('start', $date . " 00:00:00")
-                ->setParameter('end', $date . " 23:59:59");
+                ->setParameter('start', sprintf('%s 00:00:00', $date))
+                ->setParameter('end', sprintf('%s 23:59:59', $date));
         }
 
         return $statement->orderBy('f.date', 'ASC')
@@ -61,20 +71,17 @@ class FixtureRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param DateTimeImmutable $startDate
-     * @param DateTimeImmutable $endDate
      * @return Fixture[] Returns an array of Fixture objects
      */
     public function findByDateRange(
         DateTimeImmutable $startDate,
-        DateTimeImmutable $endDate
-    ): array
-{
-    return $this->createQueryBuilder('f')
-        ->where('f.date BETWEEN :start AND :end')
-        ->setParameter('start', $startDate)
-        ->setParameter('end', $endDate)
-        ->getQuery()
-        ->getResult();
-}
+        DateTimeImmutable $endDate,
+    ): array {
+        return $this->createQueryBuilder('f')
+            ->where('f.date BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->getQuery()
+            ->getResult();
+    }
 }

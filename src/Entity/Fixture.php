@@ -2,24 +2,25 @@
 
 namespace App\Entity;
 
+use App\Config\Competition;
+use App\Config\HomeAway;
+use App\Config\Team;
 use App\Repository\FixtureRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Config\HomeAway;
-use \App\Config\Competition;
-use \App\Config\Team;
 
 #[ORM\Entity(repositoryClass: FixtureRepository::class)]
 class Fixture
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column]
     #[ORM\OrderBy(['date' => 'DESC'])]
-    private ?\DateTimeImmutable $date = null;
+    private ?DateTimeImmutable $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'fixtures')]
     #[ORM\JoinColumn(nullable: true)]
@@ -45,12 +46,12 @@ class Fixture
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeImmutable
+    public function getDate(): ?DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeImmutable $date): static
+    public function setDate(DateTimeImmutable $date): static
     {
         $this->date = $date;
 
@@ -69,8 +70,7 @@ class Fixture
         return $this;
     }
 
-
-    public function getHomeAway(): ?HomeAway
+    public function getHomeAway(): HomeAway
     {
         return $this->homeAway;
     }
@@ -82,19 +82,19 @@ class Fixture
         return $this;
     }
 
-    public function getCompetition(): ?Competition
+    public function getCompetition(): Competition
     {
         return $this->competition;
     }
 
-    public function setCompetition(?Competition $competition): static
+    public function setCompetition(Competition $competition): static
     {
         $this->competition = $competition;
 
         return $this;
     }
 
-    public function getTeam(): ?Team
+    public function getTeam(): Team
     {
         return $this->team;
     }
@@ -118,30 +118,30 @@ class Fixture
         return $this;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->format();
     }
-    public function format(
-        $incHA = true,
-        $incComp = false
-    ): string{
-        $text = "";
-        if (empty($this->getName()) && empty($this->getClub())) {
-            return "";
-        }
 
-        if ($this->getClub() != null) {
+    public function format(
+        bool $incHA = true,
+        bool $incComp = false,
+    ): string {
+        if (null != $this->getClub()) {
             $text = $this->getClub()->getName();
         } else {
             $text = $this->getName();
         }
-        if ($incHA && $this->getCompetition() != Competition::None) {
-            $text .= " (" . $this->getHomeAway()->value . ")";
+        if ($incHA && Competition::None != $this->getCompetition()) {
+            $text .= ' ('.$this->getHomeAway()->value.')';
         }
         if ($incComp) {
-            $text .= " [" . $this->getCompetition()->shortValue() . "]";
+            $text .= ' ['.$this->getCompetition()->shortValue().']';
         }
 
+        if ($text == null) {
+            $text = '???';
+        }
         return $text;
     }
 

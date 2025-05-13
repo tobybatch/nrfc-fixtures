@@ -27,6 +27,14 @@ class FixtureExtensionTest extends TestCase
         $this->assertEquals('fixtureSummary', $filters[0]->getName());
     }
 
+    public function testGetFunctions(): void
+    {
+        $filters = $this->extension->getFunctions();
+        $this->assertCount(2, $filters);
+        $this->assertEquals('dateIsNew', $filters[0]->getName());
+        $this->assertEquals('dateIsNotSet', $filters[1]->getName());
+    }
+
 
     public function testDateIsNew(): void
     {

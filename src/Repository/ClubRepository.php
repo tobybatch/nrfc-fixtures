@@ -15,9 +15,10 @@ class ClubRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Club::class);
     }
+
     public function findAll(): array
     {
-        return $this->findBy(array(), array('name' => 'ASC'));
+        return $this->findBy([], ['name' => 'ASC']);
     }
 
     //    /**

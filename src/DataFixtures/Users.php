@@ -2,25 +2,22 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Club;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Exception;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class Users extends Fixture
 {
-    const BASIC_USER = 'basic_user@example.com';
-    const ADMIN_USER = 'admin_user@example.com';
-    const EDITOR_USER = 'editor_user@example.com';
-    const PASSWORD = 'super_nutty_123';
-    private UserPasswordHasherInterface $passwordHasher;
+    public const string BASIC_USER = 'basic_user@example.com';
+    public const string ADMIN_USER = 'admin_user@example.com';
+    public const string EDITOR_USER = 'editor_user@example.com';
+    public const string PASSWORD = 'super_nutty_123';
+    private UserPasswordHasherInterface $passwordHashTool;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    public function __construct(UserPasswordHasherInterface $passwordHashTool)
     {
-        $this->passwordHasher = $passwordHasher;
+        $this->passwordHashTool = $passwordHashTool;
     }
 
     public function load(ObjectManager $manager): void
@@ -30,12 +27,18 @@ class Users extends Fixture
         $this->makeUser($manager, self::EDITOR_USER, ['ROLE_EDITOR']);
     }
 
+    /**
+     * @param ObjectManager $manager
+     * @param string $email
+     * @param string[] $roles
+     * @return void
+     */
     private function makeUser(ObjectManager $manager, string $email, array $roles = []): void
     {
         $u = new User();
         $u->setEmail($email);
         $u->setRoles($roles);
-        $u->setPassword($this->passwordHasher->hashPassword($u, self::PASSWORD));
+        $u->setPassword($this->passwordHashTool->hashPassword($u, self::PASSWORD));
         $manager->persist($u);
         $manager->flush();
     }

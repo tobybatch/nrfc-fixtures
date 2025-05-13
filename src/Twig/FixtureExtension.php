@@ -3,7 +3,6 @@
 namespace App\Twig;
 
 use App\Config\Competition;
-use App\Config\Team;
 use App\Entity\Fixture;
 use DateTimeImmutable;
 use Twig\Extension\AbstractExtension;
@@ -15,10 +14,11 @@ class FixtureExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-//            new TwigFilter('teamName', [$this, 'teamName']),
+            //            new TwigFilter('teamName', [$this, 'teamName']),
             new TwigFilter('fixtureSummary', [$this, 'fixtureSummary']),
         ];
     }
+
     public function getFunctions(): array
     {
         return [
@@ -26,11 +26,6 @@ class FixtureExtension extends AbstractExtension
             new TwigFunction('dateIsNotSet', [$this, 'dateIsNotSet']),
         ];
     }
-
-//    public function teamName(Team $team): string
-//    {
-//        return $team->value;
-//    }
 
     public function dateIsNew(DateTimeImmutable $d1, DateTimeImmutable $d2): bool
     {
@@ -41,30 +36,25 @@ class FixtureExtension extends AbstractExtension
      * Default tim eof a date is set to 1 minute past midnight, it the time is still
      * 12:01 then it has not been set, return true. If it's been changed then assume
      * that is deliberate and return false.
-     *
-     * @param DateTimeImmutable $date
-     * @return bool
      */
     public function dateIsNotSet(DateTimeImmutable $date): bool
     {
-        return $date->format('H:i') != '12:01';
+        return '12:01' != $date->format('H:i');
     }
 
     public function fixtureSummary(Fixture $fixture): string
     {
-        if ($fixture->getCompetition() === Competition::None) {
+        if (Competition::None === $fixture->getCompetition()) {
             return $fixture->getTeam()->value . ' Training';
-        }
-        elseif ($fixture->getClub() != null) {
+        } elseif (null != $fixture->getClub()) {
             return sprintf(
-                "%s vs %s (%s)",
+                '%s vs %s (%s)',
                 $fixture->getTeam()->value,
                 $fixture->getClub()->getName(),
                 $fixture->getHomeAway()->value,
             );
-        }
-        else {
-            return $fixture->getTeam()->value . " " . $fixture;
+        } else {
+            return $fixture->getTeam()->value.' '.$fixture;
         }
     }
 }

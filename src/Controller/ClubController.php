@@ -58,6 +58,7 @@ final class ClubController extends AbstractController
                     title: $club->getName(),
                 ));
         }
+
         return $this->render('club/show.html.twig', [
             'club' => $club,
             'map' => $myMap,
@@ -85,7 +86,7 @@ final class ClubController extends AbstractController
     #[Route('/{id}', name: 'app_club_delete', methods: ['POST'])]
     public function delete(Request $request, Club $club, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $club->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$club->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($club);
             $entityManager->flush();
         }

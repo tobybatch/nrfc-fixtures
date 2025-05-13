@@ -1,5 +1,7 @@
 <?php
+
 // src/Config/Competition.php
+
 namespace App\Config;
 
 enum Competition: string
@@ -17,11 +19,11 @@ enum Competition: string
     public function shortValue(): string
     {
         return match ($this) {
-            Competition::CountyCup => "CC",
-            Competition::NationalCup => "NC",
-            Competition::Conference => "Conf",
+            Competition::CountyCup => 'CC',
+            Competition::NationalCup => 'NC',
+            Competition::Conference => 'Conf',
             // Competition::Pathway, Competition::Festival, Competition::Norfolk10s, Competition::None, Competition::Friendly => "",
-            default => "",
+            default => '',
         };
     }
 }

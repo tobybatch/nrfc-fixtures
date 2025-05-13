@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,23 +46,23 @@ class NrfcFixturesInitclubsCommand extends Command
 
         $cnt = 0;
         foreach (Clubs::CLUBS as $club) {
-            $c = $this->clubRepository->findOneBy(['name' => $club["name"]]);
-            if ($c == null) {
+            $c = $this->clubRepository->findOneBy(['name' => $club['name']]);
+            if (null == $c) {
                 $c = new Club();
             } elseif (!$overwrite) {
-                $io->warning(sprintf("Deleting existing club %s", $club["name"]));
+                $io->warning(sprintf('Deleting existing club %s', $club['name']));
                 $this->em->detach($c);
                 $this->em->flush();
                 $c = new Club();
             }
 
-            $c->setName($club["name"]);
-            $c->setAddress($club["addr"]);
-            $c->setLatitude($club["lat"]);
-            $c->setLongitude($club["lon"]);
+            $c->setName($club['name']);
+            $c->setAddress($club['addr']);
+            $c->setLatitude($club['lat']);
+            $c->setLongitude($club['lon']);
             $this->em->persist($c);
-            $io->info(sprintf("Creating club %s", $club["name"]));
-            $cnt++;
+            $io->info(sprintf('Creating club %s', $club['name']));
+            ++$cnt;
         }
         $this->em->flush();
 

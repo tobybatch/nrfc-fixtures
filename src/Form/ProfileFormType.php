@@ -1,5 +1,7 @@
 <?php
+
 // src/Form/ProfileFormType.php
+
 namespace App\Form;
 
 use App\Entity\User;
@@ -10,8 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ProfileFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -20,7 +24,7 @@ class ProfileFormType extends AbstractType
             ->add('email', EmailType::class, [
                 'attr' => [
                     'class' => 'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
-                    'placeholder' => 'Your email address'
+                    'placeholder' => 'Your email address',
                 ],
                 'required' => true,
             ])
@@ -28,7 +32,7 @@ class ProfileFormType extends AbstractType
                 'mapped' => false,
                 'attr' => [
                     'class' => 'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
-                    'placeholder' => 'Current password'
+                    'placeholder' => 'Current password',
                 ],
                 'required' => true,
             ])
@@ -39,7 +43,7 @@ class ProfileFormType extends AbstractType
                 'first_options' => [
                     'attr' => [
                         'class' => 'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
-                        'placeholder' => 'New password (leave blank to keep current)'
+                        'placeholder' => 'New password (leave blank to keep current)',
                     ],
                     'constraints' => [
                         new Length([
@@ -52,7 +56,7 @@ class ProfileFormType extends AbstractType
                 'second_options' => [
                     'attr' => [
                         'class' => 'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2',
-                        'placeholder' => 'Repeat new password'
+                        'placeholder' => 'Repeat new password',
                     ],
                 ],
                 'invalid_message' => 'The password fields must match.',
