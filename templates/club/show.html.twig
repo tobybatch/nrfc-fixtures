@@ -4,16 +4,11 @@
 {% block page_title %}{{ club.name }}{% endblock %}
 
 {% block body %}
+
+    <h2 class="text-2xl font-bold mb-4">{{ club.name }}</h2>
+
     <!-- Club Address -->
     <div class="text-gray-600 mb-6">
-
-        <div class="flex-row mb-10">
-            {{ club.address }}
-            <a href="https://www.google.com/maps/search/?api=1&query={{ club.address | url_encode }}" target='_blank'
-               class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                ↗️
-            </a>
-        </div>
 
         {% if club.notes %}
             <div class="mb-6">
@@ -23,13 +18,7 @@
             </div>
         {% endif %}
 
-        <div class="flex-row">
-            {% if map %}
-                <div>
-                    {{ ux_map(map, { style: 'height: 300px; width: 300px' }) }}
-                </div>
-            {% endif %}
-        </div>
+        {{ makeMap(club) }}
 
     </div>
 

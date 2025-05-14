@@ -48,21 +48,7 @@ final class ClubController extends AbstractController
     #[Route('/{id}', name: 'app_club_show', methods: ['GET'])]
     public function show(Club $club): Response
     {
-        $myMap = false;
-        if ($club->getLatitude() && $club->getLongitude()) {
-            $point = new Point($club->getLatitude(), $club->getLongitude());
-            $myMap = (new Map())->center($point)
-                ->zoom(10)
-                ->addMarker(new Marker(
-                    position: $point,
-                    title: $club->getName(),
-                ));
-        }
-
-        return $this->render('club/show.html.twig', [
-            'club' => $club,
-            'map' => $myMap,
-        ]);
+        return $this->render('club/show.html.twig', ['club' => $club]);
     }
 
     #[Route('/{id}/edit', name: 'app_club_edit', methods: ['GET', 'POST'])]

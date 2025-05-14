@@ -27,13 +27,13 @@ class ClubsAndFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->runCommand([
-            'file' => 'assets/fixtures.csv',
+            'file' => 'assets/clubs.csv',
+            '--type' => 'club',
             '--skip-first' => true,
         ]);
 
         $this->runCommand([
-            'file' => 'assets/clubs.csv',
-            '--type' => 'club',
+            'file' => 'assets/fixtures.csv',
             '--skip-first' => true,
         ]);
     }

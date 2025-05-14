@@ -39,8 +39,8 @@ symfony serve
 docker compose down
 docker volume rm nrfc-fixtures-prod-dbdata
 docker compose up -d
-docker compose exec fixtures ./bin/console nrfc:fixtures:initclubs
-docker compose exec fixtures ./bin/console nrfc:fixtures:import assets/fixtures.csv
+docker compose exec fixtures ./bin/console nrfc:fixtures:import -s -t club ./assets/clubs.csv
+docker compose exec fixtures ./bin/console nrfc:fixtures:import -s ./assets/fixtures.csv
 ```
 
 ## Make a migration and run it

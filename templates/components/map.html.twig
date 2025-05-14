@@ -1,0 +1,18 @@
+
+
+<div class="flex-row">
+
+    <div class="flex-row mb-10">
+        {{ address }}
+        <a href="https://www.google.com/maps/search/?api=1&query={{ address | url_encode }}" target='_blank'
+           class="text-indigo-600 hover:text-indigo-900 hover:underline">
+            ↗️
+        </a>
+    </div>
+
+    {% if map %}
+        <div>
+            {{ ux_map(map, { style: 'height: 300px; width: 300px' }) }}
+        </div>
+    {% endif %}
+</div>
