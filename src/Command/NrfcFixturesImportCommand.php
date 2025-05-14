@@ -46,6 +46,7 @@ class NrfcFixturesImportCommand extends Command
             ->setDescription('Import data from CSV file and create entities')
             ->setHelp('This command allows you to import fixture data from a CSV file and create corresponding entities in the database.')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the CSV file')
+            ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'club/fixture', 'fixture')
             ->addOption('delimiter', 'd', InputOption::VALUE_OPTIONAL, 'CSV delimiter', ',')
             ->addOption('skip-first', 's', InputOption::VALUE_NONE, 'Skip first row (header)')
             ->addOption('batch-size', 'b', InputOption::VALUE_OPTIONAL, 'Flush batch size', 100);
@@ -55,6 +56,7 @@ class NrfcFixturesImportCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $filePath = $input->getArgument('file');
+        $type = $input->getOption('type');
         $delimiter = $input->getOption('delimiter');
         $skipFirstRow = $input->getOption('skip-first');
         $batchSize = (int) $input->getOption('batch-size');
@@ -62,6 +64,11 @@ class NrfcFixturesImportCommand extends Command
         // Skip validation for help command
         if ($input->hasOption('help') && $input->getOption('help')) {
             return Command::SUCCESS;
+        }
+
+        if ($type != 'fixture' && $type != 'club') {
+            $io->error('Invalid type');
+            return Command::FAILURE;
         }
 
         // Validate file exists
@@ -95,24 +102,11 @@ class NrfcFixturesImportCommand extends Command
                         continue;
                     }
 
-                    if (empty($row[0]) || !DateTime::createFromFormat('j-M-y', $row[0])) {
-                        continue;
+                    if ($type == 'fixture') {
+                        $this->processFixtureRow($row);
+                    } else {
+                        $this->processClubRow($row);
                     }
-
-                    $date = DateTimeImmutable::createFromMutable(
-                        DateTime::createFromFormat('j-M-y', $row[0])
-                    )->setTime(0, 1);
-
-                    $this->createFixture(Team::Minis, $date, $row[2]);
-                    $this->createFixture(Team::U13B, $date, $row[3]);
-                    $this->createFixture(Team::U14B, $date, $row[4]);
-                    $this->createFixture(Team::U15B, $date, $row[5]);
-                    $this->createFixture(Team::U16B, $date, $row[6]);
-                    $this->createFixture(Team::U18B, $date, $row[7]);
-                    $this->createFixture(Team::U12G, $date, $row[9]);
-                    $this->createFixture(Team::U14G, $date, $row[10]);
-                    $this->createFixture(Team::U16G, $date, $row[11]);
-                    $this->createFixture(Team::U18G, $date, $row[12]);
 
                     ++$importedCount;
 
@@ -148,6 +142,50 @@ class NrfcFixturesImportCommand extends Command
             return Command::FAILURE;
         }
     }
+
+    /**
+     * @param string[] $row
+     * @return void
+     */
+    private function processFixtureRow(array $row): void
+    {
+        if (empty($row[0]) || !DateTime::createFromFormat('j-M-y', $row[0])) {
+            return;
+        }
+
+        $date = DateTimeImmutable::createFromMutable(
+            DateTime::createFromFormat('j-M-y', $row[0])
+        )->setTime(0, 1);
+
+        $this->createFixture(Team::Minis, $date, $row[2]);
+        $this->createFixture(Team::U13B, $date, $row[3]);
+        $this->createFixture(Team::U14B, $date, $row[4]);
+        $this->createFixture(Team::U15B, $date, $row[5]);
+        $this->createFixture(Team::U16B, $date, $row[6]);
+        $this->createFixture(Team::U18B, $date, $row[7]);
+        $this->createFixture(Team::U12G, $date, $row[9]);
+        $this->createFixture(Team::U14G, $date, $row[10]);
+        $this->createFixture(Team::U16G, $date, $row[11]);
+        $this->createFixture(Team::U18G, $date, $row[12]);
+    }
+
+    /**
+     * @param string[] $row
+     * @return void
+     */
+    private function processClubRow(array $row): void
+    {
+        $c = $this->clubRepository->findOneBy(['name' => $row[0]]);
+        if (null == $c) {
+            $c = new Club();
+            $c->setName($row[0]);
+        }
+        $c->setAddress($row[1]);
+        $c->setLatitude($row[2]);
+        $c->setLongitude($row[3]);
+        $this->em->persist($c);
+    }
+
 
     private function createFixture(Team $team, DateTimeImmutable $date, mixed $detail): void
     {

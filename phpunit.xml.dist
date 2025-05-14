@@ -16,13 +16,13 @@
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
         <env name="PANTHER_CHROME_DRIVER_BINARY" value="/usr/lib/chromium-browser/chromedriver"/>
-        <env name="PANTHER_NO_HEADLESS" value="1"/>
+<!--        <env name="PANTHER_NO_HEADLESS" value="1"/>-->
         <env name="DATABASE_URL" value="postgresql://nrfc:nrfc@127.0.0.1:55432/nrfc_test"/>
     </php>
 
     <testsuites>
         <testsuite name="Unit Test Suite">
-            <directory>tests/unit</directory>
+            <directory>tests/Unit</directory>
         </testsuite>
         <testsuite name="E2E Test Suite">
             <directory>tests/E2E</directory>

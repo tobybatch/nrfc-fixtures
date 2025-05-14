@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class Fixtures extends Fixture
+class ClubsAndFixtures extends Fixture
 {
     private KernelInterface $kernel;
 
@@ -26,17 +26,25 @@ class Fixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
-        $commandName = 'nrfc:fixtures:import';
-        $arguments = [
+        $this->runCommand([
             'file' => 'assets/fixtures.csv',
             '--skip-first' => true,
-        ];
+        ]);
 
+        $this->runCommand([
+            'file' => 'assets/clubs.csv',
+            '--type' => 'club',
+            '--skip-first' => true,
+        ]);
+    }
+
+    private function runCommand(array $arguments): void
+    {
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
 
         $input = new ArrayInput(array_merge(
-            ['command' => $commandName],
+            ['command' => 'nrfc:fixtures:import'],
             $arguments
         ));
 
@@ -44,7 +52,7 @@ class Fixtures extends Fixture
         $exitCode = $application->run($input, $output);
 
         if (0 !== $exitCode) {
-            throw new RuntimeException(sprintf('Command "%s" failed with code %d. Output: %s', $commandName, $exitCode, $output->fetch()));
+            throw new RuntimeException(sprintf('Command "nrfc:fixtures:import" failed with code %d. Output: %s', $exitCode, $output->fetch()));
         }
 
         (new ConsoleOutput())->writeln($output->fetch());

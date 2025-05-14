@@ -33,6 +33,16 @@ symfony serve
 ./bin/console doctrine:fixtures:load
 ```
 
+## Init/Reset the live DB
+
+```
+docker compose down
+docker volume rm nrfc-fixtures-prod-dbdata
+docker compose up -d
+docker compose exec fixtures ./bin/console nrfc:fixtures:initclubs
+docker compose exec fixtures ./bin/console nrfc:fixtures:import assets/fixtures.csv
+```
+
 ## Make a migration and run it
 
 ```
