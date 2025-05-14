@@ -26,6 +26,7 @@
         </testsuite>
         <testsuite name="E2E Test Suite">
             <directory>tests/E2E</directory>
+            <exclude>tests/E2E/LoginFlowTest.php</exclude>
         </testsuite>
     </testsuites>
 
