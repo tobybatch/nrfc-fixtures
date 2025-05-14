@@ -8,7 +8,7 @@
         <tbody>
         {% if fixture.competition.value != "None" %}
             <tr>
-                <th colspan="2">{{ fixture.competition.value }}</th>
+                <th colspan="2">{{ fixture.format }}</th>
             </tr>
         {% endif %}
         <tr>
@@ -31,7 +31,7 @@
                 {% if fixture.homeAway.value == "H" %}
                     Norwich Rugby Club
                 {% elseif fixture.homeAway.value == "A" and fixture.club is defined %}
-                    {{ fixture.club.name }}
+                    <a class="underline font-bold text-blue-600" href="{{ path('app_club_show', {'id': fixture.club.id}) }}">{{ fixture.club.name }}</a>
                 {% else %}
                     To be arranged.
                 {% endif %}
@@ -49,17 +49,21 @@
                 {{ fixture.competition.value }}
             </td>
         </tr>
+        {% if fixture.notes %}
         <tr>
             <th class="text-left pr-2">Notes</th>
             <td class="text-left">
                 {{ fixture.notes }}
             </td>
         </tr>
+        {% endif %}
+        {% if fixture.homeAway.value == "A" %}
         <tr>
             <td colspan="2" class="text-center">
                 {{ makeMap(fixture.club) }}
             </td>
         </tr>
+        {% endif %}
         </tbody>
     </table>
 

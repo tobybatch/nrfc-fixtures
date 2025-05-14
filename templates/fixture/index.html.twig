@@ -39,7 +39,7 @@
                     <td class="py-3 px-4 whitespace-nowrap">
                         <a href="{{ path('app_fixture_byDate', parameters = {date: date|date('Ymd')}) }}">
                             {{ date|date('j M y') }}
-                            <a>
+                        </a>
                     </td>
                     {# each col is a different team #}
                     {% for fixtures_by_team in fixtures_on_date %}
