@@ -21,8 +21,14 @@
         }
     </script>
     {% block stylesheets %}{{ encore_entry_link_tags('app') }}{% endblock %}
+    {% block javascripts %}{{ encore_entry_script_tags('app') }}{% endblock %}
 </head>
-<body class="bg-light text-gray-800 font-sans leading-relaxed">
+<body
+        class="bg-light text-gray-800 font-sans leading-relaxed"
+        data-controller="helptoggle"
+        data-helptoggle-current-route-value="{{ app.request.attributes.get('_route') }}"
+        data-helptoggle-csrf-value="{{ csrf_token('app') }}"
+>
 
 <!-- Header -->
 {% include 'components/header.html.twig' %}
@@ -43,6 +49,7 @@
 
 <!-- Main Content -->
 <main class="container mx-auto px-4 py-6 min-h-[calc(100vh-180px)]">
+    {% include 'components/help.html.twig' %}
     {% block body %}{% endblock %}
 </main>
 
@@ -50,6 +57,5 @@
 {% include 'components/footer.html.twig' %}
 
 
-{% block javascripts %}{{ encore_entry_script_tags('app') }}{% endblock %}
 </body>
 </html>
