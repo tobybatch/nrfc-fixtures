@@ -70,17 +70,36 @@ class ProfileController extends AbstractController
         LoggerInterface $logger,
     ): Response
     {
-        $logger->info('Updating preferences');
-        $data = $request->getPayload();
-        foreach ($data->all() as $key => $value) {
-            $logger->info($key . ' = ' . json_encode($value));
+        $data = json_decode($request->getContent(), true);
+
+        if (in_array('showHelp', array_keys($data))) {
+            $logger->info('Updating preferences');
+            $key = $data['showHelp']["route"];
+            $value = $data['showHelp']["state"];
+            // get current prefs
+            /* @var User $user */
+            $user = $request->getUser();
+            $preferences = ['showHelp' => [ $key => $value ] ];
+            $cookie_preferences = $request->cookies->get('preferences');
+            if ($cookie_preferences) {
+                $preferences = array_merge(
+                    json_decode($cookie_preferences, true),
+                    $preferences,
+                );
+            }
+            if ($user) {
+                $preferences = array_merge(
+                    $user->getPreferences(),
+                    $preferences,
+                );
+            }
+            $user?->setPreferences($preferences);
+            $request->getSession()->set('preferences', $preferences);
+            $logger->info('Preferences updated');
+            $logger->info(json_encode($preferences));
+
+            return new JsonResponse($preferences);
         }
-        $showHelp = $data->get('showHelp');
-        if ($showHelp) {
-            $logger->info(json_encode($showHelp));
-        }
-        // if the user is logged in, update user prefs
-        // either way update the cookie value
-        return new JsonResponse([]);
+        return new JsonResponse([], Response::HTTP_BAD_REQUEST);
     }
 }
