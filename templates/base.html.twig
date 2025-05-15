@@ -28,6 +28,7 @@
         data-controller="helptoggle"
         data-helptoggle-current-route-value="{{ app.request.attributes.get('_route') }}"
         data-helptoggle-csrf-value="{{ csrf_token('app') }}"
+        data-helptoggle-pagehelpisvisible-value="{{ pageHelpIsVisible() ? 'true' : 'false' }}"
 >
 
 <!-- Header -->

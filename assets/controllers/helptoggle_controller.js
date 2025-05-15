@@ -5,13 +5,18 @@ export default class extends Controller {
         currentRoute: String,
         routeParams: Object,
         csrf: String,
+        pagehelpisvisible: String,
     };
     static targets = ['content', 'showButton', 'hideButton'];
 
     connect() {
-        this.contentTarget.hidden = false;
-        this.showButtonTarget.hidden = true;
-        this.hideButtonTarget.hidden = false;
+        const toggle = (this.pagehelpisvisibleValue == "true")
+        console.log("this.contentTarget.hidden",    !toggle);
+        console.log("this.hideButtonTarget.hidden", !toggle);
+        console.log("this.showButtonTarget.hidden", toggle);
+        this.contentTarget.hidden =    !toggle;
+        this.hideButtonTarget.hidden = !toggle;
+        this.showButtonTarget.hidden = toggle;
     }
 
     show() {
@@ -45,9 +50,7 @@ export default class extends Controller {
                     }
                 })
             }).then(response => {
-                if (response.ok) {
-                    console.log('Success!');
-                } else {
+                if (!response.ok) {
                     console.log('Error!', response.statusText);
                 }
         });

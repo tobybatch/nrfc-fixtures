@@ -1,11 +1,8 @@
 
-{% if showHelp() %}
+{% if pageHasHelp() %}
 <div
         class="mb-4 bg-blue-50 border-l-4 border-blue-400 p-4 relative help"
         data-helptoggle-target="content"
-        {% if not showHelp(app.request) %}
-                hidden
-        {% endif %}
 >
         <button
                 data-helptoggle-target="hideButton"

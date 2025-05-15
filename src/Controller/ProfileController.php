@@ -73,7 +73,6 @@ class ProfileController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (in_array('showHelp', array_keys($data))) {
-            $logger->info('Updating preferences');
             $key = $data['showHelp']["route"];
             $value = $data['showHelp']["state"];
             // get current prefs
@@ -95,8 +94,12 @@ class ProfileController extends AbstractController
             }
             $user?->setPreferences($preferences);
             $request->getSession()->set('preferences', $preferences);
-            $logger->info('Preferences updated');
-            $logger->info(json_encode($preferences));
+            $logger->warning(
+                sprintf(
+                    'Preferences updated: %s',
+                    json_encode($preferences)
+                )
+            );
 
             return new JsonResponse($preferences);
         }
