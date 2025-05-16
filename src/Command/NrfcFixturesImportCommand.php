@@ -79,11 +79,6 @@ class NrfcFixturesImportCommand extends Command
         $io->title(sprintf('Starting import from %s', $filePath));
 
         $file = fopen($filePath, 'r');
-        if (false === $file) {
-            $io->error('Could not open the file');
-
-            return Command::FAILURE;
-        }
 
         if ($skipFirstRow) {
             fgetcsv($file, 0, $delimiter);
