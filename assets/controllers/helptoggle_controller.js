@@ -10,7 +10,7 @@ export default class extends Controller {
     static targets = ['content', 'showButton', 'hideButton'];
 
     connect() {
-        const toggle = (this.pagehelpisvisibleValue == "true")
+        const toggle = (this.pagehelpisvisibleValue === "true")
         console.log("this.contentTarget.hidden",    !toggle);
         console.log("this.hideButtonTarget.hidden", !toggle);
         console.log("this.showButtonTarget.hidden", toggle);

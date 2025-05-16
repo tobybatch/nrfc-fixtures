@@ -56,6 +56,11 @@ docker compose exec fixtures ./bin/console nrfc:fixtures:import -s ./assets/fixt
 sudo apt install chromium-browser chromium-chromedriver firefox
 ```
 
+## Tests
+
+```
+XDEBUG_MODE=coverage ./vendor/bin/phpunit 
+```
 # TODO
 
  1. Fix route name
