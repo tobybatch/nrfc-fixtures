@@ -28,7 +28,7 @@ services:
       POSTGRES_PASSWORD: nrfc
       POSTGRES_USER: nrfc
     ports:
-      - "55432:5432"
+      - "5002:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "nrfc", "-U", "nrfc"]
       timeout: 5s

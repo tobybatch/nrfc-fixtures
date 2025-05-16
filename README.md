@@ -28,9 +28,9 @@ symfony serve
 ## Reset DB
 
 ```
-./bin/console doctrine:schema:drop    # Not needed in intial set up
-./bin/console doctrine:schema:create
-./bin/console doctrine:fixtures:load
+./bin/console doctrine:schema:drop -n   # Not needed in intial set up
+./bin/console doctrine:schema:create -n
+./bin/console doctrine:fixtures:load -n
 ```
 
 ## Init/Reset the live DB
