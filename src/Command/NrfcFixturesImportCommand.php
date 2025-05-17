@@ -47,7 +47,7 @@ class NrfcFixturesImportCommand extends Command
             ->setHelp('This command allows you to import fixture data from a CSV file and create corresponding entities in the database.')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the CSV file')
             ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'club/fixture', 'fixture')
-            ->addOption('delimiter', 'd', InputOption::VALUE_OPTIONAL, 'CSV delimiter', ',')
+            // ->addOption('delimiter', 'd', InputOption::VALUE_OPTIONAL, 'CSV delimiter', ',')
             ->addOption('skip-first', 's', InputOption::VALUE_NONE, 'Skip first row (header)')
             ->addOption('batch-size', 'b', InputOption::VALUE_OPTIONAL, 'Flush batch size', 100);
     }
@@ -57,7 +57,8 @@ class NrfcFixturesImportCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $filePath = $input->getArgument('file');
         $type = $input->getOption('type');
-        $delimiter = $input->getOption('delimiter');
+        // $delimiter = $input->getOption('delimiter');
+        $delimiter = ',';
         $skipFirstRow = $input->getOption('skip-first');
         $batchSize = (int) $input->getOption('batch-size');
 
@@ -92,11 +93,6 @@ class NrfcFixturesImportCommand extends Command
                 ++$rowNumber;
 
                 try {
-                    // Skip empty rows
-                    if (empty(array_filter($row))) {
-                        continue;
-                    }
-
                     if ($type == 'fixture') {
                         $this->processFixtureRow($row);
                     } else {
@@ -150,7 +146,7 @@ class NrfcFixturesImportCommand extends Command
 
         $date = DateTimeImmutable::createFromMutable(
             DateTime::createFromFormat('j-M-y', $row[0])
-        )->setTime(0, 1);
+        )->setTime(0, 0);
 
         $this->createFixture(Team::Minis, $date, $row[2]);
         $this->createFixture(Team::U13B, $date, $row[3]);
@@ -176,8 +172,8 @@ class NrfcFixturesImportCommand extends Command
             $c->setName($row[0]);
         }
         $c->setAddress($row[1]);
-        $c->setLatitude($row[2]);
-        $c->setLongitude($row[3]);
+        $c->setLatitude((float)$row[2]);
+        $c->setLongitude((float)$row[3]);
         $this->em->persist($c);
     }
 

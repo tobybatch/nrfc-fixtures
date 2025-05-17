@@ -19,12 +19,10 @@ use Twig\TwigFunction;
 class GlobalExtension extends AbstractExtension
 {
     private RequestStack $requestStack;
-    private $logger;
 
-    public function __construct(RequestStack $requestStack, LoggerInterface $logger)
+    public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
-        $this->logger = $logger;
     }
 
     public function getFunctions(): array
@@ -68,18 +66,12 @@ class GlobalExtension extends AbstractExtension
 
         $routeName = $request->attributes->get('_route');
 
-        $this->logger->info('========================');
-        $this->logger->info(json_encode($preferences));
-        $this->logger->info($routeName);
-
         if (
             array_key_exists('showHelp', $preferences) &&
             array_key_exists($routeName, $preferences['showHelp'])
         ) {
-            $this->logger->info($preferences['showHelp'][$routeName]);
             return $preferences['showHelp'][$routeName];
         }
-        $this->logger->info('Show help not found');
         return false;
     }
 }

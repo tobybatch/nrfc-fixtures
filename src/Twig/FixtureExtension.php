@@ -39,22 +39,61 @@ class FixtureExtension extends AbstractExtension
      */
     public function dateIsNotSet(DateTimeImmutable $date): bool
     {
-        return '12:01' != $date->format('H:i');
+        $d = $date->format('H:i');
+        return '00:00' == $date->format('H:i');
     }
 
     public function fixtureSummary(Fixture $fixture): string
     {
-        if (Competition::None === $fixture->getCompetition()) {
-            return $fixture->getTeam()->value . ' Training';
-        } elseif (null != $fixture->getClub()) {
+        $club = $fixture->getClub();
+        $comp = $fixture->getCompetition();
+
+        if ($comp == Competition::Training && $club) {
+            // If there is a club then it may be cluster training
             return sprintf(
-                '%s vs %s (%s)',
+                "%s Training with %s (%s)",
                 $fixture->getTeam()->value,
-                $fixture->getClub()->getName(),
+                $club->getName(),
                 $fixture->getHomeAway()->value,
             );
-        } else {
-            return $fixture->getTeam()->value.' '.$fixture;
+        }
+        elseif ($comp == Competition::Training && !$club) {
+            return sprintf("%s Training", $fixture->getTeam()->value);
+        }
+        elseif ($club && $comp != Competition::None) {
+            // Club Comp   U13 vs Club COMP [HA]
+            return sprintf("%s %s vs %s (%s)",
+                $fixture->getTeam()->value,
+                $club->getName(),
+                $comp->value,
+                $fixture->getHomeAway()->value,
+            );
+        }
+        elseif ($club && $comp == Competition::None) {
+            // Club !Comp  U13 vs Club [HA]
+            return sprintf("%s vs %s (%s)",
+                $fixture->getTeam()->value,
+                $club->getName(),
+                $fixture->getHomeAway()->value,
+
+            );
+        }
+        elseif (!$club && $comp != Competition::None) {
+            // !Club Comp  U13 Comp [HA]
+            return sprintf("%s %s %s (%s)",
+                $fixture->getTeam()->value,
+                $fixture->getName(),
+                $comp->value,
+                $fixture->getHomeAway()->value,
+            );
+        }
+        else {
+            // if (!$club && $comp == Competition::None)
+            return sprintf("%s %s (%s)",
+                $fixture->getTeam()->value,
+                $fixture->getName(),
+                $fixture->getHomeAway()->value,
+            );
         }
     }
 }

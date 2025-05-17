@@ -46,18 +46,48 @@ class FixtureExtensionTest extends TestCase
         $this->assertFalse($this->extension->dateIsNew($date1, $date3));
     }
 
-//    public function testDateIsNotSet(): void
-//    {
-//        $fixture = new Fixture();
-//        $this->assertFalse($this->extension->dateIsNotSet($fixture));
-//
-//        $fixture->setDate(new \DateTimeImmutable('2023-01-01'));
-//        $this->assertTrue($this->extension->dateIsNotSet($fixture));
-//    }
+    public function testDateIsNotSet(): void
+    {
+        $this->assertTrue(
+            $this->extension->dateIsNotSet(new \DateTimeImmutable('2023-01-01 00:00:00'))
+        );
+        $this->assertFalse(
+            $this->extension->dateIsNotSet(new \DateTimeImmutable('2023-01-01 10:00:00'))
+        );
+    }
 
-    public function testFixtureSummary(): void
+    public function testFixtureSummaryTrainingWithClub(): void
     {
         $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
+        $fixture->setTeam(Team::U13B);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setCompetition(Competition::Training);
+
+        $club = new Club();
+        $club->setName('Test Club');
+        $fixture->setClub($club);
+
+        $expected = 'U13B Training with Test Club (H)';
+        $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
+    }
+
+    public function testFixtureSummaryTrainingWithNoClub(): void
+    {
+        $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
+        $fixture->setTeam(Team::U13B);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setCompetition(Competition::Training);
+
+        $expected = 'U13B Training';
+        $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
+    }
+
+    public function testFixtureSummaryWithClubComp(): void
+    {
+        $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
         $fixture->setTeam(Team::U13B);
         $fixture->setHomeAway(HomeAway::Home);
         $fixture->setCompetition(Competition::Friendly);
@@ -66,7 +96,63 @@ class FixtureExtensionTest extends TestCase
         $club->setName('Test Club');
         $fixture->setClub($club);
 
+        $expected = 'U13B Test Club vs Friendly (H)';
+        $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
+    }
+
+    public function testFixtureSummaryWithClubNoComp(): void
+    {
+        $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
+        $fixture->setTeam(Team::U13B);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setCompetition(Competition::None);
+
+        $club = new Club();
+        $club->setName('Test Club');
+        $fixture->setClub($club);
+
         $expected = 'U13B vs Test Club (H)';
         $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
     }
-} 
+
+    public function testFixtureSummaryWithNoClubComp(): void
+    {
+        $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
+        $fixture->setTeam(Team::U13B);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setCompetition(Competition::Friendly);
+
+        $expected = 'U13B Test Fixture Friendly (H)';
+        $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
+    }
+
+    public function testFixtureSummaryWithNoClubNoComp(): void
+    {
+        $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
+        $fixture->setTeam(Team::U13B);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setCompetition(Competition::None);
+
+        $expected = 'U13B Test Fixture (H)';
+        $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
+    }
+
+    public function testFixtureSummaryFailOver(): void
+    {
+        $fixture = new Fixture();
+        $fixture->setName('Test Fixture');
+        $fixture->setTeam(Team::U13B);
+        $fixture->setHomeAway(HomeAway::Home);
+        $fixture->setCompetition(Competition::Training);
+
+        $club = new Club();
+        $club->setName('Test Club');
+        $fixture->setClub($club);
+
+        $expected = 'U13B Training with Test Club (H)';
+        $this->assertEquals($expected, $this->extension->fixtureSummary($fixture));
+    }
+}

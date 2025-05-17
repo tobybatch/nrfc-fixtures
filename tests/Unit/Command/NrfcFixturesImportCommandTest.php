@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Command;
+namespace App\Tests\Unit\Command;
 
 use App\Command\NrfcFixturesImportCommand;
 use App\Entity\Club;
@@ -8,16 +8,24 @@ use App\Entity\Fixture;
 use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+
 
 class NrfcFixturesImportCommandTest extends TestCase
 {
     private CommandTester $commandTester;
     private EntityManagerInterface $entityManager;
     private ClubRepository $clubRepository;
+    private string $tempFixtureFile = __DIR__ . '/../../../assets/fixtures.csv';
+    private string $tempClubFile = __DIR__ . '/../../../assets/clubs.csv';
 
     protected function setUp(): void
     {
@@ -29,27 +37,6 @@ class NrfcFixturesImportCommandTest extends TestCase
         
         $command = $application->find('nrfc:fixtures:import');
         $this->commandTester = new CommandTester($command);
-        // Create a temporary CSV file
-        $this->tempFile = tempnam(sys_get_temp_dir(), 'test_');
-        $fh = fopen($this->tempFile, 'w');
-        fputcsv($fh, ["","","Mini","U13","U14","U15","U16","U17/U18 (COLTS)","","GIRLS U12","GIRLS U14","GIRLS U16","GIRLS U18"]);
-        fputcsv($fh, ["01-Jan-23","xxx","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training"]);
-        fputcsv($fh, ["01-Feb-30","xxx","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training"]);
-        fputcsv($fh, ["01-Mar-30","xxx","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training"]);
-        fputcsv($fh, ["01-Apr-30","xxx","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training"]);
-        fputcsv($fh, ["01-May-30","xxx","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training","Training"]);
-        fclose($fh);
-
-        // Mock the club repository to return a club
-        $club = new Club();
-        $club->setName('Test Club');
-        $this->clubRepository->method('findOneBy')->willReturn($club);
-    }
-    
-    public function tearDown(): void
-    {
-        unlink($this->tempFile);
-        
     }
 
     public function testExecuteWithNonExistentFile(): void
@@ -60,12 +47,12 @@ class NrfcFixturesImportCommandTest extends TestCase
         ]);
     }
 
-    public function testExecuteWithValidFile(): void
+    public function testExecuteWithValidFixturesFile(): void
     {
         $this->commandTester->execute([
-            'file' => $this->tempFile,
-            '--skip-first' => false,
-            '--batch-size' => 10
+            'file' => $this->tempFixtureFile,
+            '--skip-first' => true,
+            '--batch-size' => 2
         ]);
 
         $output = $this->commandTester->getDisplay();
@@ -81,6 +68,20 @@ class NrfcFixturesImportCommandTest extends TestCase
 //            ->method('flush');
 //        $this->entityManager->expects($this->atLeastOnce())
 //            ->method('clear');
+    }
+
+    public function testExecuteWithValidClubsFile(): void
+    {
+        $this->commandTester->execute([
+            'file' => $this->tempClubFile,
+            '--type' => 'club',
+            '--skip-first' => false,
+            '--batch-size' => 10
+        ]);
+
+        $output = $this->commandTester->getDisplay();
+        $this->assertStringContainsString('Successfully imported', $output);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
     }
 
     public function testExecuteWithInvalidRow(): void
@@ -114,7 +115,7 @@ class NrfcFixturesImportCommandTest extends TestCase
         
         $definition = $command->getDefinition();
         $this->assertTrue($definition->hasArgument('file'));
-        $this->assertTrue($definition->hasOption('delimiter'));
+        // $this->assertTrue($definition->hasOption('delimiter'));
         $this->assertTrue($definition->hasOption('skip-first'));
         $this->assertTrue($definition->hasOption('batch-size'));
     }
@@ -135,5 +136,66 @@ class NrfcFixturesImportCommandTest extends TestCase
         $output = $this->commandTester->getDisplay();
         $this->assertStringContainsString('[ERROR] Invalid type', trim($output));
         $this->assertEquals(Command::FAILURE, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * @throws ExceptionInterface
+     */
+    public function testErrorInProcessRow(): void
+    {
+        // Doesn't really test anything, it's for coverage
+        $this->clubRepository->expects($this->atLeastOnce())->method('findOneBy')->willThrowException(new BadMethodCallException());
+        $this->commandTester->execute([
+            'file' => $this->tempClubFile,
+            '--type' => 'club',
+        ]);
+        $output = $this->commandTester->getDisplay();
+        $this->assertStringContainsString('Error processing row', trim($output));
+        $this->assertEquals(Command::SUCCESS, $this->commandTester->getStatusCode());
+    }
+
+    public function testErrorInTopLevel(): void
+    {
+        // Doesn't really test anything, it's for coverage
+        $this->entityManager->expects($this->atLeastOnce())->method('flush')->willThrowException(new BadMethodCallException());
+        $this->commandTester->execute([
+            'file' => $this->tempClubFile,
+            '--type' => 'club',
+        ]);
+        $output = $this->commandTester->getDisplay();
+        $this->assertStringContainsString('Import failed', trim($output));
+        $this->assertEquals(Command::FAILURE, $this->commandTester->getStatusCode());
+    }
+
+    public function testFindClubEmptyName() :void
+    {
+        $command = new NrfcFixturesImportCommand($this->entityManager, $this->clubRepository);
+        $reflection = new ReflectionClass($command);
+
+        // set accessible for private method
+        $method = $reflection->getMethod('findClub');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($command, '');
+        $this->assertNull($result);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testFindClubNameFixer() :void
+    {
+        $command = new NrfcFixturesImportCommand($this->entityManager, $this->clubRepository);
+        $reflection = new ReflectionClass($command);
+
+        // set accessible for private method
+        $method = $reflection->getMethod('findClub');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($command, 'W Norfolk');
+        $this->assertNull($result);
+
+        $result = $method->invoke($command, 'N Walsham');
+        $this->assertNull($result);
     }
 } 
