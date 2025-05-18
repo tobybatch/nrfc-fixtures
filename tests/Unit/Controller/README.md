@@ -1,0 +1,1 @@
+No unit tests for the controllers, they are tested by the E2E tests

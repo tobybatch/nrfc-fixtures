@@ -1,96 +1,75 @@
 <?php
 
-namespace App\Tests\Unit\Repository;
+namespace App\Tests\Repository;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class UserRepositoryTest extends TestCase
 {
-    private EntityManagerInterface $entityManager;
-    private $passwordUpgrade;
+    private UserRepository $userRepository;
+    private MockObject $managerRegistry;
+    private MockObject $entityManager;
+    private MockObject $classMetadata;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        // Create a mock EntityManager
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
 
-        // Create an instance of the class containing upgradePassword method
-        // This assumes the method is in a service class that has access to EntityManager
-        $this->passwordUpgrade = new class($this->entityManager) {
-            private EntityManagerInterface $entityManager;
+        // Mock ClassMetadata to avoid uninitialized property access
+        $this->classMetadata->name = User::class;
 
-            public function __construct(EntityManagerInterface $entityManager)
-            {
-                $this->entityManager = $entityManager;
-            }
+        // Configure EntityManager to return the mocked ClassMetadata
+        $this->entityManager
+            ->method('getClassMetadata')
+            ->with(User::class)
+            ->willReturn($this->classMetadata);
 
-            public function getEntityManager(): EntityManagerInterface
-            {
-                return $this->entityManager;
-            }
+        // Configure ManagerRegistry to return the mocked EntityManager
+        $this->managerRegistry
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($this->entityManager);
 
-            public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
-            {
-                if (!$user instanceof User) {
-                    throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
-                }
-
-                $user->setPassword($newHashedPassword);
-                $this->getEntityManager()->persist($user);
-                $this->getEntityManager()->flush();
-            }
-        };
+        $this->userRepository = new UserRepository($this->managerRegistry);
     }
 
-    public function testUpgradePasswordWithValidUser()
+    public function testUpgradePasswordWithValidUser(): void
     {
         $user = new User();
-        $oldPassword = 'old_hash';
-        $newPassword = 'new_hash';
+        $newHashedPassword = 'new_hashed_password';
 
-        $user->setPassword($oldPassword);
-
-        // Expect persist and flush to be called once
-        $this->entityManager->expects($this->once())
+        $this->entityManager
+            ->expects($this->once())
             ->method('persist')
             ->with($user);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager
+            ->expects($this->once())
             ->method('flush');
 
-        $this->passwordUpgrade->upgradePassword($user, $newPassword);
+        $this->userRepository->upgradePassword($user, $newHashedPassword);
 
-        $this->assertEquals($newPassword, $user->getPassword());
+        $this->assertSame($newHashedPassword, $user->getPassword());
     }
 
-    public function testUpgradePasswordWithUnsupportedUser()
+    public function testUpgradePasswordWithInvalidUserThrowsException(): void
     {
+        $invalidUser = $this->createMock(PasswordAuthenticatedUserInterface::class);
+        $newHashedPassword = 'new_hashed_password';
+
         $this->expectException(UnsupportedUserException::class);
+        $this->expectExceptionMessage(sprintf('Instances of "%s" are not supported.', get_class($invalidUser)));
 
-        $unsupportedUser = new class implements PasswordAuthenticatedUserInterface {
-            public function getPassword(): ?string { return 'hash'; }
-            // Other required interface methods would be here
-        };
-
-        $this->passwordUpgrade->upgradePassword($unsupportedUser, 'new_hash');
-    }
-
-    public function testPasswordIsUpdated()
-    {
-        $user = new User();
-        $newPassword = 'brand_new_hash';
-
-        $this->entityManager->expects($this->once())->method('persist');
-        $this->entityManager->expects($this->once())->method('flush');
-
-        $this->passwordUpgrade->upgradePassword($user, $newPassword);
-
-        $this->assertSame($newPassword, $user->getPassword());
+        $this->userRepository->upgradePassword($invalidUser, $newHashedPassword);
     }
 }
