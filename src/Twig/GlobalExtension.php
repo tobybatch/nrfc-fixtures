@@ -72,6 +72,6 @@ class GlobalExtension extends AbstractExtension
         ) {
             return $preferences['showHelp'][$routeName];
         }
-        return false;
+        return true;
     }
 }

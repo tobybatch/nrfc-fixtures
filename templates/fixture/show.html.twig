@@ -5,12 +5,14 @@
 
 {% block body %}
     <table class="table">
-        <tbody>
         {% if fixture.competition.value != "None" %}
-            <tr>
-                <th colspan="2">{{ fixture.format }}</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th colspan="2">{{ fixture.format }}</th>
+                </tr>
+            </thead>
         {% endif %}
+        <tbody>
         <tr>
             <th class="text-left pr-2">Date</th>
             <td class="text-left">{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>

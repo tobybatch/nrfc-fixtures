@@ -22,13 +22,13 @@ chmod 755 .git/hooks/pre-commit
 composer install
 npm i
 docker compose up -d
-symfony serve
+symfony serve --listen-ip=0.0.0.0 --port=7000
 ```
 
 ## Reset DB
 
 ```
-./bin/console doctrine:schema:drop -n   # Not needed in intial set up
+./bin/console doctrine:schema:drop --force   # Not needed in intial set up
 ./bin/console doctrine:schema:create -n
 ./bin/console doctrine:fixtures:load -n
 ```

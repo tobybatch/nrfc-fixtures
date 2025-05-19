@@ -24,7 +24,6 @@ services:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
       POSTGRES_DB: nrfc_test
-      # You should definitely change the password in production
       POSTGRES_PASSWORD: nrfc
       POSTGRES_USER: nrfc
     ports:
@@ -34,8 +33,3 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-
-volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
