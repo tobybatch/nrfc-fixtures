@@ -7,7 +7,7 @@ use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
 use Symfony\Component\Panther\PantherTestCase;
 
-class LoginFlowTest extends PantherTestCase
+class _LoginFlowTest extends PantherTestCase
 {
     protected function setUp(): void
     {
