@@ -38,6 +38,11 @@ class ClubsAndFixtures extends Fixture
         ]);
     }
 
+    /**
+     * @param array<string, string|true> $arguments
+     * @return void
+     * @throws Exception
+     */
     private function runCommand(array $arguments): void
     {
         $application = new Application($this->kernel);

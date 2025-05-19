@@ -34,6 +34,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    /**
+     * @var array<string>|null $preferences
+     */
     #[ORM\Column(nullable: true)]
     private ?array $preferences = null;
 
@@ -115,11 +118,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
+    /**
+     * @return array<string>|null
+     */
     public function getPreferences(): ?array
     {
         return $this->preferences;
     }
 
+    /**
+     * @param array<string, mixed>|null $preferences
+     */
     public function setPreferences(?array $preferences): static
     {
         $this->preferences = $preferences;

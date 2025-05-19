@@ -75,9 +75,10 @@ class ProfileController extends AbstractController
         if (in_array('showHelp', array_keys($data))) {
             $key = $data['showHelp']["route"];
             $value = $data['showHelp']["state"];
-            // get current prefs
+
             /* @var User $user */
-            $user = $request->getUser();
+            $user = $this->getUser();
+
             $preferences = ['showHelp' => [ $key => $value ] ];
             $cookie_preferences = $request->cookies->get('preferences');
             if ($cookie_preferences) {
@@ -86,13 +87,13 @@ class ProfileController extends AbstractController
                     $preferences,
                 );
             }
-            if ($user) {
+            if ($user instanceof User) {
                 $preferences = array_merge(
                     $user->getPreferences(),
                     $preferences,
                 );
+                $user->setPreferences($preferences);
             }
-            $user?->setPreferences($preferences);
             $request->getSession()->set('preferences', $preferences);
             $logger->warning(
                 sprintf(
