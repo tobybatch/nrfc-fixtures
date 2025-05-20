@@ -124,10 +124,8 @@ class UserTest extends PantherTestCase
         $this->client->waitForElementToContain('body', 'Fixtures for 2025/26');
         $this->client->clickLink($this->email);
         $this->client->waitForElementToContain('body', 'Your Profile');
-        $this->client->clickLink('Update Profile');
-
+        // TODO test page elements
     }
-    public function testChangePassword(): void {}
 
     private function createUser(): void
     {

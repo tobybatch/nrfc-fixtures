@@ -93,6 +93,7 @@ class ViewClubsTest extends PantherTestCase
         );
 
         $client->clickLink("Back to list");
+        $client->waitForElementToContain('h1', 'Clubs');
         $this->assertSelectorTextContains('h1', 'Clubs');
         $this->assertEquals('/club', parse_url($client->getCurrentURL(), PHP_URL_PATH));
 
