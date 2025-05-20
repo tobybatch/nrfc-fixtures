@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\LoginFormType;
 use App\Form\RegistrationFormType;
 use App\Service\MagicLinkService;
+use App\Service\PreferencesService;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -150,44 +151,16 @@ class UserController extends AbstractController
 
     #[Route('/updatePreferences', name: 'app_update_preferences', methods: ['POST'])]
     public function updatePreferences(
-        Request         $request,
-        LoggerInterface $logger,
+        Request            $request,
+        PreferencesService $preferencesService,
+        LoggerInterface    $logger,
     ): Response
     {
         $data = json_decode($request->getContent(), true);
-
-        if (in_array('showHelp', array_keys($data))) {
-            $key = $data['showHelp']["route"];
-            $value = $data['showHelp']["state"];
-
-            /* @var User $user */
-            $user = $this->getUser();
-
-            $preferences = ['showHelp' => [$key => $value]];
-            $cookie_preferences = $request->cookies->get('preferences');
-            if ($cookie_preferences) {
-                $preferences = array_merge(
-                    json_decode($cookie_preferences, true),
-                    $preferences,
-                );
-            }
-            if ($user instanceof User) {
-                $preferences = array_merge(
-                    $user->getPreferences(),
-                    $preferences,
-                );
-                $user->setPreferences($preferences);
-            }
-            $request->getSession()->set('preferences', $preferences);
-            $logger->warning(
-                sprintf(
-                    'Preferences updated: %s',
-                    json_encode($preferences)
-                )
-            );
-
-            return new JsonResponse($preferences);
+        $logger->debug('Preferences updated', ['data' => $data]);
+        foreach ($data as $key => $value) {
+            $preferencesService->setPreferences($key, $value);
         }
-        return new JsonResponse([], Response::HTTP_BAD_REQUEST);
+        return new Response(status: 204);
     }
 }

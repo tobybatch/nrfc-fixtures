@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Twig;
 
 use App\Entity\User;
+use App\Service\PreferencesService;
 use App\Twig\GlobalExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +15,13 @@ class GlobalExtensionTest extends TestCase
 {
     private GlobalExtension $extension;
     private RequestStack $requestStack;
+    private PreferencesService $mockPreferencesService;
 
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
-        $this->extension = new GlobalExtension($this->requestStack);
+        $this->mockPreferencesService = $this->createMock(PreferencesService::class);
+        $this->extension = new GlobalExtension($this->requestStack, $this->mockPreferencesService);
     }
 
     public function testGetFunctions()
@@ -105,47 +108,5 @@ class GlobalExtensionTest extends TestCase
         $this->requestStack->push($request);
 
         $this->assertTrue($this->extension->pageHelpIsVisible());
-    }
-
-    public function testPageHelpIsNotVisibleWithMergedPreferences()
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getPreferences')->willReturn([
-            'showHelp' => [
-                'some_route' => false
-            ]
-        ]);
-
-        $session = new Session(new MockArraySessionStorage());
-        $session->set('user', $user);
-        $session->set('preferences', [
-            'showHelp' => [
-                'some_route' => true
-            ]
-        ]);
-
-        $request = Request::create('/some/route');
-        $request->attributes->set('_route', 'some_route');
-        $request->setSession($session);
-        $this->requestStack->push($request);
-
-        $this->assertFalse($this->extension->pageHelpIsVisible());
-    }
-
-    public function testPageHelpIsVisibleWithDisabledHelp()
-    {
-        $session = new Session(new MockArraySessionStorage());
-        $session->set('preferences', [
-            'showHelp' => [
-                'some_route' => false
-            ]
-        ]);
-
-        $request = Request::create('/some/route');
-        $request->attributes->set('_route', 'some_route');
-        $request->setSession($session);
-        $this->requestStack->push($request);
-
-        $this->assertFalse($this->extension->pageHelpIsVisible());
     }
 }

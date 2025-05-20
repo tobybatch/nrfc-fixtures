@@ -19,6 +19,7 @@ class ShowHideHelpTest extends PantherTestCase
         $helpContainer = $crawler->filter('div[data-helptoggle-target="content"]');
         $this->assertTrue($helpContainer->isDisplayed(), 'Help text container should be visible initially.');
 
+        // Hide
         $hideButton = $crawler->filter('button[data-helptoggle-target="hideButton"]');
         $hideButton->click();
         $client->waitForInvisibility('div[data-helptoggle-target="content"]', 5);

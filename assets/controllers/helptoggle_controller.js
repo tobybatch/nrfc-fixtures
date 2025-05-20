@@ -11,9 +11,6 @@ export default class extends Controller {
 
     connect() {
         const toggle = (this.pagehelpisvisibleValue === "true")
-        console.log("this.contentTarget.hidden",    !toggle);
-        console.log("this.hideButtonTarget.hidden", !toggle);
-        console.log("this.showButtonTarget.hidden", toggle);
         this.contentTarget.hidden =    !toggle;
         this.hideButtonTarget.hidden = !toggle;
         this.showButtonTarget.hidden = toggle;
@@ -34,6 +31,8 @@ export default class extends Controller {
     }
 
     updateSettings(showHelp) {
+        const currentRoute = this.currentRouteValue;
+        const preferencesKey = 'showHelp.' + currentRoute;
         // No need to await this, it'll just happen
         fetch('/user/updatePreferences', {
                 method: 'POST',
@@ -43,12 +42,7 @@ export default class extends Controller {
                     credentials: 'same-origin',
                     'X-CSRF-TOKEN': this.crsfValue
                 },
-                body: JSON.stringify({
-                    'showHelp': {
-                        'route':this.currentRouteValue,
-                        'state':showHelp
-                    }
-                })
+                body: JSON.stringify({[preferencesKey]: showHelp})
             }).then(response => {
                 if (!response.ok) {
                     console.log('Error!', response.statusText);
