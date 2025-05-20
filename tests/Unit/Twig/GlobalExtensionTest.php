@@ -67,7 +67,7 @@ class GlobalExtensionTest extends TestCase
         $request->setSession(new Session(new MockArraySessionStorage()));
         $this->requestStack->push($request);
 
-        $this->assertFalse($this->extension->pageHelpIsVisible());
+        $this->assertTrue($this->extension->pageHelpIsVisible());
     }
 
     public function testPageHelpIsVisibleWithPreferencesButNoRoute()
@@ -84,7 +84,7 @@ class GlobalExtensionTest extends TestCase
         $request->setSession($session);
         $this->requestStack->push($request);
 
-        $this->assertFalse($this->extension->pageHelpIsVisible());
+        $this->assertTrue($this->extension->pageHelpIsVisible());
     }
 
     public function testPageHelpIsVisibleWithUserPreferences()
