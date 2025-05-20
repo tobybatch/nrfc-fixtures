@@ -34,7 +34,7 @@ class RegisterUserTest extends PantherTestCase
      */
     public function testRegister(): void
     {
-        $email = "foo@eaxmple.com";
+        $email = "newuser@eaxmple.com";
 
         $entityManager = static::getContainer()->get('doctrine')->getManager();
         $entities = $entityManager->getRepository(User::class)->findBy([

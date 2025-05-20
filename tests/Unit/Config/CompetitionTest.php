@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Config;
+namespace App\Tests\Unit\Config;
 
 use App\Config\Competition;
 use PHPUnit\Framework\TestCase;

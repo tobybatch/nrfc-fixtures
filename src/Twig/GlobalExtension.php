@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Entity\Club;
+use App\Service\PreferencesService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -19,10 +20,12 @@ use Twig\TwigFunction;
 class GlobalExtension extends AbstractExtension
 {
     private RequestStack $requestStack;
+    private PreferencesService $preferencesService;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, PreferencesService $preferencesService)
     {
         $this->requestStack = $requestStack;
+        $this->preferencesService = $preferencesService;
     }
 
     public function getFunctions(): array
@@ -54,16 +57,7 @@ class GlobalExtension extends AbstractExtension
             return true;
         }
 
-        $user = $request->getSession()->get('user');
-        $userPreferences = [];
-        if ($user) {
-            $userPreferences = $user->getPreferences();
-        }
-        $preferences = array_merge(
-            $request->getSession()->get('preferences', []),
-            $userPreferences
-        );
-
+        $preferences = $this->preferencesService->getPreferences();
         $routeName = $request->attributes->get('_route');
 
         if (

@@ -58,8 +58,9 @@ class ViewClubsTest extends PantherTestCase
         $clubCount = count($clubs) - 1; // header row
         $this->assertCount($clubCount, $rows, 'Incorrect number of clubs.');
 
+        $text = $rows->first()->filter('td')->first()->text();
         $rows->first()->filter('a')->click();
-        $client->waitForElementToContain('body', $rows->first()->filter('td')->first()->text());
+        $client->waitForElementToContain('body', $text);
         $this->assertStringStartsWith('/club/', parse_url($client->getCurrentURL(), PHP_URL_PATH));
     }
 
