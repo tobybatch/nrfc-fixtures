@@ -2,6 +2,8 @@ twig:
     file_name_pattern: '*.twig'
     form_themes:
         - 'form/tailwind_theme.html.twig'
+    globals:
+        app_data: '@App\Service\PreferencesService'
 
 when@test:
     twig:

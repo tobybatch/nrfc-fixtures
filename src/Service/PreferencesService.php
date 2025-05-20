@@ -50,4 +50,14 @@ class PreferencesService
         $this->session->set('preferences', $targetArray);
         return $targetArray;
     }
+
+    /**
+     * For twig globals, see config/packages/twig.yaml
+     *
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->getPreferences();
+    }
 }
