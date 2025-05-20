@@ -7,12 +7,13 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\LoginFormType;
 use App\Form\RegistrationFormType;
-use App\Repository\UserRepository;
+use App\Service\MagicLinkService;
 use Doctrine\ORM\EntityManagerInterface;
-use HttpException;
 use LogicException;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -21,11 +22,14 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
+use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
+use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
+use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 #[Route('/user')]
-class LoginController extends AbstractController
+class UserController extends AbstractController
 {
+
     #[Route('/login', name: 'app_login')]
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
@@ -53,44 +57,26 @@ class LoginController extends AbstractController
      */
     #[Route('/magic_login', name: 'app_magic_login')]
     public function requestLoginLink(
-        LoginLinkHandlerInterface $loginLinkHandler,
-        UserRepository $userRepository,
-        Request $request,
-        MailerInterface $mailer): Response
+        Request          $request,
+        MagicLinkService $magicLinkService): Response
     {
         // check if form is submitted
         if ($request->isMethod('POST')) {
             // load the user in some way (e.g. using the form input)
             $email = $request->getPayload()->get('email');
-            $user = $userRepository->findOneBy(['email' => $email]);
 
-            if ($user) {
-
-                $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
-                $loginLink = $loginLinkDetails->getUrl();
-                $email = (new TemplatedEmail())
-                    ->from(new Address('no-reply@norwichrugby.com', 'Norwich Rugby admin bot'))
-                    ->to((string)$user->getEmail())
-                    ->subject('Login to NRFC Fixture')
-                    ->text(sprintf('Follow this link to login automatically: %s', $loginLink))
-                    ->htmlTemplate('login/magic_login_link_email.html.twig')
-                    ->context([
-                        'loginLink' => $loginLink,
-                    ]);
-
-                $mailer->send($email);
-
+            if ($magicLinkService->sendMagicLink($email)) {
                 $this->addFlash(
                     'success', // The type (can be anything: success, error, warning, etc.)
                     'Check your email for a magic login link' // The message
                 );
-
                 return $this->redirectToRoute('app_login');
             } else {
                 $this->addFlash(
                     'error', // The type (can be anything: success, error, warning, etc.)
                     'Unknown email address' // The message
                 );
+                return $this->redirectToRoute('app_magic_login');
             }
         }
 
@@ -109,11 +95,12 @@ class LoginController extends AbstractController
      */
     #[Route('/register', name: 'app_register')]
     public function register(
-        Request $request,
+        Request                     $request,
         UserPasswordHasherInterface $userPasswordHashTool,
-        EntityManagerInterface $entityManager,
-        MailerInterface $mailer,
-    ): Response {
+        EntityManagerInterface      $entityManager,
+        MailerInterface             $mailer,
+    ): Response
+    {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -130,7 +117,7 @@ class LoginController extends AbstractController
 
             $email = (new TemplatedEmail())
                 ->from(new Address('no-reply@norwichrugby.com', 'Norwich Rugby admin bot'))
-                ->to((string) $user->getEmail())
+                ->to((string)$user->getEmail())
                 ->subject('Welcome to NRFC Fixture')
                 ->htmlTemplate('login/confirmation_email.html.twig');
 
@@ -148,5 +135,62 @@ class LoginController extends AbstractController
         return $this->render('login/register.html.twig', [
             'registrationForm' => $form,
         ]);
+    }
+
+    #[Route('/profile', name: 'app_profile')]
+    public function profile(): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('You must be logged in to access this page.');
+        }
+
+        return $this->render('profile/index.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
+    #[Route('/updatePreferences', name: 'app_update_preferences', methods: ['POST'])]
+    public function updatePreferences(
+        Request         $request,
+        LoggerInterface $logger,
+    ): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (in_array('showHelp', array_keys($data))) {
+            $key = $data['showHelp']["route"];
+            $value = $data['showHelp']["state"];
+
+            /* @var User $user */
+            $user = $this->getUser();
+
+            $preferences = ['showHelp' => [$key => $value]];
+            $cookie_preferences = $request->cookies->get('preferences');
+            if ($cookie_preferences) {
+                $preferences = array_merge(
+                    json_decode($cookie_preferences, true),
+                    $preferences,
+                );
+            }
+            if ($user instanceof User) {
+                $preferences = array_merge(
+                    $user->getPreferences(),
+                    $preferences,
+                );
+                $user->setPreferences($preferences);
+            }
+            $request->getSession()->set('preferences', $preferences);
+            $logger->warning(
+                sprintf(
+                    'Preferences updated: %s',
+                    json_encode($preferences)
+                )
+            );
+
+            return new JsonResponse($preferences);
+        }
+        return new JsonResponse([], Response::HTTP_BAD_REQUEST);
     }
 }

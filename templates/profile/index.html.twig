@@ -18,78 +18,15 @@
 
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
             <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                {{ form_start(profileForm) }}
-
-                {% for flash_error in app.flashes('error') %}
-                    <div class="mb-4 rounded-md bg-red-50 p-4">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-red-800">{{ flash_error }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-
-                {% for flash_success in app.flashes('success') %}
-                    <div class="mb-4 rounded-md bg-green-50 p-4">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-green-800">{{ flash_success }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-
-                <div class="space-y-6">
-                    <div>
-                        {{ form_label(profileForm.email, null, {
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700'}
-                        }) }}
-                        <div class="mt-1">
-                            {{ form_widget(profileForm.email) }}
-                            {{ form_errors(profileForm.email) }}
-                        </div>
-                    </div>
-
-                    <div>
-                        {{ form_label(profileForm.currentPassword, null, {
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700'}
-                        }) }}
-                        <div class="mt-1">
-                            {{ form_widget(profileForm.currentPassword) }}
-                            {{ form_errors(profileForm.currentPassword) }}
-                        </div>
-                    </div>
-
-                    <div>
-                        {{ form_label(profileForm.newPassword.first, null, {
-                            'label': 'New Password',
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700'}
-                        }) }}
-                        <div class="mt-1">
-                            {{ form_widget(profileForm.newPassword.first) }}
-                            {{ form_errors(profileForm.newPassword.first) }}
-                        </div>
-                    </div>
-
-                    <div>
-                        {{ form_label(profileForm.newPassword.second, null, {
-                            'label': 'Repeat New Password',
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700'}
-                        }) }}
-                        <div class="mt-1">
-                            {{ form_widget(profileForm.newPassword.second) }}
-                            {{ form_errors(profileForm.newPassword.second) }}
-                        </div>
-                    </div>
-
-                    <div>
-                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Update Profile
-                        </button>
-                    </div>
+                <div class="mb-6 text-gray-700">
+                    <p class="text-lg font-medium">Email: {{ user.email }}</p>
+                    <p class="mt-2 text-sm text-gray-500">Change email coming soon</p>
                 </div>
-                {{ form_end(profileForm) }}
+                <div class="mt-6">
+                    <a href="{{ path('app_forgot_password_request') }}" class="flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Send a password reset link
+                    </a>
+                </div>
             </div>
         </div>
     </div>
