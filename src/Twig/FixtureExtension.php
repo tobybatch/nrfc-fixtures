@@ -14,7 +14,6 @@ class FixtureExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            //            new TwigFilter('teamName', [$this, 'teamName']),
             new TwigFilter('fixtureSummary', [$this, 'fixtureSummary']),
         ];
     }
@@ -24,6 +23,7 @@ class FixtureExtension extends AbstractExtension
         return [
             new TwigFunction('dateIsNew', [$this, 'dateIsNew']),
             new TwigFunction('dateIsNotSet', [$this, 'dateIsNotSet']),
+            new TwigFunction('dateIsPast', [$this, 'dateIsPast']),
         ];
     }
 
@@ -41,6 +41,11 @@ class FixtureExtension extends AbstractExtension
     {
         $d = $date->format('H:i');
         return '00:00' == $date->format('H:i');
+    }
+
+    public function dateIsPast(string $date): bool
+    {
+        return $date < (new DateTimeImmutable())->format('Y-m-d');
     }
 
     public function fixtureSummary(Fixture $fixture): string

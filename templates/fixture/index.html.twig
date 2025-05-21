@@ -3,11 +3,14 @@
 {% block title %}All{% endblock %}
 
 {% block body %}
-    <div class="flex justify-between items-center mb-6">
+    <div
+            class="flex justify-between items-center mb-6"
+            data-controller="fixtures"
+    >
         <h1 class="text-primary text-2xl font-bold">{% if teams|length == 1 %}{{ teams.0.name }} {% endif %}Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}</h1>
 
         <a href="{{ path('app_fixture_new') }}" class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-center">
-            Show past dates
+            {% if getPreference('showPastFixtures') %}Hide{% else %}Show{% endif %} past dates
         </a>
 
         {% if app.user is not null and 'ROLE_ADMIN' in app.user.roles %}
@@ -39,11 +42,14 @@
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-            {% for date, fixtures_on_date in fixtures %}
-                <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
+            {% for fixture_date, fixtures_on_date in fixtures %}
+                <tr
+                        class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : ''}} {% if dateIsPast(fixture_date) %}hidden{% endif %}"
+                        data-fixtures-target="fixturesRow"
+                >
                     <td class="py-3 px-4 whitespace-nowrap underline">
-                        <a class="nrfc-date-link" href="{{ path('app_fixture_byDate', parameters = {date: date|date('Ymd')}) }}">
-                            {{ date|date('j M y') }}
+                        <a class="nrfc-date-link" href="{{ path('app_fixture_byDate', parameters = {date: fixture_date|date('Ymd')}) }}">
+                            {{ fixture_date|date('j M y') }}
                         </a>
                     </td>
                     {# each col is a different team #}

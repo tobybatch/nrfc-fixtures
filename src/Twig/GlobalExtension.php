@@ -33,7 +33,26 @@ class GlobalExtension extends AbstractExtension
         return [
             new TwigFunction('pageHasHelp', [$this, 'pageHasHelp']),
             new TwigFunction('pageHelpIsVisible', [$this, 'pageHelpIsVisible']),
+            new TwigFunction('getPreference', [$this, 'getPreference']),
         ];
+    }
+
+    public function getPreference(string $path): bool
+    {
+        $segments = explode('.', $path);
+
+        // Start with the initial array
+        $current = $this->preferencesService->getPreferences();
+
+        // Traverse through each segment
+        foreach ($segments as $segment) {
+            if (!is_array($current) || !array_key_exists($segment, $current)) {
+                return false;
+            }
+
+            $current = $current[$segment];
+        }
+        return $current;
     }
 
     public function pageHasHelp(): bool
