@@ -8,7 +8,11 @@
 # docker build --no-cache -t nrfc/fixtures:fpm --build-arg BASE=fpm .
 # docker build --no-cache -t nrfc/fixtures:apache --build-arg BASE=apache .
 # docker run -d --name nrfrc-fixtures-apache-app nrfrc-fixtures-apache
+#
+# cp .docker/sample.dev.env .docker/dev.env
+# docker compose -f .docker/compose.dev.yml up -d
 # docker exec -ti nrfrc-fixtures-apache-app /bin/bash
+# docker exec -ti nrfrc-fixtures-apache-app symfony serve --port=7000 --listen-ip=0.0.0.0
 # ---------------------------------------------------------------------
 # Official PHP images: https://hub.docker.com/_/php/
 # https://github.com/docker-library/docs/blob/master/php/README.md#supported-tags-and-respective-dockerfile-links
@@ -315,6 +319,8 @@ RUN \
     sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console
 RUN yarn && \
     yarn run build && \
+    curl -sS https://get.symfony.com/cli/installer | bash && \
+    mv /root/.symfony5/bin/symfony /usr/local/bin/symfony && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=dev
 ENV DATABASE_URL=""

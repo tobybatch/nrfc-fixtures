@@ -23,7 +23,7 @@ services:
     volumes:
       - ..:/opt/nrfcfixtures
     ports:
-      - 8001:8001
+      - 7000:8001
     restart: unless-stopped
 
 volumes:
