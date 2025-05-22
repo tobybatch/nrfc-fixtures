@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250519201059 extends AbstractMigration
+final class Version20250522162534 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -31,6 +31,18 @@ final class Version20250519201059 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             COMMENT ON COLUMN fixture.date IS '(DC2Type:datetime_immutable)'
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE TABLE reset_password_request (id SERIAL NOT NULL, user_id INT NOT NULL, selector VARCHAR(20) NOT NULL, hashed_token VARCHAR(100) NOT NULL, requested_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expires_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE INDEX IDX_7CE748AA76ED395 ON reset_password_request (user_id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            COMMENT ON COLUMN reset_password_request.requested_at IS '(DC2Type:datetime_immutable)'
+        SQL);
+        $this->addSql(<<<'SQL'
+            COMMENT ON COLUMN reset_password_request.expires_at IS '(DC2Type:datetime_immutable)'
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE users (id SERIAL NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, preferences JSON DEFAULT NULL, PRIMARY KEY(id))
@@ -76,6 +88,9 @@ final class Version20250519201059 extends AbstractMigration
         $this->addSql(<<<'SQL'
             ALTER TABLE fixture ADD CONSTRAINT FK_5E540EE61190A32 FOREIGN KEY (club_id) REFERENCES club (id) NOT DEFERRABLE INITIALLY IMMEDIATE
         SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE reset_password_request ADD CONSTRAINT FK_7CE748AA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE
+        SQL);
     }
 
     public function down(Schema $schema): void
@@ -88,10 +103,16 @@ final class Version20250519201059 extends AbstractMigration
             ALTER TABLE fixture DROP CONSTRAINT FK_5E540EE61190A32
         SQL);
         $this->addSql(<<<'SQL'
+            ALTER TABLE reset_password_request DROP CONSTRAINT FK_7CE748AA76ED395
+        SQL);
+        $this->addSql(<<<'SQL'
             DROP TABLE club
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE fixture
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE reset_password_request
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE users
