@@ -2,35 +2,37 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PreferencesService
 {
-    private ?SessionInterface $session;
+    private ?RequestStack $requestStack;
+    private LoggerInterface $logger;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, LoggerInterface $logger)
     {
-        $currentRequest = $requestStack->getCurrentRequest();
+        $this->logger = $logger;
+        $this->requestStack = $requestStack;
+    }
 
-        if ($currentRequest && $currentRequest->hasSession()) {
-            $this->session = $currentRequest->getSession();
-        } else {
-            // Provide a fallback "null session" to avoid exceptions
-            $this->session = null;
-        }
+    private function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 
     public function getPreferences(): array
     {
-        // Return empty preferences if no session is available
-        return $this->session?->get('preferences', []) ?? [];
+        $preferences = $this->getSession()->get('preferences', []) ?? [];
+        $this->logger->debug('Getting preferences', $preferences);
+        return $preferences;
     }
 
     public function setPreferences(string $path, string|bool $value): array
     {
-        if (!$this->session) {
+        if (!$this->getSession()) {
             throw new \RuntimeException('Cannot set preferences without an active session.');
         }
 
@@ -47,7 +49,7 @@ class PreferencesService
         }
 
         $current = $value; // Set the final value
-        $this->session->set('preferences', $targetArray);
+        $this->getSession()->set('preferences', $targetArray);
         return $targetArray;
     }
 
