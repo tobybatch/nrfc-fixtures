@@ -268,4 +268,7 @@
   <component name="PsalmOptionsConfiguration">
     <option name="transferred" value="true" />
   </component>
+  <component name="TwigDebugConfiguration">
+    <cachePath>$PROJECT_DIR$/var/cache</cachePath>
+  </component>
 </project>

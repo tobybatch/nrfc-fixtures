@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="debug:autowiring" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="debug:autowiring">
+    <CommandLine workingDirectory="$PROJECT_DIR$">
+      <envFiles>
+        <find>$PROJECT_DIR$/.env</find>
+      </envFiles>
+    </CommandLine>
+    <option name="envFilePaths">
+      <list>
+        <option value="$PROJECT_DIR$/.env" />
+      </list>
+    </option>
+    <method v="2" />
+  </configuration>
+</component>

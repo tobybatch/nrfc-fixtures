@@ -118,6 +118,19 @@ class Fixture
         return $this;
     }
 
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): static
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
+
     public function __toString()
     {
         return $this->format();
@@ -143,17 +156,5 @@ class Fixture
             $text = '???';
         }
         return $text;
-    }
-
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(?string $notes): static
-    {
-        $this->notes = $notes;
-
-        return $this;
     }
 }
