@@ -51,9 +51,7 @@ final class FixtureController extends AbstractController
             $fixture = [];
             foreach ($teams as $team) {
                 if ($team) {
-                    $f = $this->fixtureRepository->getFixturesForTeam($team, $date);
-//                    $f['formatted_name'] = $f->format();
-                    $fixture[$team->value] = $f;
+                    $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
                 }
             }
             $fixtures[$date] = $fixture;

@@ -138,6 +138,11 @@ class Fixture
         return $this->format();
     }
 
+    public function getFullName(): string
+    {
+        return $this->format();
+    }
+
     public function format(
         bool $incHA = true,
         bool $incComp = false,
