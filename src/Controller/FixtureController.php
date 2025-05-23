@@ -13,9 +13,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/')]
 final class FixtureController extends AbstractController
@@ -28,7 +30,7 @@ final class FixtureController extends AbstractController
     }
 
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
-    public function index(Request $request): Response
+    public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
         $teams = [];
 
@@ -49,16 +51,36 @@ final class FixtureController extends AbstractController
             $fixture = [];
             foreach ($teams as $team) {
                 if ($team) {
-                    $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                    $f = $this->fixtureRepository->getFixturesForTeam($team, $date);
+//                    $f['formatted_name'] = $f->format();
+                    $fixture[$team->value] = $f;
                 }
             }
             $fixtures[$date] = $fixture;
         }
 
-        return $this->render('fixture/index.html.twig', [
+        $context = [
             'teams' => $teams,
             'fixtures' => $fixtures,
-        ]);
+        ];
+
+        // This could be done in an event listener
+        if ($request->getAcceptableContentTypes()[0] === 'application/json') {
+//            $data = [];
+//            foreach ($fixtures as $date => $fixturesOnDate) {
+//                $data[$date] = [];
+//                foreach ($fixturesOnDate as $team => $fixturesForTeams) {
+//                    foreach ($fixturesForTeams as $fixture) {
+//                        $data[$date][$team] = $fixture->format();
+//                    }
+//                }
+//            }
+            $json = $serializer->serialize($context, 'json');
+
+            return new JsonResponse($json, 200, [], true);
+        }
+
+        return $this->render('fixture/index.html.twig', $context);
     }
 
     #[Route('/new', name: 'app_fixture_new', methods: ['GET', 'POST'])]
