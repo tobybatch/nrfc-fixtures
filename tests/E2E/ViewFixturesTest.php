@@ -91,7 +91,9 @@ class ViewFixturesTest extends PantherTestCase
 
     public function testViewSingleDate() {
         $client = static::createPantherClient();
-        $client->request('GET', '/')->filter('.nrfc-date-link')->click();
+        $links = $client->request('GET', '/')->filter('.nrfc-date-link');
+        $lastLink = $links->last();
+        $lastLink->click();
 
         $crawler = $client->waitForElementToContain('body', "Home Fixtures");
         $gridItems = $crawler->filter('.nrfc-by-date-items');

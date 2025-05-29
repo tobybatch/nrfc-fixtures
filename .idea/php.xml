@@ -203,6 +203,8 @@
       <path value="$PROJECT_DIR$/vendor/api-platform/openapi" />
       <path value="$PROJECT_DIR$/vendor/api-platform/validator" />
       <path value="$PROJECT_DIR$/vendor/api-platform/documentation" />
+      <path value="$PROJECT_DIR$/vendor/api-platform/core" />
+      <path value="$PROJECT_DIR$/vendor/dbrekelmans/bdi" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

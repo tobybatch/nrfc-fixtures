@@ -11,6 +11,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,6 +42,9 @@ class FixtureType extends AbstractType
                 'required' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'Training',
+            ])
+            ->add('notes', TextareaType::class, [
+                'label' => 'Notes',
             ])
         ;
     }

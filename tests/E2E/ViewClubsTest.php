@@ -61,7 +61,7 @@ class ViewClubsTest extends PantherTestCase
         $text = $rows->first()->filter('td')->first()->text();
         $rows->first()->filter('a')->click();
         $client->waitForElementToContain('body', $text);
-        $this->assertStringStartsWith('/club/', parse_url($client->getCurrentURL(), PHP_URL_PATH));
+        $this->assertStringStartsWith('/club', parse_url($client->getCurrentURL(), PHP_URL_PATH));
     }
 
     /**

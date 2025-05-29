@@ -43,9 +43,9 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/profile, roles: ROLE_USER }
-        - { path: .*/new\b$, roles: ROLE_ADMIN }
-        - { path: .*/edit\b$, roles: ROLE_ADMIN }
-        - { path: ^.*$, roles: ROLE_ADMIN, methods: [DELETE] }
+        - { path: .*/new\b$, roles: ROLE_EDITOR }
+        - { path: .*/edit\b$, roles: ROLE_EDITOR }
+        - { path: ^.*$, roles: ROLE_EDITOR, methods: [DELETE] }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
