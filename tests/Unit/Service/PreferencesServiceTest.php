@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Service;
 
 use App\Service\PreferencesService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +51,13 @@ class PreferencesServiceTest extends KernelTestCase
             ->method('getCurrentRequest')
             ->willReturn($this->requestMock);
 
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         // Instantiate PreferencesService with the mocked RequestStack
-        $this->preferencesService = new PreferencesService($this->requestStackMock);
+        $this->preferencesService = new PreferencesService(
+            $this->requestStackMock,
+            $this->logger
+        );
     }
 
     public function testGet(): void

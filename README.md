@@ -54,6 +54,8 @@ docker compose exec fixtures ./bin/console nrfc:fixtures:import -s ./assets/fixt
 
 ```
 sudo apt install chromium-browser chromium-chromedriver firefox
+# or
+vendor/bin/bdi detect drivers
 ```
 
 ## Tests

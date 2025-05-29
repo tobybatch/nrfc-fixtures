@@ -28,9 +28,10 @@ class GlobalExtensionTest extends TestCase
     {
         $functions = $this->extension->getFunctions();
 
-        $this->assertCount(2, $functions);
+        $this->assertCount(3, $functions);
         $this->assertEquals('pageHasHelp', $functions[0]->getName());
         $this->assertEquals('pageHelpIsVisible', $functions[1]->getName());
+        $this->assertEquals('getPreference', $functions[2]->getName());
     }
 
     public function testPageHasHelpWithNoRequest()
