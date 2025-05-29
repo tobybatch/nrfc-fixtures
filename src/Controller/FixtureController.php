@@ -64,15 +64,6 @@ final class FixtureController extends AbstractController
 
         // This could be done in an event listener
         if ($request->getAcceptableContentTypes()[0] === 'application/json') {
-//            $data = [];
-//            foreach ($fixtures as $date => $fixturesOnDate) {
-//                $data[$date] = [];
-//                foreach ($fixturesOnDate as $team => $fixturesForTeams) {
-//                    foreach ($fixturesForTeams as $fixture) {
-//                        $data[$date][$team] = $fixture->format();
-//                    }
-//                }
-//            }
             $json = $serializer->serialize($context, 'json');
 
             return new JsonResponse($json, 200, [], true);
@@ -130,9 +121,11 @@ final class FixtureController extends AbstractController
     #[Route('/{id}', name: 'app_fixture_delete', methods: ['POST'])]
     public function delete(Request $request, Fixture $fixture, EntityManagerInterface $entityManager): Response
     {
+        $id = $fixture->getId();
         if ($this->isCsrfTokenValid('delete'.$fixture->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($fixture);
             $entityManager->flush();
+            $this->addFlash('success', 'Fixture '. $id .' deleted');
         }
 
         return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
