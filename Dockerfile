@@ -280,6 +280,7 @@ ENV DATABASE_URL="mysql://app:app@127.0.0.1:3306/app?charset=utf8mb4&serverVersi
 ENV APP_SECRET=change_this_to_something_unique
 # The default container name for nginx is nginx
 ENV TRUSTED_PROXIES=nginx,localhost,127.0.0.1
+ENV CORS_ALLOW_ORIGIN=nginx,localhost,127.0.0.1
 ENV MAILER_FROM=no-reply@norwichrugby.com
 ENV MAILER_URL=null://localhost
 ENV MESSENGER_TRANSPORT_DSN="doctrine://default?auto_setup=0"
