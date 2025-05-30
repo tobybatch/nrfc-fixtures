@@ -18,6 +18,9 @@ class ClubType extends AbstractType
         $builder
             ->add('name')
             ->add('address', TextareaType::class)
+            ->add('notes', TextareaType::class, [
+                'label' => 'Notes',
+            ])
         ;
     }
 
