@@ -1,0 +1,8 @@
+#!/bin/bash
+
+PROJ_DIR="$(dirname $0)/.."
+WORKDIR="$(realpath $PROJ_DIR)"
+COMPOSER_FILE="${WORKDIR}/compose.yaml)"
+
+docker compose -f "${COMPOSER_FILE}" up -d
+symfony serve --listen-ip=0.0.0.0 --port=7000 --dir="${WORKDIR}"
