@@ -95,13 +95,11 @@
         },
         "post-install-cmd": [
             "@auto-scripts",
-            "cp -f ./bin/pre-commit .git/hooks/pre-commit",
-            "chmod +x .git/hooks/pre-commit"
+            "if [ -d .git/hooks/ ]; then cp bin/pre-commit .git/hooks/pre-commit && chmod 777 .git/hooks/pre-commit; fi"
         ],
         "post-update-cmd": [
             "@auto-scripts",
-            "cp -f ./bin/pre-commit .git/hooks/pre-commit",
-            "chmod +x .git/hooks/pre-commit"
+            "if [ -d .git/hooks/ ]; then cp bin/pre-commit .git/hooks/pre-commit && chmod 777 .git/hooks/pre-commit; fi"
         ]
     },
     "conflict": {
