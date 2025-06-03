@@ -24,7 +24,25 @@ class FixtureExtension extends AbstractExtension
             new TwigFunction('dateIsNew', [$this, 'dateIsNew']),
             new TwigFunction('dateIsNotSet', [$this, 'dateIsNotSet']),
             new TwigFunction('dateIsPast', [$this, 'dateIsPast']),
+            new TwigFunction('hasPastDates', [$this, 'hasPastDates']),
         ];
+    }
+
+    /**
+     * @param array<string, array<Fixture>> $fixtures
+     * @return bool
+     */
+    public function hasPastDates(array $fixtures): bool
+    {
+        $dates = array_keys($fixtures);
+        $now = (new DateTimeImmutable())->format('Y-m-d');
+        asort($dates);
+        foreach ($dates as $date) {
+            if ($date < $now) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function dateIsNew(DateTimeImmutable $d1, DateTimeImmutable $d2): bool

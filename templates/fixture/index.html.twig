@@ -10,12 +10,14 @@
         </h1>
 
   <div class="flex justify-end space-x-4">
-        <button
-                data-action="click->fixtures#update"
-                data-fixtures-target="fixturesRowToggle"
-                class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-right">
-            {% if getPreference('showPastFixtures') %}Hide{% else %}Show{% endif %} past dates
-        </button>
+        {% if hasPastDates(fixtures) %}
+            <button
+                    data-action="click->fixtures#update"
+                    data-fixtures-target="fixturesRowToggle"
+                    class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-right">
+                {% if getPreference('showPastFixtures') %}Hide{% else %}Show{% endif %} past dates
+            </button>
+        {% endif %}
 
         {% if app.user is not null and 'ROLE_EDITOR' in app.user.roles %}
         <a
