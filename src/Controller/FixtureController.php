@@ -7,11 +7,14 @@ use App\Config\HomeAway;
 use App\Config\Team;
 use App\Entity\Fixture;
 use App\Form\FixtureType;
+use App\Form\TeamsSelectorForm;
 use App\Repository\FixtureRepository;
+use App\Service\PreferencesService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,26 +26,52 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class FixtureController extends AbstractController
 {
     private FixtureRepository $fixtureRepository;
+    private LoggerInterface $logger;
+    private PreferencesService $preferencesService;
 
-    public function __construct(FixtureRepository $fixtureRepository)
+    public function __construct(FixtureRepository $fixtureRepository, LoggerInterface $logger, PreferencesService $preferencesService)
     {
         $this->fixtureRepository = $fixtureRepository;
+        $this->logger = $logger;
+        $this->preferencesService = $preferencesService;
     }
 
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
+        $teamsForm = $this->createForm(TeamsSelectorForm::class);
+        $teamsForm->handleRequest($request);
         $teams = [];
 
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
             if (null !== $team) {
                 $teams = [Team::getBy($team)];
+                $this->preferencesService->setPreferences('teamsSelected', json_encode([$teams]));
+            }
+        } else {
+            if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
+                $data = $teamsForm->getData();
+                if (array_key_exists('teams', $data)) {
+                    foreach ($data['teams'] as $team) {
+                        $teams[] = Team::getBy($team);
+                    }
+                }
+                $this->preferencesService->setPreferences('teamsSelected', json_encode($teams));
+                return $this->redirectToRoute('app_fixture_index');
             }
         }
 
-        if (0 === count($teams)) {
-            $teams = Team::cases();
+        if (empty($teams)) {
+            $_teams = json_decode(
+                $this->preferencesService->getPreferences()['teamsSelected'] ?? '[]',
+                true
+            );
+            if (empty($_teams)) {
+                $teams = Team::cases();
+            } else {
+                $teams = array_map(fn($team) => Team::getBy($team), $_teams);
+            }
         }
 
         $fixtures = [];
@@ -58,6 +87,7 @@ final class FixtureController extends AbstractController
         }
 
         $context = [
+            'teamsForm' => $teamsForm->createView(),
             'teams' => $teams,
             'fixtures' => $fixtures,
         ];
@@ -122,10 +152,10 @@ final class FixtureController extends AbstractController
     public function delete(Request $request, Fixture $fixture, EntityManagerInterface $entityManager): Response
     {
         $id = $fixture->getId();
-        if ($this->isCsrfTokenValid('delete'.$fixture->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $fixture->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($fixture);
             $entityManager->flush();
-            $this->addFlash('success', 'Fixture '. $id .' deleted');
+            $this->addFlash('success', 'Fixture ' . $id . ' deleted');
         }
 
         return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
@@ -133,9 +163,10 @@ final class FixtureController extends AbstractController
 
     #[Route('/byDate/{date}', name: 'app_fixture_byDate', methods: ['GET'])]
     public function byDate(
-        string $date,
+        string            $date,
         FixtureRepository $fixtureRepository,
-    ): Response {
+    ): Response
+    {
         // Manually validate the date format
         $dateObj = DateTimeImmutable::createFromFormat('Ymd', $date);
 

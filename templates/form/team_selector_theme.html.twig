@@ -1,0 +1,21 @@
+<!-- start templates/form/team_selector_theme.html.twig -->
+{% block choice_widget_expanded %}
+    <div {{ block('widget_container_attributes') }} class="flex flex-col">
+        {% for child in form %}
+            <div class="flex items-center space-x-2">
+                <span>
+                {{ form_widget(child, {
+                    attr: {
+                        class: 'form-checkbox text-blue-600 w-auto h-auto'
+                    }
+                }) }}
+                    </span><span class="inline-block align-middle">
+                {{ form_label(child, null, {
+                    translation_domain: choice_translation_domain,
+                    label_attr: { class: 'text-gray-700' }
+                }) }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+<!-- end templates/form/team_selector_theme.html.twig -->
