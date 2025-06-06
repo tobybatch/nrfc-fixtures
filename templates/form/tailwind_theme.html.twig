@@ -10,14 +10,14 @@
 
 {%- block widget_attributes -%}
     {%- set attr = attr|default({})|merge({
-        class: (attr.class|default('') ~ ' bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500')|trim
+        class: (attr.class|default('') ~ ' bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500')|trim
     }) -%}
     {{- parent() -}}
 {%- endblock widget_attributes -%}
 
 {%- block form_label -%}
     {%- set label_attr = label_attr|default({})|merge({
-        class: (label_attr.class|default('') ~ ' block mb-2 text-sm font-bold text-gray-900 dark:text-white')|trim
+        class: (label_attr.class|default('') ~ ' block mb-2 text-sm font-bold')|trim
     }) -%}
     {{- parent() -}}
 {%- endblock form_label -%}

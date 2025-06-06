@@ -7,7 +7,8 @@ use App\Config\HomeAway;
 use App\Config\Team;
 use App\Entity\Fixture;
 use App\Form\FixtureType;
-use App\Form\TeamsSelectorForm;
+use App\Form\FixturesDisplayOptionsForm;
+use App\Form\Model\FixturesDisplayOptionsDTO;
 use App\Repository\FixtureRepository;
 use App\Service\PreferencesService;
 use DateTimeImmutable;
@@ -39,7 +40,13 @@ final class FixtureController extends AbstractController
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
-        $teamsForm = $this->createForm(TeamsSelectorForm::class);
+        $preferences = $this->preferencesService->getPreferences();
+
+        $displayOptions = new FixturesDisplayOptionsDTO();
+        $displayOptions->teams = json_decode($preferences['teamsSelected'] ?? '[]', true);
+        $displayOptions->showPastDates = $preferences['showPastDates'] ?? false; // Assuming you have this preference
+
+        $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
         $teamsForm->handleRequest($request);
         $teams = [];
 
@@ -51,11 +58,9 @@ final class FixtureController extends AbstractController
             }
         } else {
             if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
-                $data = $teamsForm->getData();
-                if (array_key_exists('teams', $data)) {
-                    foreach ($data['teams'] as $team) {
-                        $teams[] = Team::getBy($team);
-                    }
+                $data = $displayOptions->teams;
+                foreach ($data['teams'] as $team) {
+                    $teams[] = Team::getBy($team);
                 }
                 $this->preferencesService->setPreferences('teamsSelected', json_encode($teams));
                 return $this->redirectToRoute('app_fixture_index');

@@ -1,0 +1,13 @@
+<!-- start templates/components/fixtures_display_options.html.twig -->
+
+{% form_theme form 'form/tailwind_theme.html.twig' %}
+
+{{ form_start(form) }}
+    {{ form_row(form.teams) }} {# This will now use your custom choice_widget_expanded and choice_label blocks #}
+    {{ form_row(form.showPastDates) }} {# This will use your custom checkbox_widget #}
+    {# Add a submit button if you like #}
+<button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+    Update view
+</button>
+{{ form_end(form) }}
+<!-- end templates/components/fixtures_display_options.html.twig -->

@@ -3,7 +3,7 @@
 {% block title %}All{% endblock %}
 
 {% block body %}
-    <div data-controller="shared_utility collapsible">
+    <div data-controller="collapsible">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-primary text-2xl font-bold">{% if teams|length == 1 %}{{ teams.0.name }} {% endif %}
                 Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}
@@ -51,15 +51,7 @@
                     class="flex flex-row max-h-0 overflow-hidden transition-all duration-300 bg-gray-100 rounded-lg mt-2 w-auto"
             >
                 <div class="w-auto min-w-0 flex-shrink-0">
-                    {% include 'components/team_selector.html.twig' with {'form': teamsForm} %}
-                </div>
-                <div class="w-auto min-w-0 flex-shrink-0 pl-4">
-                    {% if hasPastDates(fixtures) %}
-                        <button
-                                class="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded flex items-right">
-                            {% if getPreference('showPastFixtures') %}Hide{% else %}Show{% endif %} past dates
-                        </button>
-                    {% endif %}
+                    {% include 'components/fixtures_display_options.html.twig' with {'form': teamsForm} %}
                 </div>
             </div>
         </div>
