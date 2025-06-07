@@ -1,0 +1,46 @@
+<!-- start templates/form/fixtures_display_options_theme.html.twig -->
+
+{% use 'form/tailwind_theme.html.twig' %}
+
+{%- block form_row -%}
+    {# Check if the field is a multiple, expanded choice field (or any field you want to apply this to) #}
+    {% if form.vars.expanded and form.vars.multiple and 'choice' in form.vars.block_prefixes %}
+        {# Apply a specific class to the label for these types of fields #}
+        <div class="form-row-custom-choice-label">
+            {{- form_label(form, null, {'label_attr': {'class': 'choice-group-label font-bold'}}) -}}
+            {{- form_widget(form) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        </div>
+    {% else %}
+        <div>
+            {{- form_label(form) -}}
+            {{- form_widget(form) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        </div>
+    {% endif %}
+{%- endblock form_row -%}
+
+{%- block form_label -%}
+    {% if label is empty %}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {% endif %}
+
+    <label
+            {% if label_attr %}
+                {% with { attr: label_attr } %}
+                    {{ block('attributes') }}
+                {% endwith %}
+            {% endif %}
+    >{{ label }}</label>
+{%- endblock form_label -%}
+
+<!-- end templates/form/fixtures_display_options_theme.html.twig -->

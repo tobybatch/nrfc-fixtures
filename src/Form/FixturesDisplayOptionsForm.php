@@ -39,7 +39,7 @@ class FixturesDisplayOptionsForm extends AbstractType
                 'row_attr' => ['class' => 'flex items-start'],
             ])
             ->add('showPastDates', CheckboxType::class, [
-                'label' => 'Show past dates?',
+                'label' => 'Show?',
                 'required' => false,
                 'attr' => ['class' => 'form-checkbox h-4 w-4'],
                 'label_attr' => ['class' => ''],

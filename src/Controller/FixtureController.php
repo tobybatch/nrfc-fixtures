@@ -91,6 +91,7 @@ final class FixtureController extends AbstractController
             $fixtures[$date] = $fixture;
         }
 
+        dump($teamsForm->createView());
         $context = [
             'teamsForm' => $teamsForm->createView(),
             'teams' => $teams,
