@@ -7,7 +7,7 @@
     {% if form.vars.expanded and form.vars.multiple and 'choice' in form.vars.block_prefixes %}
         {# Apply a specific class to the label for these types of fields #}
         <div class="form-row-custom-choice-label">
-            {{- form_label(form, null, {'label_attr': {'class': 'choice-group-label font-bold'}}) -}}
+            {{- form_label(form, null, {'label_attr': {'class': 'choice-group-label font-bold p-8'}}) -}}
             {{- form_widget(form) -}}
             {{- form_help(form) -}}
             {{- form_errors(form) -}}
@@ -34,13 +34,32 @@
         {%- endif -%}
     {% endif %}
 
-    <label
-            {% if label_attr %}
-                {% with { attr: label_attr } %}
-                    {{ block('attributes') }}
-                {% endwith %}
-            {% endif %}
-    >{{ label }}</label>
+    {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' pl-2')|trim}) %}
+    <label for="{{ id }}"
+        {% for attrname, attrvalue in label_attr %}
+            {{ attrname }}="{{ attrvalue|escape('html_attr') }}"
+        {% endfor %}
+    >
+    {{ label }}
+    </label>
 {%- endblock form_label -%}
 
+{%- block form_widget -%}
+    {% if form.vars.name == 'showPastDates' and 'checkbox' in form.vars.block_prefixes %}
+        {# Customize checkbox for showPastDates field #}
+        <input type="checkbox"
+               id="{{ id }}"
+               name="{{ full_name }}"
+               {% if value is defined %} value="{{ value }}"{% endif %}
+               {% if checked %} checked="checked"{% endif %}
+               {% if attr %}
+                   {% set attr = attr|merge({'class': (attr.class|default('') ~ ' form-checkbox h-4 w-4 bg-gray-50 border border-gray-300 text-gray-900 rounded focus:ring-blue-500 focus:border-blue-500')|trim}) %}
+                   {% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue|escape('html_attr') }}"{% endfor %}
+               {% endif %}
+        >
+    {% else %}
+        {# Fallback to default widget rendering for other fields #}
+        {{ parent() }}
+    {% endif %}
+{%- endblock form_widget -%}
 <!-- end templates/form/fixtures_display_options_theme.html.twig -->
