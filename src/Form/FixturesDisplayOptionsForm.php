@@ -28,9 +28,6 @@ class FixturesDisplayOptionsForm extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Show which teams?',
-                'constraints' => [
-                    new Count(['min' => 1, 'minMessage' => 'Select at least one team.']),
-                ],
                 'attr' => ['class' => 'space-y-2 w-1'],
                 'label_attr' => [
                     'class' => ''

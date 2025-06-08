@@ -59,7 +59,7 @@ final class FixtureController extends AbstractController
         } else {
             if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
                 $data = $displayOptions->teams;
-                foreach ($data['teams'] as $team) {
+                foreach ($data as $team) {
                     $teams[] = Team::getBy($team);
                 }
                 $this->preferencesService->setPreferences('teamsSelected', json_encode($teams));
