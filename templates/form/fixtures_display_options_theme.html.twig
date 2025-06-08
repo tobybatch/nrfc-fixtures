@@ -44,8 +44,8 @@
     </label>
 {%- endblock form_label -%}
 
-{%- block form_widget -%}
-    {% if form.vars.name == 'showPastDates' and 'checkbox' in form.vars.block_prefixes %}
+{%- block checkbox_widget -%}
+    {% if form.vars.name == 'showPastDates' %}
         {# Customize checkbox for showPastDates field #}
         <input type="checkbox"
                id="{{ id }}"
@@ -58,8 +58,8 @@
                {% endif %}
         >
     {% else %}
-        {# Fallback to default widget rendering for other fields #}
+        {# Fallback to parent theme for other checkboxes #}
         {{ parent() }}
     {% endif %}
-{%- endblock form_widget -%}
+{%- endblock checkbox_widget -%}
 <!-- end templates/form/fixtures_display_options_theme.html.twig -->

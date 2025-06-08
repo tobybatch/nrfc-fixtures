@@ -5,6 +5,9 @@ twig:
     globals:
         app_data: '@App\Service\PreferencesService'
 
+when@dev:
+    debug: true
+
 when@test:
     twig:
         strict_variables: true
