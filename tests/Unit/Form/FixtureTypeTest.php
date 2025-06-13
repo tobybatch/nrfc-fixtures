@@ -33,7 +33,7 @@ class FixtureTypeTest extends TestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $formBuilder
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(6))
             ->method('add')
             ->withConsecutive(
                 [

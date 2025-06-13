@@ -26,7 +26,7 @@ class ClubTypeTest extends TestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $formBuilder
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('add')
             ->withConsecutive(
                 ['name'],

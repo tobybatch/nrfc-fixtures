@@ -33,21 +33,10 @@ class PreferencesService
         return $preferences;
     }
 
-    public function setPreferences(string $path, mixed $value): void
+    public function setPreferences(string $key, mixed $value): void
     {
         $targetArray = $this->getPreferences();
-        $keys = explode('.', $path);
-        $current = &$targetArray;
-
-        foreach ($keys as $key) {
-            // If the key doesn't exist or isn't an array, initialize it
-            if (!isset($current[$key]) || !is_array($current[$key])) {
-                $current[$key] = [];
-            }
-            $current = &$current[$key]; // Move deeper
-        }
-
-        $current = $value; // Set the final value
+        $targetArray[$key] = $value;
         $this->getSession()->set('preferences', $targetArray);
     }
 
