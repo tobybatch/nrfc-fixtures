@@ -28,13 +28,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class FixtureController extends AbstractController
 {
     private FixtureRepository $fixtureRepository;
-    private LoggerInterface $logger;
     private PreferencesService $preferencesService;
 
-    public function __construct(FixtureRepository $fixtureRepository, LoggerInterface $logger, PreferencesService $preferencesService)
+    public function __construct(FixtureRepository $fixtureRepository, PreferencesService $preferencesService)
     {
         $this->fixtureRepository = $fixtureRepository;
-        $this->logger = $logger;
         $this->preferencesService = $preferencesService;
     }
 

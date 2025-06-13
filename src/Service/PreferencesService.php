@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PreferencesService
 {
-    private ?RequestStack $requestStack;
+    private RequestStack $requestStack;
     private LoggerInterface $logger;
 
     public function __construct(RequestStack $requestStack, LoggerInterface $logger)
@@ -18,11 +18,14 @@ class PreferencesService
         $this->requestStack = $requestStack;
     }
 
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         return $this->requestStack->getCurrentRequest()->getSession();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getPreferences(): array
     {
         $preferences = $this->getSession()->get('preferences', []) ?? [];
@@ -30,12 +33,8 @@ class PreferencesService
         return $preferences;
     }
 
-    public function setPreferences(string $path, mixed $value): array
+    public function setPreferences(string $path, mixed $value): void
     {
-        if (!$this->getSession()) {
-            throw new \RuntimeException('Cannot set preferences without an active session.');
-        }
-
         $targetArray = $this->getPreferences();
         $keys = explode('.', $path);
         $current = &$targetArray;
@@ -50,14 +49,10 @@ class PreferencesService
 
         $current = $value; // Set the final value
         $this->getSession()->set('preferences', $targetArray);
-        dump($this->getSession());
-        return $targetArray;
     }
 
     /**
-     * For twig globals, see config/packages/twig.yaml
-     *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getData(): array
     {
