@@ -11,6 +11,7 @@ use App\Form\FixturesDisplayOptionsForm;
 use App\Form\Model\FixturesDisplayOptionsDTO;
 use App\Repository\FixtureRepository;
 use App\Service\PreferencesService;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -41,56 +42,49 @@ final class FixtureController extends AbstractController
     public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
         $preferences = $this->preferencesService->getPreferences();
-
         $displayOptions = new FixturesDisplayOptionsDTO();
-        $displayOptions->teams = json_decode($preferences['teamsSelected'] ?? '[]', true);
+        $_teams = $preferences['teamsSelected'] ?? [];
+        $displayOptions->teams = $_teams;
         $displayOptions->showPastDates = $preferences['showPastDates'] ?? false; // Assuming you have this preference
 
         $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
         $teamsForm->handleRequest($request);
-        $teams = [];
 
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
             if (null !== $team) {
-                $teams = [Team::getBy($team)];
-                $this->preferencesService->setPreferences('teamsSelected', json_encode([$teams]));
+                $this->preferencesService->setPreferences('teamsSelected', [$team]);
+                return $this->redirectToRoute('app_fixture_index');
             }
         } else {
             if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
-                $teamsData = $displayOptions->teams;
-                foreach ($teamsData as $team) {
-                    $teams[] = Team::getBy($team);
-                }
-                $this->preferencesService->setPreferences('teamsSelected', json_encode($teams));
-                $showPastDates = $displayOptions->showPastDates;
-                $this->preferencesService->setPreferences('showPastDates', $showPastDates);
+                $this->preferencesService->setPreferences('teamsSelected',$displayOptions->teams);
+                $this->preferencesService->setPreferences('showPastDates', $displayOptions->showPastDates);
                 return $this->redirectToRoute('app_fixture_index');
             }
         }
 
-        if (empty($teams)) {
-            $_teams = json_decode(
-                $this->preferencesService->getPreferences()['teamsSelected'] ?? '[]',
-                true
-            );
-            if (empty($_teams)) {
-                $teams = Team::cases();
-            } else {
-                $teams = array_map(fn($team) => Team::getBy($team), $_teams);
-            }
+        if (empty($_teams)) {
+            $teams = Team::cases();
+        } else {
+            $teams = array_map(fn($team) => Team::getBy($team), $_teams);
         }
+
+        $showPastDates = $this->preferencesService->getPreferences()['showPastDates'] ?? false;
 
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
-            $fixture = [];
-            foreach ($teams as $team) {
-                if ($team) {
-                    $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
+            // check date is today or later, or force show is set
+            if ($showPastDates || new DateTime($date) >= new DateTime()) {
+                $fixture = [];
+                foreach ($teams as $team) {
+                    if ($team) {
+                        $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                    }
                 }
+                $fixtures[$date] = $fixture;
             }
-            $fixtures[$date] = $fixture;
         }
 
         dump($teamsForm->createView());

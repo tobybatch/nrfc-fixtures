@@ -30,7 +30,7 @@ class PreferencesService
         return $preferences;
     }
 
-    public function setPreferences(string $path, string|bool $value): array
+    public function setPreferences(string $path, mixed $value): array
     {
         if (!$this->getSession()) {
             throw new \RuntimeException('Cannot set preferences without an active session.');
@@ -50,6 +50,7 @@ class PreferencesService
 
         $current = $value; // Set the final value
         $this->getSession()->set('preferences', $targetArray);
+        dump($this->getSession());
         return $targetArray;
     }
 
