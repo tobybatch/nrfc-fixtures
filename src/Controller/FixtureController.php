@@ -58,11 +58,13 @@ final class FixtureController extends AbstractController
             }
         } else {
             if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
-                $data = $displayOptions->teams;
-                foreach ($data as $team) {
+                $teamsData = $displayOptions->teams;
+                foreach ($teamsData as $team) {
                     $teams[] = Team::getBy($team);
                 }
                 $this->preferencesService->setPreferences('teamsSelected', json_encode($teams));
+                $showPastDates = $displayOptions->showPastDates;
+                $this->preferencesService->setPreferences('showPastDates', $showPastDates);
                 return $this->redirectToRoute('app_fixture_index');
             }
         }
