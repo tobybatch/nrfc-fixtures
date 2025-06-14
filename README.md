@@ -65,5 +65,8 @@ XDEBUG_MODE=coverage ./vendor/bin/phpunit
 ```
 # TODO
 
+/bin/console doctrine:query:sql "update users set roles='[\"ROLE_EDITOR\"]' where email='toby@nfn.org.uk'"
+
+
  1. Fix route name
  2. check magic link detail in security.yaml, https://symfony.com/doc/current/security/login_link.html
