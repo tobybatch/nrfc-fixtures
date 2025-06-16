@@ -26,13 +26,7 @@
     {% block stylesheets %}{{ encore_entry_link_tags('app') }}{% endblock %}
     {% block javascripts %}{{ encore_entry_script_tags('app') }}{% endblock %}
 </head>
-<body
-        class="bg-light text-gray-800 font-sans leading-relaxed"
-        data-controller="helptoggle"
-        data-helptoggle-current-route-value="{{ app.request.attributes.get('_route') }}"
-        data-helptoggle-csrf-value="{{ csrf_token('app') }}"
-        data-helptoggle-pagehelpisvisible-value="{{ pageHelpIsVisible() ? 'true' : 'false' }}"
->
+<body class="bg-light text-gray-800 font-sans leading-relaxed">
 
 <!-- Header -->
 {% include 'components/header.html.twig' %}
