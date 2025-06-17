@@ -73,6 +73,7 @@ function prepare() {
 
 function runServer() {
   # Just while I'm fixing things
+  /opt/nrfcfixtures/bin/console cache:clear
   chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures/var
   if [ -e /use_apache ]; then
     exec /usr/sbin/apache2 -D FOREGROUND

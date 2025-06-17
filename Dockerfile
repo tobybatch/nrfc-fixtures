@@ -5,7 +5,7 @@
 # ---------------------------------------------------------------------
 # For local testing by maintainer:
 #
-# docker build --no-cache -t nrfc/fixtures:fpm --build-arg BASE=fpm .
+# docker build --no-cache -t ghcr.io/tobybatch/nrfc-fixtures:fpm-prod --build-arg BASE=fpm .
 # docker build --no-cache -t nrfc/fixtures:apache --build-arg BASE=apache .
 # docker run -d --name nrfrc-fixtures-apache-app nrfrc-fixtures-apache
 #

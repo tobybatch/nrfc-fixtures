@@ -7,7 +7,7 @@ services:
       - path: ./prod.env
         required: true
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-nrfc}", "-U", "${POSTGRES_USER:-nrfc}"]
       timeout: 5s
       retries: 5
       start_period: 60s
