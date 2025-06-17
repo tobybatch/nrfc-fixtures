@@ -5,9 +5,6 @@
 # ---------------------------------------------------------------------
 # For local testing by maintainer:
 #
-# docker build --no-cache -t nrfc/fixtures:fpm --build-arg BASE=fpm .
-# docker build --no-cache -t nrfc/fixtures:apache --build-arg BASE=apache .
-# docker run -d --name nrfrc-fixtures-apache-app nrfrc-fixtures-apache
 #
 # cp .docker/sample.dev.env .docker/dev.env
 # docker compose -f .docker/compose.dev.yml up -d
@@ -317,9 +314,10 @@ RUN \
     chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
-    sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console
-RUN yarn && \
-    yarn run build && \
+    sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console && \
+    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
+    yarn --cwd /opt/nrfcfixtures && \
+    yarn --cwd /opt/nrfcfixtures build && \
     curl -sS https://get.symfony.com/cli/installer | bash && \
     mv /root/.symfony5/bin/symfony /usr/local/bin/symfony && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
@@ -339,7 +337,7 @@ RUN export COMPOSER_HOME=/composer && \
     touch /opt/nrfcfixtures/.env
 RUN composer --no-ansi install --working-dir=/opt/nrfcfixtures --no-dev --optimize-autoloader
 RUN composer --no-ansi clearcache && \
-       cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
+    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
     sed -i "s/expose_php = On/expose_php = Off/g" /usr/local/etc/php/php.ini && \
     sed -i "s/;opcache.enable=1/opcache.enable=1/g" /usr/local/etc/php/php.ini && \
     sed -i "s/;opcache.memory_consumption=128/opcache.memory_consumption=256/g" /usr/local/etc/php/php.ini && \
@@ -349,9 +347,9 @@ RUN composer --no-ansi clearcache && \
     sed -i "s/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 604800/g" /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini
-RUN yarn && \
-    yarn run build && \
+    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
+    yarn --cwd /opt/nrfcfixtures && \
+    yarn --cwd /opt/nrfcfixtures build && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=prod
 ENV DATABASE_URL=""

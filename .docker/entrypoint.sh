@@ -72,6 +72,7 @@ function prepare() {
 }
 
 function runServer() {
+  /opt/nrfcfixtures/bin/console cache:clear
   # Just while I'm fixing things
   chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures/var
   if [ -e /use_apache ]; then
