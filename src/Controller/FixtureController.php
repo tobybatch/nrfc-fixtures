@@ -9,6 +9,7 @@ use App\Entity\Fixture;
 use App\Form\FixtureType;
 use App\Form\FixturesDisplayOptionsForm;
 use App\Form\Model\FixturesDisplayOptionsDTO;
+use App\Repository\ClubRepository;
 use App\Repository\FixtureRepository;
 use App\Service\PreferencesService;
 use DateTime;
@@ -52,11 +53,11 @@ final class FixtureController extends AbstractController
             $team = $request->query->get('team');
             if (null !== $team) {
                 $this->preferencesService->setPreferences('teamsSelected', [$team]);
-                return $this->redirectToRoute('app_fixture_index');
+                $_teams = [$team];
             }
         } else {
             if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
-                $this->preferencesService->setPreferences('teamsSelected',$displayOptions->teams);
+                $this->preferencesService->setPreferences('teamsSelected', $displayOptions->teams);
                 $this->preferencesService->setPreferences('showPastDates', $displayOptions->showPastDates);
                 return $this->redirectToRoute('app_fixture_index');
             }
@@ -220,4 +221,74 @@ final class FixtureController extends AbstractController
             'fixtures' => $fixtures,
         ]);
     }
+
+    // This will be removed when we get to the new website
+    #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
+    public function forOldWebsite(Request $request, SerializerInterface $serializer): Response|JsonResponse
+    {
+        $team = Team::getBy($request->query->get('team'));
+        $fixtures = [];
+        $dates = $this->fixtureRepository->getDates();
+        foreach ($dates as $date) {
+            $_fixtures = $this->fixtureRepository->getFixturesForTeam($team, $date);
+            if (!empty($_fixtures)) {
+                $fixture = $_fixtures[0];
+                $club = $fixture->getClub();
+                $fixtures[] = [
+                    "id" => $fixture->getId(),
+                    "opponent" => $club?->getName() ?: 'Training',
+                    "competition" => $this->translateCompetition($fixture->getCompetition()),
+                    "venue" => $fixture->getHomeAway() == HomeAway::Home ? 'home' : 'away',
+                    "date" => $date,
+                ];
+            }
+        }
+
+        // This could be done in an event listener
+        if ($request->getAcceptableContentTypes()[0] === 'application/json') {
+            $json = $serializer->serialize($fixtures, 'json');
+            return new JsonResponse($json, 200, [], true);
+        }
+
+        return new Response("Unsupported accept type", 400);
+    }
+
+    private function translateCompetition($competition): string|null
+    {
+        return match ($competition) {
+            Competition::CountyCup, Competition::NationalCup => 'cup',
+            Competition::League => 'league',
+            default => null,
+        };
+    }
 }
+/*
+    competition: 'cup',
+    competition: 'friendly',
+    competition: 'league',
+    competition: 'null',
+[
+  {
+      id: '1624',
+    relatedMatchReport: null,
+    opponent: 'Fakenham (Senior Squad)',
+    competition: 'friendly',
+    venue: 'home',
+    result: '47:5',
+    date: '2024-08-17',
+    __typename: 'fixtures'
+  },
+  {
+      id: '1535',
+    relatedMatchReport: {
+      slug: 'norwich-39-north-walsham-raiders-24',
+      __typename: 'matchReports'
+    },
+    opponent: 'North Walsham 2',
+    competition: 'league',
+    venue: 'home',
+    result: '39:24',
+    date: '2024-09-21',
+    __typename: 'fixtures'
+  }
+*/

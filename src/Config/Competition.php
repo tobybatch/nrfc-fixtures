@@ -15,6 +15,7 @@ enum Competition: string
     case NationalCup = 'NationalCup';
     case Norfolk10s = 'Norfolk10s';
     case Conference = 'Conference';
+    case League = 'League';
 
     public function shortValue(): string
     {
