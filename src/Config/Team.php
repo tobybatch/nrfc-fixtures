@@ -16,6 +16,10 @@ enum Team: string
     case U14G = 'U14G';
     case U16G = 'U16G';
     case U18G = 'U18G';
+    case FIRST_XV = "1st Team (Mens)";
+    case LIONS = "2nd Team (Mens)";
+    case AXV = "3rd Team (Mens)";
+    case SENIOR_WOMEN = "1st Team (Women)";
 
     public static function getBy(string $value): ?Team
     {
@@ -30,6 +34,10 @@ enum Team: string
             'U14G' => self::U14G,
             'U16G' => self::U16G,
             'U18G' => self::U18G,
+            '1st Team (Mens)' => self::FIRST_XV,
+            '2nd Team (Mens)' => self::LIONS,
+            '3rd Team (Mens)' => self::AXV,
+            '1st Team (Women)' => self::SENIOR_WOMEN,
             default => null,
         };
     }
