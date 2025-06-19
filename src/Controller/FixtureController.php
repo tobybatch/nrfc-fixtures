@@ -66,11 +66,14 @@ final class FixtureController extends AbstractController
                 $_teams = [$team];
             }
         } else {
+            $this->logger->warning('POST', ['_teams' => $_teams]);
             if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
+                $this->logger->warning('is valid');
                 $this->preferencesService->setPreferences('teamsSelected', $displayOptions->teams);
                 $this->preferencesService->setPreferences('showPastDates', $displayOptions->showPastDates);
-                return $this->redirectToRoute('app_fixture_index');
+//                return $this->redirectToRoute('app_fixture_index');
             }
+            return $this->redirectToRoute('app_fixture_index');
         }
 
         $this->logger->debug('_Teams', ['_teams' => $_teams]);
