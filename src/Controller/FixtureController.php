@@ -30,17 +30,25 @@ final class FixtureController extends AbstractController
 {
     private FixtureRepository $fixtureRepository;
     private PreferencesService $preferencesService;
+    private LoggerInterface $logger;
 
-    public function __construct(FixtureRepository $fixtureRepository, PreferencesService $preferencesService)
+    public function __construct(
+        FixtureRepository $fixtureRepository,
+        PreferencesService $preferencesService,
+        LoggerInterface $logger,
+    )
     {
         $this->fixtureRepository = $fixtureRepository;
         $this->preferencesService = $preferencesService;
+        $this->logger = $logger;
     }
 
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
         $preferences = $this->preferencesService->getPreferences();
+        $this->logger->debug('Preferences', ['preferences' => $preferences]);
+
         $displayOptions = new FixturesDisplayOptionsDTO();
         $_teams = $preferences['teamsSelected'] ?? [];
         $displayOptions->teams = $_teams;
@@ -49,8 +57,10 @@ final class FixtureController extends AbstractController
         $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
         $teamsForm->handleRequest($request);
 
+        $this->logger->debug('Method', ['is GET' => $request->isMethod('GET')]);
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
+            $this->logger->debug('Team param', ['team' => $team]);
             if (null !== $team) {
                 $this->preferencesService->setPreferences('teamsSelected', [$team]);
                 $_teams = [$team];
@@ -63,11 +73,14 @@ final class FixtureController extends AbstractController
             }
         }
 
+        $this->logger->debug('_Teams', ['_teams' => $_teams]);
         if (empty($_teams)) {
             $teams = Team::cases();
         } else {
             $teams = array_map(fn($team) => Team::getBy($team), $_teams);
         }
+
+        $this->logger->debug('Teams', ['teams' => $teams]);
 
         $showPastDates = $this->preferencesService->getPreferences()['showPastDates'] ?? false;
 

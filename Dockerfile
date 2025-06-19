@@ -4,17 +4,15 @@
 # - Development     (nrfc/fixtures2:dev)
 # ---------------------------------------------------------------------
 # For local testing by maintainer:
-#
-#
 # cp .docker/sample.dev.env .docker/dev.env
 # docker compose -f .docker/compose.dev.yml up -d
 # docker exec -ti nrfrc-fixtures-apache-app /bin/bash
 # docker exec -ti nrfrc-fixtures-apache-app symfony serve --port=7000 --listen-ip=0.0.0.0
-# ---------------------------------------------------------------------
-# Official PHP images: https://hub.docker.com/_/php/
-# https://github.com/docker-library/docs/blob/master/php/README.md#supported-tags-and-respective-dockerfile-links
-# Pass-through Arguments: https://benkyriakou.com/posts/docker-args-empty
-# Best practices: https://docs.docker.com/build/building/best-practices/
+
+# For testing prod
+# docker build -t ghcr.io/tobybatch/nrfc-fixtures:fpm-prod .
+# cp .docker/sample.prod.env .docker/prod.env
+# docker compose -f .docker/compose.prod.yml up -d
 # ---------------------------------------------------------------------
 
 # Source base, one of: fpm, apache
