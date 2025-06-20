@@ -48,9 +48,10 @@ class FixturesDisplayOptionsForm extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        // TODO Enable CRSF - The apache -> nginx -> fpm seems to mess it up
         $resolver->setDefaults([
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
+            'csrf_protection' => false,
+//            'csrf_field_name' => '_token',
             'data_class' => FixturesDisplayOptionsDTO::class,
         ]);
     }

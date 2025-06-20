@@ -54,10 +54,14 @@ final class FixtureController extends AbstractController
         $displayOptions->teams = $_teams;
         $displayOptions->showPastDates = $preferences['showPastDates'] ?? false; // Assuming you have this preference
 
-        $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
-        $teamsForm->handleRequest($request);
+        // $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
+        $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions, [
+            'action' => $this->generateUrl(
+                'app_preferences_update'
+            ),
+            'method' => 'POST',
+        ]);
 
-        $this->logger->debug('Method', ['is GET' => $request->isMethod('GET')]);
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
             $this->logger->debug('Team param', ['team' => $team]);
@@ -65,15 +69,6 @@ final class FixtureController extends AbstractController
                 $this->preferencesService->setPreferences('teamsSelected', [$team]);
                 $_teams = [$team];
             }
-        } else {
-            $this->logger->warning('POST', ['_teams' => $_teams]);
-            if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
-                $this->logger->warning('is valid');
-                $this->preferencesService->setPreferences('teamsSelected', $displayOptions->teams);
-                $this->preferencesService->setPreferences('showPastDates', $displayOptions->showPastDates);
-//                return $this->redirectToRoute('app_fixture_index');
-            }
-            return $this->redirectToRoute('app_fixture_index');
         }
 
         $this->logger->debug('_Teams', ['_teams' => $_teams]);
