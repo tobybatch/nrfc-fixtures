@@ -4,14 +4,32 @@
             <!-- Left group -->
             <div class="flex">
                 <li class="mr-4">
-                    <a href="{{ path('app_fixture_index') }}"
-                       class="text-white px-4 py-2 rounded hover:bg-tertiary transition">
-                        Fixtures
+                    <a href="{{ path('app_fixture_index', { team: 'youth' }) }}"
+                       class="text-white px-1 py-2 rounded hover:bg-tertiary transition">
+                        All Youth
+                    </a>
+                </li>
+                <li class="mr-4">
+                    <a href="{{ path('app_fixture_index', { team: 'boys' }) }}"
+                       class="text-white px-1 py-2 rounded hover:bg-tertiary transition">
+                        Boys
+                    </a>
+                </li>
+                <li class="mr-4">
+                    <a href="{{ path('app_fixture_index', { team: 'girls' }) }}"
+                       class="text-white px-1 py-2 rounded hover:bg-tertiary transition">
+                        Girls
+                    </a>
+                </li>
+                <li class="mr-4">
+                    <a href="{{ path('app_fixture_index', { team: 'seniors' }) }}"
+                       class="text-white px-1 py-2 rounded hover:bg-tertiary transition">
+                        Seniors
                     </a>
                 </li>
                 <li>
                     <a href="{{ path('app_club_index') }}"
-                       class="text-white px-4 py-2 rounded hover:bg-tertiary transition">
+                       class="text-white px-4 py-2 ml-10 rounded hover:bg-tertiary transition">
                         Clubs
                     </a>
                 </li>

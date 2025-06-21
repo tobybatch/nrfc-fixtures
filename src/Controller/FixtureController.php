@@ -43,18 +43,43 @@ final class FixtureController extends AbstractController
         $this->logger = $logger;
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
+        if ($request->isMethod('GET')) {
+            $team = $request->query->get('team');
+            $this->logger->debug('Team param', ['team' => $team]);
+            if (null !== $team) {
+                $selectedTeams = [];
+                switch ($team) {
+                    case 'boys':
+                        $selectedTeams = Team::getBoys();
+                        break;
+                    case 'girls':
+                        $selectedTeams = Team::getGirls();
+                        break;
+                    case'youth':
+                        $selectedTeams = Team::getYouth();
+                        break;
+                    case 'seniors':
+                        $selectedTeams = Team::getSenior();
+                        break;
+                    default:
+                }
+                $this->preferencesService->setPreferences('teamsSelected', array_map(static fn (Team $team) => $team->value, $selectedTeams));
+            }
+        }
+
         $preferences = $this->preferencesService->getPreferences();
         $this->logger->debug('Preferences', ['preferences' => $preferences]);
 
         $displayOptions = new FixturesDisplayOptionsDTO();
         $_teams = $preferences['teamsSelected'] ?? [];
         $displayOptions->teams = $_teams;
-        $displayOptions->showPastDates = $preferences['showPastDates'] ?? false; // Assuming you have this preference
-
-        // $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
+        $displayOptions->showPastDates = $preferences['showPastDates'] ?? false;
         $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions, [
             'action' => $this->generateUrl(
                 'app_preferences_update'
@@ -62,18 +87,9 @@ final class FixtureController extends AbstractController
             'method' => 'POST',
         ]);
 
-        if ($request->isMethod('GET')) {
-            $team = $request->query->get('team');
-            $this->logger->debug('Team param', ['team' => $team]);
-            if (null !== $team) {
-                $this->preferencesService->setPreferences('teamsSelected', [$team]);
-                $_teams = [$team];
-            }
-        }
-
         $this->logger->debug('_Teams', ['_teams' => $_teams]);
         if (empty($_teams)) {
-            $teams = Team::cases();
+            $teams = Team::getYouth();
         } else {
             $teams = array_map(fn($team) => Team::getBy($team), $_teams);
         }

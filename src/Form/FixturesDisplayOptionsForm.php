@@ -21,7 +21,7 @@ class FixturesDisplayOptionsForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = array_reduce(Team::cases(), function ($carry, $enum) {
-            $carry[$enum->name] = $enum->value;
+            $carry[$enum->value] = $enum->name;
             return $carry;
         }, []);
 
