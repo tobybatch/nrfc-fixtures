@@ -31,6 +31,14 @@ services:
       - 7000:8001
     restart: unless-stopped
 
+  encore:
+    image: node
+    volumes:
+      - ..:/opt/nrfcfixtures
+    working_dir: /opt/nrfcfixtures
+    entrypoint: "npm run watch"
+
+
 volumes:
   database_data:
     name: nrfc-fixtures-dev-dbdata
