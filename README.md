@@ -1,5 +1,17 @@
-
 ## Set up xdebug
+
+## Set up
+
+```
+sudo apt update
+sudo apt install -y software-properties-common wget git 
+sudo add-apt-repository ppa:ondrej/php
+wget https://get.symfony.com/cli/installer -O - | bash
+sudo mv $HOME/.symfony5/bin/symfony /usr/local/bin/symfony
+sudo apt update`
+sudo apt install -y composer php8.3 php8.3-cli php8.3-{bz2,curl,mbstring,intl,zip,opcache,curl,gettext,mbstring,phar}`
+
+```
 
 ```shell
 zend_extension=xdebug.so  # or xdebug.dll on Windows
@@ -114,7 +126,8 @@ docker compose ${COMPOSE_FILE} exec fixtures bash
 
 /bin/console doctrine:query:sql "update users set roles='[\"ROLE_EDITOR\"]' where email='toby@nfn.org.uk'"
 
-1. Fix route names
-2. check magic link detail in security.yaml, https://symfony.com/doc/current/security/login_link.html
-3. Admin screens
-4. Remove encore js from prod deps, build assets as part of the prod build
+1. Add deps install
+2. Fix route names
+3. check magic link detail in security.yaml, https://symfony.com/doc/current/security/login_link.html
+4. Admin screens
+5. Remove encore js from prod deps, build assets as part of the prod build
