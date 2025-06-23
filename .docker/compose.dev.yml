@@ -15,7 +15,7 @@ services:
       - database_data:/var/lib/postgresql/data:rw
 
   nrfcfixtures:
-    image: ghcr.io/tobybatch/nrfc-fixtures:apache-dev
+    image: nrfc-fixtures:apache-dev
     build:
       context: ..
       target: dev
@@ -28,7 +28,7 @@ services:
     volumes:
       - ..:/opt/nrfcfixtures
     ports:
-      - 7000:8001
+      - 8001:8001 # If you change the external port the debug toolbar will break
     restart: unless-stopped
 
   encore:
