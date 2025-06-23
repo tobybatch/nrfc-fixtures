@@ -16,7 +16,11 @@ services:
 
   nrfcfixtures:
     image: ghcr.io/tobybatch/nrfc-fixtures:apache-dev
-    build: ..
+    build:
+      context: ..
+      target: dev
+      args:
+        BASE: apache
     container_name: nrfc-fixtures-dev
     env_file:
       - path: ./dev.env

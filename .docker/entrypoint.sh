@@ -26,6 +26,8 @@ function handleStartup() {
     GROUP_ID=$(id -g www-data)
   fi
 
+  touch .env
+
   # if group doesn't exist
   if grep -w "$GROUP_ID" /etc/group &>/dev/null; then
     echo Group already exists
@@ -41,6 +43,8 @@ function handleStartup() {
     echo www-nrfcfixtures:x:"$USER_ID":"$GROUP_ID":www-nrfcfixtures:/var/www:/usr/sbin/nologin >> /etc/passwd
     pwconv
   fi
+
+  composer install
 
   if [ -e /use_apache ]; then
     export APACHE_RUN_USER=$(id -nu "$USER_ID")
@@ -69,6 +73,10 @@ function prepare() {
   fi
   echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
   echo "NRFC Fixtures is ready"
+  if [ "$APP_ENV" == "dev" ]; then
+      bin/console doctrine:schema:create -n
+      bin/console doctrine:fixtures:load -n
+  fi
 }
 
 function runServer() {
