@@ -13,9 +13,6 @@
 ./bin/install-dependencies-mac.sh
 ```
 
-warning: be sure to add `/Users/toby.batch/.cargo/bin` to your PATH to be able to run the installed binaries
-
-
 ## Linux
 
 ### Pre-requisites
