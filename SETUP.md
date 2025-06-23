@@ -21,6 +21,7 @@ warning: be sure to add `/Users/toby.batch/.cargo/bin` to your PATH to be able t
 ### Pre-requisites
 
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+* cargo - `sudo apt install cargo`
 
 ### Install dependencies
 

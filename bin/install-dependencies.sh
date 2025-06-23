@@ -1,4 +1,7 @@
-cargo -q install commitlint-rs
+if ! command -v "commitlint" >/dev/null 2>&1; then
+  echo "Installing commitlint"
+  cargo install commitlint-rs
+fi
 
 if [ "$SHELL" == "/bin/bash" ]; then
     source $HOME/.bashrc
