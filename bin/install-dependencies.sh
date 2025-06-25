@@ -58,5 +58,6 @@ if [ ! -e "$DOCKER_DIR/dev.env" ]; then
   cp "$DOCKER_DIR/sample.dev.env" "$DOCKER_DIR/dev.env"
 fi
 
+touch .env
 echo "Dependencies installed"
 $SHELL

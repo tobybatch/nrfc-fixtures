@@ -33,3 +33,4 @@ phpstan.neon
 ###< phpstan/phpstan ###
 
 *.swp
+.in_startup
