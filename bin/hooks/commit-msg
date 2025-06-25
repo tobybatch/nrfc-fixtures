@@ -9,4 +9,4 @@ if ! command -v "commitlint" >/dev/null 2>&1; then
   exit 1
 fi
 
-commitlint-rs --edit "$1"
+commitlint --edit "$1"
