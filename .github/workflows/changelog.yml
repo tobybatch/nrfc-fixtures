@@ -14,6 +14,11 @@ name: Generate Changelog
            with:
              fetch-depth: 0 # Fetch all history for git-cliff
 
+         - name: Create Release
+           run: gh release create ${{ github.ref_name }} --title "${{ github.ref_name }}" --generate-notes
+           env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
          - name: Install Rust
            uses: actions-rs/toolchain@v1
            with:
