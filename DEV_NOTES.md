@@ -36,5 +36,18 @@ vendor/bin/bdi detect drivers
 ## Tests
 
 ```shell
-XDEBUG_MODE=coverage ./vendor/bin/phpunit 
+XDEBUG_MODE=coverage ./vendor/bin/phpunit
+```
+
+## Change log Incremental updates
+
+```
+git-cliff --latest -o CHANGELOG.md
+```
+
+## Releasing
+
+```
+git-cliff v1.0.0..HEAD -o CHANGELOG.md
+
 ```
