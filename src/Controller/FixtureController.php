@@ -103,13 +103,18 @@ final class FixtureController extends AbstractController
         foreach ($dates as $date) {
             // check date is today or later, or force show is set
             if ($showPastDates || new DateTime($date) >= new DateTime()) {
-                $fixture = [];
+                $fixturesForDate = [];
                 foreach ($teams as $team) {
                     if ($team) {
-                        $fixture[$team->value] = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                        $_fixturesForTeam = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                        if (!empty($_fixturesForTeam)) {
+                            $fixturesForDate[$team->value] = $_fixturesForTeam;
+                        }
                     }
                 }
-                $fixtures[$date] = $fixture;
+                if (!empty($fixturesForDate)) {
+                    $fixtures[$date] = $fixturesForDate;
+                }
             }
         }
 
