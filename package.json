@@ -26,7 +26,7 @@
         "dev": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production --progress",
-        "prepare": "husky install"
+        "prepare": "husky"
     },
     "dependencies": {
         "@material-tailwind/html": "^3.0.0-beta.7",
