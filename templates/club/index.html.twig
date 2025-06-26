@@ -48,10 +48,12 @@
                 </a>
             </td>
             <td class="py-3 px-4 whitespace-nowrap">
-                {{ club.address }}
-                <a href="https://www.google.com/maps/search/?api=1&query={{ club.address | url_encode }}" target='_blank' class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                    ↗️
-                </a>
+                {% if club.address %}
+                    {{ club.address }}
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ club.address | url_encode }}" target='_blank' class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                        ↗️
+                    </a>
+                {% endif %}
             </td>
             {% if app.user is not null and 'ROLE_ADMIN' in app.user.roles %}
             <td class="py-3 px-4 whitespace-nowrap text-center">

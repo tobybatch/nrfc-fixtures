@@ -280,11 +280,14 @@ class NrfcFixturesImportCommand extends Command
                 break;
         }
 
+        $this->io->info(sprintf('Searching for club: "%s"', $n));
         $club = $this->clubRepository->findOneBy(['name' => $n]);
         if (null == $club) {
             $club = new Club();
             $club->setName($n);
+            $this->io->info(sprintf('Creating club for "%s"', $n));
             $this->em->persist($club);
+            $this->em->flush();
         }
 
         return $club;
