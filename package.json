@@ -2,6 +2,7 @@
     "devDependencies": {
         "@babel/core": "^7.17.0",
         "@babel/preset-env": "^7.16.0",
+        "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@hotwired/stimulus": "^3.0.0",
         "@hotwired/turbo": "^7.1.1 || ^8.0",
@@ -10,6 +11,7 @@
         "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
         "@tailwindcss/forms": "^0.5.10",
         "core-js": "^3.38.0",
+        "husky": "^9.1.7",
         "leaflet": "^1.9.4",
         "regenerator-runtime": "^0.13.9",
         "stylelint": "^16.18.0",
@@ -23,7 +25,8 @@
     "scripts": {
         "dev": "encore dev",
         "watch": "encore dev --watch",
-        "build": "encore production --progress"
+        "build": "encore production --progress",
+        "prepare": "husky install"
     },
     "dependencies": {
         "@material-tailwind/html": "^3.0.0-beta.7",
