@@ -281,10 +281,12 @@ class NrfcFixturesImportCommand extends Command
         }
 
         $club = $this->clubRepository->findOneBy(['name' => $n]);
-        if (null != $club) {
-            return $club;
+        if (null == $club) {
+            $club = new Club();
+            $club->setName($n);
+            $this->em->persist($club);
         }
 
-        return null;
+        return $club;
     }
 }

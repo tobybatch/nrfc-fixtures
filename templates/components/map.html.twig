@@ -2,13 +2,15 @@
 
 <div class="flex-row">
 
-    <div class="flex-row mb-10 nrfc-address">
-        {{ address }}
-        <a href="https://www.google.com/maps/search/?api=1&query={{ address | url_encode }}" target='_blank'
-           class="text-indigo-600 hover:text-indigo-900 hover:underline">
-            ↗️
-        </a>
-    </div>
+    {% if address %}
+        <div class="flex-row mb-10 nrfc-address">
+            {{ address }}
+            <a href="https://www.google.com/maps/search/?api=1&query={{ address | url_encode }}" target='_blank'
+               class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                ↗️
+            </a>
+        </div>
+    {% endif %}
 
     {% if map %}
         <div class="nrfc-map">
