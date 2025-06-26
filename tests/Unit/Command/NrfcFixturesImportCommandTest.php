@@ -24,7 +24,7 @@ class NrfcFixturesImportCommandTest extends TestCase
     private CommandTester $commandTester;
     private EntityManagerInterface $entityManager;
     private ClubRepository $clubRepository;
-    private string $tempFixtureFile = __DIR__ . '/../../../assets/fixtures.csv';
+    private string $tempFixtureFile = __DIR__ . '/../../../assets/fixtures-youth-2025-6.csv';
     private string $tempClubFile = __DIR__ . '/../../../assets/clubs.csv';
 
     protected function setUp(): void

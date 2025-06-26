@@ -29,12 +29,14 @@ class ClubsAndFixtures extends Fixture
         $this->runCommand([
             'file' => 'assets/clubs.csv',
             '--type' => 'club',
-            '--skip-first' => true,
         ]);
 
         $this->runCommand([
-            'file' => 'assets/fixtures.csv',
-            '--skip-first' => true,
+            'file' => 'assets/fixtures-youth-2025-6.csv',
+        ]);
+
+        $this->runCommand([
+            'file' => 'assets/fixtures-senior-2025-6.csv',
         ]);
     }
 

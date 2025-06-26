@@ -32,6 +32,7 @@ class NrfcFixturesImportCommand extends Command
 {
     private ObjectManager $em;
     private ClubRepository $clubRepository;
+    private SymfonyStyle $io;
 
     public function __construct(EntityManagerInterface $em, ClubRepository $clubRepository)
     {
@@ -48,18 +49,16 @@ class NrfcFixturesImportCommand extends Command
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the CSV file')
             ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'club/fixture', 'fixture')
             // ->addOption('delimiter', 'd', InputOption::VALUE_OPTIONAL, 'CSV delimiter', ',')
-            ->addOption('skip-first', 's', InputOption::VALUE_NONE, 'Skip first row (header)')
             ->addOption('batch-size', 'b', InputOption::VALUE_OPTIONAL, 'Flush batch size', 100);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $this->io = new SymfonyStyle($input, $output);
         $filePath = $input->getArgument('file');
         $type = $input->getOption('type');
         // $delimiter = $input->getOption('delimiter');
         $delimiter = ',';
-        $skipFirstRow = $input->getOption('skip-first');
         $batchSize = (int) $input->getOption('batch-size');
 
         // Skip validation for help command
@@ -68,7 +67,7 @@ class NrfcFixturesImportCommand extends Command
         }
 
         if ($type != 'fixture' && $type != 'club') {
-            $io->error('Invalid type');
+            $this->io->error('Invalid type');
             return Command::FAILURE;
         }
 
@@ -77,16 +76,23 @@ class NrfcFixturesImportCommand extends Command
             throw new FileNotFoundException(sprintf('File "%s" not found', $filePath));
         }
 
-        $io->title(sprintf('Starting import from %s', $filePath));
+        $this->io->title(sprintf('Starting import from %s', $filePath));
 
         $file = fopen($filePath, 'r');
-
-        if ($skipFirstRow) {
-            fgetcsv($file, 0, $delimiter);
-        }
-
         $importedCount = 0;
-        $rowNumber = $skipFirstRow ? 1 : 0;
+        $rowNumber = 0;
+
+        // Process title row
+        $row = fgetcsv($file, 0, $delimiter);
+        $teamList = [];
+        if ($type == 'fixture') {
+            foreach ($row as $column => $team) {
+                $t = Team::getBy(trim($team));
+                if ($t) {
+                    $teamList[$t->value] = $column;
+                }
+            }
+        }
 
         try {
             while (($row = fgetcsv($file, 0, $delimiter)) !== false) {
@@ -94,7 +100,18 @@ class NrfcFixturesImportCommand extends Command
 
                 try {
                     if ($type == 'fixture') {
-                        $this->processFixtureRow($row);
+                        if (empty($row[0])) {
+                            $this->io->warning(sprintf("Row %d, has no date: %s", $rowNumber, implode(", ", $row)));
+                        }
+                        $_date = DateTime::createFromFormat('j-M-y', $row[0]);
+                        if (!$_date) {
+                            $this->io->warning(sprintf("Row %d has an invalid date: %s", $rowNumber, implode(", ", $row)));
+                            continue;
+                        }
+                        $date = DateTimeImmutable::createFromMutable($_date)->setTime(0, 0);
+                        foreach ($teamList as $team => $column) {
+                            $this->createFixture(Team::getBy($team), $date, $row[$column]);
+                        }
                     } else {
                         $this->processClubRow($row);
                     }
@@ -105,10 +122,10 @@ class NrfcFixturesImportCommand extends Command
                     if (0 === $importedCount % $batchSize) {
                         $this->em->flush();
                         $this->em->clear(); // Detaches all objects from Doctrine
-                        $io->comment(sprintf('Processed %d records', $importedCount));
+                        $this->io->comment(sprintf('Processed %d records', $importedCount));
                     }
                 } catch (Exception $e) {
-                    $io->warning(sprintf(
+                    $this->io->warning(sprintf(
                         'Error processing row %d: %s. Row data: %s',
                         $rowNumber,
                         $e->getMessage(),
@@ -124,40 +141,14 @@ class NrfcFixturesImportCommand extends Command
 
             fclose($file);
 
-            $io->success(sprintf('Successfully imported %d records', $importedCount));
+            $this->io->success(sprintf('Successfully imported %d records', $importedCount));
 
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $io->error(sprintf('Import failed: %s', $e->getMessage()));
+            $this->io->error(sprintf('Import failed: %s', $e->getMessage()));
 
             return Command::FAILURE;
         }
-    }
-
-    /**
-     * @param string[] $row
-     * @return void
-     */
-    private function processFixtureRow(array $row): void
-    {
-        if (empty($row[0]) || !DateTime::createFromFormat('j-M-y', $row[0])) {
-            return;
-        }
-
-        $date = DateTimeImmutable::createFromMutable(
-            DateTime::createFromFormat('j-M-y', $row[0])
-        )->setTime(0, 0);
-
-        $this->createFixture(Team::Minis, $date, $row[2]);
-        $this->createFixture(Team::U13B, $date, $row[3]);
-        $this->createFixture(Team::U14B, $date, $row[4]);
-        $this->createFixture(Team::U15B, $date, $row[5]);
-        $this->createFixture(Team::U16B, $date, $row[6]);
-        $this->createFixture(Team::U18B, $date, $row[7]);
-        $this->createFixture(Team::U12G, $date, $row[9]);
-        $this->createFixture(Team::U14G, $date, $row[10]);
-        $this->createFixture(Team::U16G, $date, $row[11]);
-        $this->createFixture(Team::U18G, $date, $row[12]);
     }
 
     /**
@@ -192,6 +183,7 @@ class NrfcFixturesImportCommand extends Command
         $fixture->setHomeAway($home);
         $fixture->setDate($date);
         $fixture->setTeam($team);
+        $this->io->info(sprintf('Creating fixture for %s on %s', $team->value, $date->format('Y-m-d')));
 
         $this->em->persist($fixture);
     }
@@ -218,6 +210,9 @@ class NrfcFixturesImportCommand extends Command
             str_starts_with(strtolower(trim($detail)), 'county cup')
             || str_contains(strtolower(trim($detail)), 'colts cup')
             || str_contains(strtolower(trim($detail)), 'norfolk finals')
+            || str_contains(strtolower(trim($detail)), 'norfolk cup')
+            || str_contains(strtolower(trim($detail)), 'cup semi')
+            || str_contains(strtolower(trim($detail)), 'cup final')
         ) {
             return [ucwords($detail), Competition::CountyCup, HomeAway::TBA, null];
         }
