@@ -45,6 +45,8 @@ function handleStartup() {
   fi
 
   composer install
+  yarn
+  yarn build
 
   if [ -e /use_apache ]; then
     export APACHE_RUN_USER=$(id -nu "$USER_ID")
@@ -74,6 +76,7 @@ function prepare() {
   echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
   echo "NRFC Fixtures is ready"
   if [ "$APP_ENV" == "dev" ]; then
+      yarn install --dev
       bin/console doctrine:schema:create -n
       bin/console doctrine:fixtures:load -n
   fi

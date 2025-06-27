@@ -314,8 +314,6 @@ RUN \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console && \
     chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
-    yarn --cwd /opt/nrfcfixtures && \
-    yarn --cwd /opt/nrfcfixtures build && \
     curl -sS https://get.symfony.com/cli/installer | bash && \
     mv /root/.symfony5/bin/symfony /usr/local/bin/symfony && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
@@ -346,8 +344,6 @@ RUN composer --no-ansi clearcache && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
-    yarn --cwd /opt/nrfcfixtures && \
-    yarn --cwd /opt/nrfcfixtures build && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=prod
 ENV DATABASE_URL=""
