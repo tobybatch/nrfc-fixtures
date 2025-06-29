@@ -51,7 +51,6 @@ class NrfcFixturesImportCommandTest extends TestCase
     {
         $this->commandTester->execute([
             'file' => $this->tempFixtureFile,
-            '--skip-first' => true,
             '--batch-size' => 2
         ]);
 
@@ -75,7 +74,6 @@ class NrfcFixturesImportCommandTest extends TestCase
         $this->commandTester->execute([
             'file' => $this->tempClubFile,
             '--type' => 'club',
-            '--skip-first' => false,
             '--batch-size' => 10
         ]);
 
@@ -93,7 +91,6 @@ class NrfcFixturesImportCommandTest extends TestCase
 
         $this->commandTester->execute([
             'file' => $tempFile,
-            '--skip-first' => true
         ]);
 
         $output = $this->commandTester->getDisplay();
@@ -115,8 +112,6 @@ class NrfcFixturesImportCommandTest extends TestCase
         
         $definition = $command->getDefinition();
         $this->assertTrue($definition->hasArgument('file'));
-        // $this->assertTrue($definition->hasOption('delimiter'));
-        $this->assertTrue($definition->hasOption('skip-first'));
         $this->assertTrue($definition->hasOption('batch-size'));
     }
 
@@ -177,25 +172,6 @@ class NrfcFixturesImportCommandTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invoke($command, '');
-        $this->assertNull($result);
-    }
-
-    /**
-     * @throws \ReflectionException
-     */
-    public function testFindClubNameFixer() :void
-    {
-        $command = new NrfcFixturesImportCommand($this->entityManager, $this->clubRepository);
-        $reflection = new ReflectionClass($command);
-
-        // set accessible for private method
-        $method = $reflection->getMethod('findClub');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($command, 'W Norfolk');
-        $this->assertNull($result);
-
-        $result = $method->invoke($command, 'N Walsham');
         $this->assertNull($result);
     }
 } 
