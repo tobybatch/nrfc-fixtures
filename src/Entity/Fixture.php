@@ -149,19 +149,24 @@ class Fixture
     ): string {
         if (null != $this->getClub()) {
             $text = $this->getClub()->getName();
-        } else {
+        } elseif (Competition::None != $this->getCompetition()) {
+            $text = $this->getCompetition()->value;
+        }else {
             $text = $this->getName();
         }
+
         if ($incHA && Competition::None != $this->getCompetition()) {
-            $text .= ' ('.$this->getHomeAway()->value.')';
+            $text .= ' ('.$this->getHomeAway()->value . ')';
         }
+
         if ($incComp) {
             $text .= ' ['.$this->getCompetition()->shortValue().']';
         }
 
         if ($text == null) {
-            $text = '???';
+            $text = 'Training?';
         }
+
         return $text;
     }
 }

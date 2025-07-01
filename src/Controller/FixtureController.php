@@ -169,6 +169,7 @@ final class FixtureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);

@@ -28,23 +28,28 @@ class FixtureType extends AbstractType
             ])
             ->add('homeAway', EnumType::class, [
                 'class' => HomeAway::class,
-                'placeholder' => HomeAway::TBA->value,
+                'data' => HomeAway::TBA,
             ])
-            ->add('competition', EnumType::class, ['class' => Competition::class])
+            ->add('competition', EnumType::class, [
+                'label' => 'Competition/Training',
+                'class' => Competition::class,
+                'data' => Competition::Training,
+            ])
             ->add('team', EnumType::class, [
                 'class' => Team::class,
                 'placeholder' => '-- choose team --',
-                'label' => 'Age group',
+                'label' => 'Team/Age group',
             ])
             ->add('club', EntityType::class, [
-                'label' => 'Opponent/Training',
+                'label' => 'Opponent/Training partner',
                 'class' => Club::class,
                 'required' => false,
                 'choice_label' => 'name',
-                'placeholder' => 'Training',
+                'placeholder' => 'N/A',
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes',
+                'required' => false,
             ])
         ;
     }

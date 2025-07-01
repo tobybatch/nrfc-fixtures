@@ -82,18 +82,24 @@
                                     {{ fixture_date|date('j M y') }}
                                 </a>
                             </td>
-                            {# each col is a different team #}
-                            {% for fixtures_by_team in fixtures_on_date %}
+
+                            {% for team in teams %}
                                 <td class="py-3 px-4">
-                                    {# each date for a team, may have multiple fixtures #}
-                                    {% for fixture in fixtures_by_team %}
-                                        <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}"
-                                           class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                                            {{ fixture }}
-                                        </a>
-                                    {% endfor %}
+                                    {% if team.name in fixtures_on_date|keys %}
+                                        {# Each cell can contain multiple fixtures on a day #}
+                                        {% set fixtureList = fixtures_on_date[team.name] %}
+                                        {% for fixture in fixtureList %}
+                                            <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                                {{ fixture }}
+                                                {% if not loop.last %}<br />{% endif %}
+                                            </a>
+                                        {% endfor %}
+                                    {% else %}
+                                        --
+                                    {% endif %}
                                 </td>
                             {% endfor %}
+
                         </tr>
                     {% endif %}
                 {% endfor %}
