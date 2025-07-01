@@ -268,7 +268,7 @@ final class FixtureController extends AbstractController
                 $club = $fixture->getClub();
                 $fixtures[] = [
                     "id" => $fixture->getId(),
-                    "opponent" => $club?->getName() ?: 'Training',
+                    "opponent" => $fixture->format(false),
                     "competition" => $this->translateCompetition($fixture->getCompetition()),
                     "venue" => $fixture->getHomeAway() == HomeAway::Home ? 'home' : 'away',
                     "date" => $date,
