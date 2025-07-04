@@ -108,7 +108,7 @@ final class FixtureController extends AbstractController
                     if ($team) {
                         $_fixturesForTeam = $this->fixtureRepository->getFixturesForTeam($team, $date);
                         if (!empty($_fixturesForTeam)) {
-                            $fixturesForDate[$team->value] = $_fixturesForTeam;
+                            $fixturesForDate[$team->name] = $_fixturesForTeam;
                         }
                     }
                 }
