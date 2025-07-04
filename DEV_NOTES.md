@@ -16,7 +16,7 @@ docker volume rm nrfc-fixtures-prod-dbdata
 docker compose up -d
 docker compose exec fixtures ./bin/console nrfc:fixtures:import -t club ./assets/clubs.csv
 docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixtures-youth-2025-6.csv
-docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixtures-youth-2025-6.csv
+docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixtures-senior-2025-6.csv
 ```
 
 ## Make a migration and run it
