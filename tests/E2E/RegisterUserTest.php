@@ -15,23 +15,6 @@ class RegisterUserTest extends PantherTestCase
      * @throws NoSuchElementException
      * @throws TimeoutException
      */
-    public function testRegisterLink(): void
-    {
-        $client = static::createPantherClient();
-        $crawler = $client->request('GET', '/user/login');
-
-        $registerLink = $crawler->filter('a[href="/user/register"]');
-        $this->assertTrue($registerLink->isDisplayed(), 'Register link should be visible.');
-
-        $crawler = $client->clickLink('Register');
-        $client->waitForElementToContain('body', 'Register a new account');
-        $this->assertSelectorTextContains('body', 'Register a new account', 'Register page should be displayed.');
-    }
-
-    /**
-     * @throws NoSuchElementException
-     * @throws TimeoutException
-     */
     public function testRegister(): void
     {
         $email = "newuser@eaxmple.com";

@@ -77,7 +77,9 @@ class CrudFixturesTest extends PantherTestCase
     {
         $this->client->request('GET', '/');
         $this->client->waitForElementToContain('body', 'Create New');
-        $this->client->clickLink('Create New');
+        $crawler = $this->client->clickLink('Create New');
+
+        $this->client->waitForElementToContain('body', 'Save');
 
         $date = (new DateTime())->modify('+3 months');
         $dateIn = $date->format('d-m-Y');
@@ -88,6 +90,7 @@ class CrudFixturesTest extends PantherTestCase
         $team = Team::U15B->value;
         $club = $this->randomClub();
         $notes = 'I\'m a shade tree mechanic, got a one-ton truck';
+
         $fixtureAsText = sprintf("%s (%s)", $club->getName(), $homeAway);
 
         $this->client->submitForm('Save', [

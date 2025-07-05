@@ -22,8 +22,8 @@ class ViewFixturesTest extends PantherTestCase
         $client = static::createPantherClient();
         $crawler = $client->request('GET', '/');
 
-        $fixturesLink = $crawler->filter('nav ul li a[href="/"]');
-        $this->assertEquals('Fixtures', trim($fixturesLink->text()));
+        $fixturesLink = $crawler->selectLink("All Youth");
+        $this->assertEquals('/?team=youth', $fixturesLink->attr('href'));
 
         $fixturesLink = $crawler->filter('nav ul li a[href="/club"]');
         $this->assertEquals('Clubs', trim($fixturesLink->text()));
