@@ -9,9 +9,9 @@ use App\Entity\Fixture;
 use App\Form\FixtureType;
 use App\Form\FixturesDisplayOptionsForm;
 use App\Form\Model\FixturesDisplayOptionsDTO;
-use App\Repository\ClubRepository;
 use App\Repository\FixtureRepository;
 use App\Service\PreferencesService;
+use App\Service\TeamService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,15 +31,18 @@ final class FixtureController extends AbstractController
     private FixtureRepository $fixtureRepository;
     private PreferencesService $preferencesService;
     private LoggerInterface $logger;
+    private TeamService $teamService;
 
     public function __construct(
         FixtureRepository $fixtureRepository,
         PreferencesService $preferencesService,
+        TeamService $teamService,
         LoggerInterface $logger,
     )
     {
         $this->fixtureRepository = $fixtureRepository;
         $this->preferencesService = $preferencesService;
+        $this->teamService = $teamService;
         $this->logger = $logger;
     }
 
@@ -56,16 +59,16 @@ final class FixtureController extends AbstractController
                 $selectedTeams = [];
                 switch ($team) {
                     case 'boys':
-                        $selectedTeams = Team::getBoys();
+                        $selectedTeams = $this->teamService->getBoys();
                         break;
                     case 'girls':
-                        $selectedTeams = Team::getGirls();
+                        $selectedTeams = $this->teamService->getGirls();
                         break;
                     case'youth':
-                        $selectedTeams = Team::getYouth();
+                        $selectedTeams = $this->teamService->getYouth();
                         break;
                     case 'seniors':
-                        $selectedTeams = Team::getSenior();
+                        $selectedTeams = $this->teamService->getSeniors();
                         break;
                     default:
                 }
@@ -89,9 +92,9 @@ final class FixtureController extends AbstractController
 
         $this->logger->debug('_Teams', ['_teams' => $_teams]);
         if (empty($_teams)) {
-            $teams = Team::getYouth();
+            $teams = $this->teamService->getYouth();
         } else {
-            $teams = array_map(fn($team) => Team::getBy($team), $_teams);
+            $teams = array_map(fn($team) => $this->teamService->getBy($team), $_teams);
         }
 
         $this->logger->debug('Teams', ['teams' => $teams]);
@@ -113,7 +116,7 @@ final class FixtureController extends AbstractController
                     }
                 }
                 if (!empty($fixturesForDate)) {
-                    $fixtures[$date] = $fixturesForDate;
+                    $fixtures[$date->format('Y-m-d')] = $fixturesForDate;
                 }
             }
         }
@@ -257,16 +260,15 @@ final class FixtureController extends AbstractController
 
     // This will be removed when we get to the new website
     #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
-    public function forOldWebsite(Request $request, SerializerInterface $serializer): Response|JsonResponse
+    public function forOldWebsite(Request $request, TeamService $teamService, SerializerInterface $serializer): Response|JsonResponse
     {
-        $team = Team::getBy($request->query->get('team'));
+        $team = $teamService->getBy($request->query->get('team'));
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
             $_fixtures = $this->fixtureRepository->getFixturesForTeam($team, $date);
             if (!empty($_fixtures)) {
                 $fixture = $_fixtures[0];
-                $club = $fixture->getClub();
                 $fixtures[] = [
                     "id" => $fixture->getId(),
                     "opponent" => $fixture->format(false),

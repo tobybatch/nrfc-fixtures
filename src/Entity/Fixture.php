@@ -149,10 +149,12 @@ class Fixture
     ): string {
         if (null != $this->getClub()) {
             $text = $this->getClub()->getName();
-        } elseif (Competition::None != $this->getCompetition()) {
-            $text = $this->getCompetition()->value;
-        }else {
+        } elseif (!empty($this->getName())) {
             $text = $this->getName();
+        } else if (Competition::None != $this->getCompetition()) {
+            $text = $this->getCompetition()->value;
+        } else {
+            $text = 'Training?';
         }
 
         if ($incHA && Competition::None != $this->getCompetition()) {
@@ -161,10 +163,6 @@ class Fixture
 
         if ($incComp) {
             $text .= ' ['.$this->getCompetition()->shortValue().']';
-        }
-
-        if ($text == null) {
-            $text = 'Training?';
         }
 
         return $text;

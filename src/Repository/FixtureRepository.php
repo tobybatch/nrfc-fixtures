@@ -23,7 +23,7 @@ class FixtureRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return string[]
+     * @return DateTimeImmutable[]
      */
     public function getDates(): array
     {
@@ -33,25 +33,40 @@ class FixtureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        $uniqueDates = array_values(array_unique(array_map(
+        $dates = array_values(array_unique(array_map(
             function ($row) {
-                return $row['date']->format('Y-m-d');
+                return $row['date'];
             },
             $results
         )));
 
-        sort($uniqueDates); // Optional sorting
+        sort($dates);
 
-        return $uniqueDates;
+        return $dates;
+    }
+
+    /**
+     * @param array<Team> $teams
+     * @param DateTimeImmutable|null $date
+     * @return array<string, array{Fixture}>
+     */
+    public function getFixturesForTeams(array $teams, DateTimeImmutable $date = null): array {
+        $fixtures = [];
+
+        foreach ($teams as $team) {
+            $fixtures[$team->value] = $this->$this->getFixturesForTeam($team, $date);
+        }
+
+        return $fixtures;
     }
 
 
     /**
      * @param Team $team
-     * @param string|null $date
+     * @param DateTimeImmutable|null $date
      * @return array{Fixture}
      */
-    public function getFixturesForTeam(Team $team, string $date = null): array
+    public function getFixturesForTeam(Team $team, DateTimeImmutable $date = null): array
     {
         $statement = $this->createQueryBuilder('f')
             ->leftJoin('f.club', 'c')
@@ -61,8 +76,8 @@ class FixtureRepository extends ServiceEntityRepository
 
         if ($date) {
             $statement->andWhere('f.date BETWEEN :start AND :end')
-                ->setParameter('start', sprintf('%s 00:00:00', $date))
-                ->setParameter('end', sprintf('%s 23:59:59', $date));
+                ->setParameter('start', $date)
+                ->setParameter('end', $date);
         }
 
         return $statement->orderBy('f.date', 'ASC')

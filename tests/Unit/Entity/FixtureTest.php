@@ -80,6 +80,6 @@ class FixtureTest extends TestCase
         $fixture = new Fixture();
         $fixture->setCompetition(Competition::None);
         $fixture->setHomeAway(HomeAway::Away);
-        $this->assertSame('???', $fixture->format());
+        $this->assertSame('Training?', $fixture->format());
     }
 }

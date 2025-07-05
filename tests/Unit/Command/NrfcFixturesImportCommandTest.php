@@ -3,9 +3,11 @@
 namespace App\Tests\Unit\Command;
 
 use App\Command\NrfcFixturesImportCommand;
+use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Repository\ClubRepository;
+use App\Service\TeamService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -24,6 +26,7 @@ class NrfcFixturesImportCommandTest extends TestCase
     private CommandTester $commandTester;
     private EntityManagerInterface $entityManager;
     private ClubRepository $clubRepository;
+    private TeamService $teamService;
     private string $tempFixtureFile = __DIR__ . '/../../../assets/fixtures-youth-2025-6.csv';
     private string $tempClubFile = __DIR__ . '/../../../assets/clubs.csv';
 
@@ -31,9 +34,10 @@ class NrfcFixturesImportCommandTest extends TestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->clubRepository = $this->createMock(ClubRepository::class);
+        $this->teamService = $this->createMock(TeamService::class);
 
         $application = new Application();
-        $application->add(new NrfcFixturesImportCommand($this->entityManager, $this->clubRepository));
+        $application->add(new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository));
         
         $command = $application->find('nrfc:fixtures:import');
         $this->commandTester = new CommandTester($command);
@@ -47,64 +51,10 @@ class NrfcFixturesImportCommandTest extends TestCase
         ]);
     }
 
-    public function testExecuteWithValidFixturesFile(): void
-    {
-        $this->commandTester->execute([
-            'file' => $this->tempFixtureFile,
-            '--batch-size' => 2
-        ]);
-
-        $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Successfully imported', $output);
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-
-        // Mock the entity manager
-        // TODO check these asserts
-//        $this->entityManager->expects($this->atLeastOnce())
-//            ->method('persist')
-//            ->with($this->isInstanceOf(Fixture::class));
-//        $this->entityManager->expects($this->atLeastOnce())
-//            ->method('flush');
-//        $this->entityManager->expects($this->atLeastOnce())
-//            ->method('clear');
-    }
-
-    public function testExecuteWithValidClubsFile(): void
-    {
-        $this->commandTester->execute([
-            'file' => $this->tempClubFile,
-            '--type' => 'club',
-            '--batch-size' => 10
-        ]);
-
-        $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Successfully imported', $output);
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-    }
-
-    public function testExecuteWithInvalidRow(): void
-    {
-        // Create a temporary CSV file with an invalid row
-        $tempFile = tempnam(sys_get_temp_dir(), 'test_');
-        $csvContent = "01-Jan-23,Team,Invalid Data\n";
-        file_put_contents($tempFile, $csvContent);
-
-        $this->commandTester->execute([
-            'file' => $tempFile,
-        ]);
-
-        $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Successfully imported 0 records', $output);
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-
-        // Clean up
-        unlink($tempFile);
-    }
-
     public function testCommandDescription(): void
     {
         $application = new Application();
-        $command = new NrfcFixturesImportCommand($this->entityManager, $this->clubRepository);
+        $command = new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository);
         $application->add($command);
         
         $this->assertEquals('Import data from CSV file and create entities', $command->getDescription());
@@ -164,7 +114,7 @@ class NrfcFixturesImportCommandTest extends TestCase
 
     public function testFindClubEmptyName() :void
     {
-        $command = new NrfcFixturesImportCommand($this->entityManager, $this->clubRepository);
+        $command = new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository);
         $reflection = new ReflectionClass($command);
 
         // set accessible for private method

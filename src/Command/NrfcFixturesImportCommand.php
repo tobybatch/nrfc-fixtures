@@ -10,6 +10,7 @@ use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture as FixtureEntity;
 use App\Repository\ClubRepository;
+use App\Service\TeamService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,11 +34,13 @@ class NrfcFixturesImportCommand extends Command
     private ObjectManager $em;
     private ClubRepository $clubRepository;
     private SymfonyStyle $io;
+    private TeamService $teamService;
 
-    public function __construct(EntityManagerInterface $em, ClubRepository $clubRepository)
+    public function __construct(EntityManagerInterface $em, TeamService $teamService, ClubRepository $clubRepository)
     {
         parent::__construct();
         $this->em = $em;
+        $this->teamService = $teamService;
         $this->clubRepository = $clubRepository;
     }
 
@@ -87,10 +90,8 @@ class NrfcFixturesImportCommand extends Command
         $teamList = [];
         if ($type == 'fixture') {
             foreach ($row as $column => $team) {
-                $t = Team::getBy(trim($team));
-                if ($t) {
-                    $teamList[$t->value] = $column;
-                }
+                $t = $this->teamService->getBy(trim($team));
+                $teamList[$t->value] = $column;
             }
         }
 

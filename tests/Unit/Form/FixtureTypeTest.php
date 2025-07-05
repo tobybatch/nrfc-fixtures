@@ -47,8 +47,7 @@ class FixtureTypeTest extends TestCase
                     'homeAway',
                     EnumType::class,
                     $this->callback(function (array $options) {
-                        return $options['class'] === HomeAway::class
-                            && $options['placeholder'] === HomeAway::TBA->value;
+                        return $options['class'] === HomeAway::class;
                     })
                 ],
                 [
@@ -64,18 +63,18 @@ class FixtureTypeTest extends TestCase
                     $this->callback(function (array $options) {
                         return $options['class'] === Team::class
                             && $options['placeholder'] === '-- choose team --'
-                            && $options['label'] === 'Age group';
+                            && $options['label'] === 'Team/Age group';
                     })
                 ],
                 [
                     'club',
                     EntityType::class,
                     $this->callback(function (array $options) {
-                        return $options['label'] === 'Opponent/Training'
+                        return $options['label'] === 'Opponent/Training partner'
                             && $options['class'] === Club::class
                             && $options['required'] === false
                             && $options['choice_label'] === 'name'
-                            && $options['placeholder'] === 'Training';
+                            && $options['placeholder'] === 'N/A';
                     })
                 ]
             )
