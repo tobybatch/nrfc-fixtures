@@ -29,26 +29,36 @@ class FixtureRepositoryTest extends TestCase
     public function testGetDates(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(Query::class); // ✅ Use Query instead of AbstractQuery
+        $query = $this->createMock(Query::class);
 
+        // Mock the entity manager to return the query builder
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())->method('select')->with('d.date')->willReturnSelf();
+        // Build the query builder chain
+        $queryBuilder->expects($this->once())->method('select')->with('DISTINCT d.date AS date')->willReturnSelf();
         $queryBuilder->expects($this->once())->method('from')->with('App\Entity\Fixture', 'd')->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('orderBy')->with('d.date', 'ASC')->willReturnSelf();
         $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
 
-        $query->expects($this->once())->method('getResult')->willReturn([
-            ['date' => new DateTimeImmutable('2024-05-01')],
-            ['date' => new DateTimeImmutable('2024-05-02')],
-            ['date' => new DateTimeImmutable('2024-05-01')], // duplicate
+        // Mock getScalarResult to return string dates
+        $query->expects($this->once())->method('getScalarResult')->willReturn([
+            ['date' => '2024-05-01'],
+            ['date' => '2024-05-02'],
+            ['date' => '2024-05-01'], // Duplicate
         ]);
 
+        // Run the method
         $dates = $this->repository->getDates();
 
-        $this->assertEquals(['2024-05-01', '2024-05-02'], $dates);
+        // Assert the result is array of DateTimeImmutable objects, unique and sorted
+        $this->assertEquals([
+            new \DateTimeImmutable('2024-05-01'),
+            new \DateTimeImmutable('2024-05-02'),
+        ], $dates);
     }
+
 
     public function testGetFixturesForTeam(): void
     {

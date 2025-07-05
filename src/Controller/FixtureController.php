@@ -71,6 +71,8 @@ final class FixtureController extends AbstractController
                         $selectedTeams = $this->teamService->getSeniors();
                         break;
                     default:
+                        $selectedTeams = [$this->teamService->getBy($team)];
+                        break;
                 }
                 $this->preferencesService->setPreferences('teamsSelected', array_map(static fn (Team $team) => $team->value, $selectedTeams));
             }
@@ -105,7 +107,7 @@ final class FixtureController extends AbstractController
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
             // check date is today or later, or force show is set
-            if ($showPastDates || new DateTime($date) >= new DateTime()) {
+            if ($showPastDates || $date >= new DateTimeImmutable()) {
                 $fixturesForDate = [];
                 foreach ($teams as $team) {
                     if ($team) {

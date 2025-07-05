@@ -17,7 +17,7 @@
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5"/>
         <env name="PANTHER_CHROME_DRIVER_BINARY" value="/usr/lib/chromium-browser/chromedriver"/>
         <env name="PANTHER_WEB_SERVER_PORT" value="5003"/>
-<!--        <env name="PANTHER_NO_HEADLESS" value="1"/>-->
+        <env name="PANTHER_NO_HEADLESS" value="1"/>
         <env name="DATABASE_URL" value="postgresql://nrfc:nrfc@127.0.0.1:5002/nrfc_test"/>
     </php>
 
@@ -36,7 +36,6 @@
         </include>
         <exclude>
             <directory>src/DataFixtures</directory>
-            <directory>src/Controller</directory>
             <file>src/Kernel.php</file>
         </exclude>
         <report>

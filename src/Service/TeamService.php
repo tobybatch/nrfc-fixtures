@@ -20,9 +20,9 @@ class TeamService
     public function getGirls(): array {
         return array(
             Team::Minis,
-            TEAM::U12G,
-            TEAM::U14G,
-            TEAM::U16G,
+            Team::U12G,
+            Team::U14G,
+            Team::U16G,
             Team::U18G,
         );
     }
@@ -37,7 +37,19 @@ class TeamService
     }
 
     public function getYouth(): array {
-        return array_unique($this->getBoys() + $this->getGirls());
+        return array(
+            Team::Minis,
+            Team::U13B,
+            Team::U14B,
+            Team::U15B,
+            Team::U16B,
+            Team::U18B,
+            Team::U12G,
+            Team::U14G,
+            Team::U16G,
+            Team::U18G,
+        );
+
     }
 
     public function getBy(string $value): Team|null {

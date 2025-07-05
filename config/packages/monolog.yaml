@@ -43,6 +43,6 @@ when@test:
         handlers:
             main:
                 type: stream
-                path: php://stderr
+                path: '%kernel.logs_dir%/test.log'
                 level: info
                 channels: ["!event"]

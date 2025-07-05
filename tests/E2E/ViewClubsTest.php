@@ -50,12 +50,7 @@ class ViewClubsTest extends PantherTestCase
 
         // Table rows
         $rows = $crawler->filter('table tbody tr');
-        $rawClubs = file_get_contents(__DIR__ . '/../../assets/clubs.csv');
-        if (!$rawClubs) {
-            throw new \Exception('Unable to read clubs.json');
-        }
-        $clubs = explode("\n", $rawClubs);
-        $clubCount = count($clubs) - 1; // header row
+        $clubCount = count($this->clubRepository->findAll());
         $this->assertCount($clubCount, $rows, 'Incorrect number of clubs.');
 
         $text = $rows->first()->filter('td')->first()->text();

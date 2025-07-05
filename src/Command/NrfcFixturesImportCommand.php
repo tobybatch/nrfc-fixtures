@@ -91,6 +91,10 @@ class NrfcFixturesImportCommand extends Command
         if ($type == 'fixture') {
             foreach ($row as $column => $team) {
                 $t = $this->teamService->getBy(trim($team));
+                if (!$t) {
+                    $this->io->warning(sprintf('Team "%s" not found', $team));
+                    continue;
+                }
                 $teamList[$t->value] = $column;
             }
         }
@@ -111,7 +115,12 @@ class NrfcFixturesImportCommand extends Command
                         }
                         $date = DateTimeImmutable::createFromMutable($_date)->setTime(0, 0);
                         foreach ($teamList as $team => $column) {
-                            $this->createFixture(Team::getBy($team), $date, $row[$column]);
+                            $team = $this->teamService->getBy($team);
+                            if (!$team) {
+                                $this->io->warning(sprintf('Team "%s" not found', $team));
+                                continue;
+                            }
+                            $this->createFixture($team, $date, $row[$column]);
                         }
                     } else {
                         $this->processClubRow($row);
@@ -184,7 +193,7 @@ class NrfcFixturesImportCommand extends Command
         $fixture->setHomeAway($home);
         $fixture->setDate($date);
         $fixture->setTeam($team);
-        $this->io->info(sprintf('Creating fixture for %s on %s', $team->value, $date->format('Y-m-d')));
+//        $this->io->info(sprintf('Creating fixture for %s on %s', $team->value, $date->format('Y-m-d')));
 
         $this->em->persist($fixture);
     }
@@ -281,12 +290,12 @@ class NrfcFixturesImportCommand extends Command
                 break;
         }
 
-        $this->io->info(sprintf('Searching for club: "%s"', $n));
+//        $this->io->info(sprintf('Searching for club: "%s"', $n));
         $club = $this->clubRepository->findOneBy(['name' => $n]);
         if (null == $club) {
             $club = new Club();
             $club->setName($n);
-            $this->io->info(sprintf('Creating club for "%s"', $n));
+//            $this->io->info(sprintf('Creating club for "%s"', $n));
             $this->em->persist($club);
             $this->em->flush();
         }

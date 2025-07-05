@@ -56,9 +56,16 @@ class CrudFixturesTest extends PantherTestCase
      */
     protected function tearDown(): void
     {
+        if ($this->hasFailed()) {
+            $client = $this->client;
+            $client->takeScreenshot('var/screenshots/error-' . time() . '.png');
+        }
+
         $this->client->manage()->deleteAllCookies();
         $this->client->executeScript('window.localStorage.clear();');
         $this->client->executeScript('window.sessionStorage.clear();');
+
+        parent::tearDown();
     }
 
     /**

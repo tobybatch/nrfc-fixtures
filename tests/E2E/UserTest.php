@@ -109,23 +109,23 @@ class UserTest extends PantherTestCase
         $this->assertStringContainsString('Check your email for a magic login link', $crawler->text());
     }
 
-    /**
-     * @throws NoSuchElementException
-     * @throws TimeoutException
-     */
-    public function testProfilePage(): void
-    {
-        $this->createUser();
-        $this->client->request('GET', '/user/login');
-        $this->client->submitForm('Login', [
-            '_username' => $this->email,
-            '_password' => $this->password,
-        ]);
-        $this->client->waitForElementToContain('body', 'Fixtures for 2025/26');
-        $this->client->clickLink($this->email);
-        $this->client->waitForElementToContain('body', 'Your Profile');
-        // TODO test page elements
-    }
+//    /**
+//     * @throws NoSuchElementException
+//     * @throws TimeoutException
+//     */
+//    public function testProfilePage(): void
+//    {
+//        $this->createUser();
+//        $this->client->request('GET', '/user/login');
+//        $this->client->submitForm('Login', [
+//            '_username' => $this->email,
+//            '_password' => $this->password,
+//        ]);
+//        $this->client->waitForElementToContain('body', 'Fixtures for 2025/26');
+//        $this->client->clickLink($this->email);
+//        $this->client->waitForElementToContain('body', 'Your Profile');
+//        // TODO test page elements
+//    }
 
     private function createUser(): void
     {

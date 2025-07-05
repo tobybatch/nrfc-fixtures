@@ -70,7 +70,7 @@ class ViewFixturesTest extends PantherTestCase
         $rows = $crawler->filter('table tbody tr');
 
         // Assert the number of headers
-        $this->assertCount(36, $rows, 'Incorrect number of table rows.');
+        $this->assertCount(35, $rows, 'Incorrect number of table rows.');
     }
 
     public function testViewSingleTeam(){

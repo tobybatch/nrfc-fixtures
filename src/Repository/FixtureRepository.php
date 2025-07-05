@@ -28,21 +28,26 @@ class FixtureRepository extends ServiceEntityRepository
     public function getDates(): array
     {
         $results = $this->entityManager->createQueryBuilder()
-            ->select('d.date')
+            ->select('DISTINCT d.date AS date')
             ->from('App\Entity\Fixture', 'd')
+            ->orderBy('d.date', 'ASC')
             ->getQuery()
-            ->getResult();
+            ->getScalarResult();
 
-        $dates = array_values(array_unique(array_map(
-            function ($row) {
-                return $row['date'];
-            },
-            $results
-        )));
+        $dates = [];
+        foreach ($results as $row) {
+            try {
+                if (!in_array($row['date'], $dates)) {
+                    $dates[] = $row['date'];
+                }
+            } catch (\Exception $e) {
+                // Optionally log the error or skip silently
+                // error_log('Invalid date format: ' . $row['date']);
+                continue;
+            }
+        }
 
-        sort($dates);
-
-        return $dates;
+        return array_map(fn($date) => new \DateTimeImmutable($date), $dates);
     }
 
     /**
@@ -50,7 +55,8 @@ class FixtureRepository extends ServiceEntityRepository
      * @param DateTimeImmutable|null $date
      * @return array<string, array{Fixture}>
      */
-    public function getFixturesForTeams(array $teams, DateTimeImmutable $date = null): array {
+    public function getFixturesForTeams(array $teams, DateTimeImmutable $date = null): array
+    {
         $fixtures = [];
 
         foreach ($teams as $team) {
@@ -91,7 +97,8 @@ class FixtureRepository extends ServiceEntityRepository
     public function findByDateRange(
         DateTimeImmutable $startDate,
         DateTimeImmutable $endDate,
-    ): array {
+    ): array
+    {
         return $this->createQueryBuilder('f')
             ->where('f.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
