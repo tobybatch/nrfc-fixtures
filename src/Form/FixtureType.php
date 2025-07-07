@@ -25,6 +25,13 @@ class FixtureType extends AbstractType
         $builder
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
+                'html5' => false, // allows custom format
+                'format' => 'dd/MM/yyyy',
+                'placeholder' => 'dd/mm/yyyy',
+                'attr' => [
+                    'class' => 'js-datepicker',
+                    'autocomplete' => 'off',
+                ],
             ])
             ->add('homeAway', EnumType::class, [
                 'class' => HomeAway::class,

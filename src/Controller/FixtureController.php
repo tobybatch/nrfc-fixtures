@@ -6,13 +6,12 @@ use App\Config\Competition;
 use App\Config\HomeAway;
 use App\Config\Team;
 use App\Entity\Fixture;
-use App\Form\FixtureType;
 use App\Form\FixturesDisplayOptionsForm;
+use App\Form\FixtureType;
 use App\Form\Model\FixturesDisplayOptionsDTO;
 use App\Repository\FixtureRepository;
 use App\Service\PreferencesService;
 use App\Service\TeamService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -34,10 +33,10 @@ final class FixtureController extends AbstractController
     private TeamService $teamService;
 
     public function __construct(
-        FixtureRepository $fixtureRepository,
+        FixtureRepository  $fixtureRepository,
         PreferencesService $preferencesService,
-        TeamService $teamService,
-        LoggerInterface $logger,
+        TeamService        $teamService,
+        LoggerInterface    $logger,
     )
     {
         $this->fixtureRepository = $fixtureRepository;
@@ -63,7 +62,7 @@ final class FixtureController extends AbstractController
                     'seniors' => $this->teamService->getSeniors(),
                     default => [$this->teamService->getBy($team)],
                 };
-                $this->preferencesService->setPreferences('teamsSelected', array_map(static fn (Team $team) => $team->value, $selectedTeams));
+                $this->preferencesService->setPreferences('teamsSelected', array_map(static fn(Team $team) => $team->value, $selectedTeams));
             }
         }
 
@@ -75,7 +74,6 @@ final class FixtureController extends AbstractController
         $displayOptions->teams = $_teams;
         $displayOptions->showPastDates = $preferences['showPastDates'] ?? false;
         $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions, [
-            'locale' => 'en_GB',
             'action' => $this->generateUrl(
                 'app_preferences_update'
             ),

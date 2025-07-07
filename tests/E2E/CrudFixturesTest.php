@@ -82,7 +82,7 @@ class CrudFixturesTest extends PantherTestCase
         $this->client->waitForElementToContain('body', 'Save');
 
         $date = (new DateTime())->modify('+17 months');
-        $dateIn = $date->format('m-d-Y');
+        $dateIn = $date->format('d/m/Y');
         $dateOut = $date->format('j M y');
 
         $homeAway = HomeAway::Away->value;
@@ -120,7 +120,7 @@ class CrudFixturesTest extends PantherTestCase
         $this->client->waitForElementToContain('body', 'Update');
 
         $date = (new DateTime())->modify('+3 months');
-        $dateIn = $date->format('d-m-Y');
+        $dateIn = $date->format('d/m/Y');
         $homeAway = $fixture->getHomeAway() == HomeAway::Away ? HomeAway::Home->value : HomeAway::Away->value;
         $competition = $fixture->getCompetition() == Competition::CountyCup ? Competition::NationalCup->value : Competition::CountyCup->value;
         $team = $fixture->getTeam() == Team::U15B ? Team::U16B->value : Team::U15B->value;
