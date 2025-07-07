@@ -56,24 +56,13 @@ final class FixtureController extends AbstractController
             $team = $request->query->get('team');
             $this->logger->debug('Team param', ['team' => $team]);
             if (null !== $team) {
-                $selectedTeams = [];
-                switch ($team) {
-                    case 'boys':
-                        $selectedTeams = $this->teamService->getBoys();
-                        break;
-                    case 'girls':
-                        $selectedTeams = $this->teamService->getGirls();
-                        break;
-                    case'youth':
-                        $selectedTeams = $this->teamService->getYouth();
-                        break;
-                    case 'seniors':
-                        $selectedTeams = $this->teamService->getSeniors();
-                        break;
-                    default:
-                        $selectedTeams = [$this->teamService->getBy($team)];
-                        break;
-                }
+                $selectedTeams = match ($team) {
+                    'boys' => $this->teamService->getBoys(),
+                    'girls' => $this->teamService->getGirls(),
+                    'youth' => $this->teamService->getYouth(),
+                    'seniors' => $this->teamService->getSeniors(),
+                    default => [$this->teamService->getBy($team)],
+                };
                 $this->preferencesService->setPreferences('teamsSelected', array_map(static fn (Team $team) => $team->value, $selectedTeams));
             }
         }
@@ -86,6 +75,7 @@ final class FixtureController extends AbstractController
         $displayOptions->teams = $_teams;
         $displayOptions->showPastDates = $preferences['showPastDates'] ?? false;
         $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions, [
+            'locale' => 'en_GB',
             'action' => $this->generateUrl(
                 'app_preferences_update'
             ),
@@ -149,7 +139,7 @@ final class FixtureController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($fixture);
             $entityManager->flush();
-            $this->logger->info('Fixture', ['fixture' => $fixture, 'fixture name' => $fixture->format()]);
+            $this->logger->info('*** Fixture', ['fixture' => $fixture, 'fixture name' => $fixture->format()]);
 
             return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
         }

@@ -4,6 +4,7 @@ twig:
         - 'form/tailwind_theme.html.twig'
     globals:
         app_data: '@App\Service\PreferencesService'
+        locale: 'en_GB'
 
 when@dev:
     debug: true
