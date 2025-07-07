@@ -18,6 +18,5 @@ enum Team: string
     case U18G = 'U18G';
     case FIRST_XV = "1st Team (Mens)";
     case LIONS = "2nd Team (Mens)";
-    case AXV = "3rd Team (Mens)";
     case SENIOR_WOMEN = "1st Team (Women)";
 }

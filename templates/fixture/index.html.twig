@@ -85,9 +85,9 @@
 
                             {% for team in teams %}
                                 <td class="py-3 px-4">
-                                    {% if team.name in fixtures_on_date|keys %}
+                                    {% if team.value in fixtures_on_date|keys %}
                                         {# Each cell can contain multiple fixtures on a day #}
-                                        {% set fixtureList = fixtures_on_date[team.name] %}
+                                        {% set fixtureList = fixtures_on_date[team.value] %}
                                         {% for fixture in fixtureList %}
                                             <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
                                                 {{ fixture }}

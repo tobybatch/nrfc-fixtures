@@ -31,7 +31,6 @@ class TeamService
         return array(
             Team::FIRST_XV,
             Team::LIONS,
-            Team::AXV,
             Team::SENIOR_WOMEN,
         );
     }
@@ -66,7 +65,6 @@ class TeamService
             'U18G' => Team::U18G,
             '1st Team (Mens)', 'FIRST_XV', '1st XV Fixture' => Team::FIRST_XV,
             '2nd Team (Mens)', 'LIONS', 'Lions Fixture' => Team::LIONS,
-            '3rd Team (Mens)', 'AXV' => Team::AXV,
             '1st Team (Women)', 'SENIOR_WOMEN' => Team::SENIOR_WOMEN,
             default => null,
         };
