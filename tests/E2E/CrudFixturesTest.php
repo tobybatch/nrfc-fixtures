@@ -159,7 +159,6 @@ class CrudFixturesTest extends PantherTestCase
     {
         $fixture = $this->randomFixture();
         $id = $fixture->getId();
-        print("\n***** " . $id . " *****\n");
 
         $this->client->request('GET', '/' . $id);
         $crawler = $this->client->waitForElementToContain('body', 'Delete');
