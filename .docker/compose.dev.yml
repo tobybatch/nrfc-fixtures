@@ -22,7 +22,7 @@ services:
       args:
         BASE: apache
     container_name: nrfc-fixtures-dev
-    user: "$(id -u):$(id -g)"
+    user: ${UID}:${GID}
     env_file:
       - path: ./dev.env
         required: true
@@ -35,9 +35,12 @@ services:
 
   encore:
     image: node
-    user: "$(id -u):$(id -g)"
+    user: ${UID}:${GID}
     volumes:
       - ..:/opt/nrfcfixtures
+    env_file:
+      - path: ./dev.env
+        required: true
     working_dir: /opt/nrfcfixtures
     entrypoint: "/opt/nrfcfixtures/bin/watch.sh"
     depends_on: [nrfcfixtures]
