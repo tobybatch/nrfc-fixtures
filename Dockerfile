@@ -1,7 +1,8 @@
 # NRFC Fixtures images for:
-# - plain PHP FPM   (nrfc/fixtures2:fpm)
-# - Apache with PHP (nrfc/fixtures2:apache)
-# - Development     (nrfc/fixtures2:dev)
+# Fast CGI Prod: ghcr.io/tobybatch/nrfc-fixtures:fpm-prod
+# Apache Prod:   ghcr.io/tobybatch/nrfc-fixtures:apache-prod
+# Fast CGI Dev:  ghcr.io/tobybatch/nrfc-fixtures:fpm-dev
+# Apache Dev:    ghcr.io/tobybatch/nrfc-fixtures:apache-dev
 # ---------------------------------------------------------------------
 # For local testing by maintainer:
 # cp .docker/sample.dev.env .docker/dev.env

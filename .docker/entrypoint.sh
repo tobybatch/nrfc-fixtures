@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 NRFCFIXTURES=$(cat /opt/nrfcfixtures/version.txt)
 
@@ -11,22 +11,21 @@ function waitForDB() {
   echo "Connection established"
 }
 
-function handleStartup() {
+function setMemoryLimit() {
   # set mem limits and copy in custom logger config
   if [ -z "$memory_limit" ]; then
     memory_limit=512M
   fi
   sed -i "s/memory_limit.*/memory_limit=$memory_limit/g" /usr/local/etc/php/php.ini
-  cp /assets/monolog.yaml /opt/nrfcfixtures/config/packages/monolog.yaml
+}
 
+function createUserAndGroup() {
   if [ -z "$USER_ID" ]; then
     USER_ID=$(id -u www-data)
   fi
   if [ -z "$GROUP_ID" ]; then
     GROUP_ID=$(id -g www-data)
   fi
-
-  touch .env
 
   # if group doesn't exist
   if grep -w "$GROUP_ID" /etc/group &>/dev/null; then
@@ -43,9 +42,9 @@ function handleStartup() {
     echo www-nrfcfixtures:x:"$USER_ID":"$GROUP_ID":www-nrfcfixtures:/var/www:/usr/sbin/nologin >> /etc/passwd
     pwconv
   fi
+}
 
-  composer install
-
+function configureWebserver() {
   if [ -e /use_apache ]; then
     export APACHE_RUN_USER=$(id -nu "$USER_ID")
     # This doesn't _exactly_ run as the specified GID, it runs as the GID of the specified user but WTF
@@ -65,14 +64,22 @@ function handleStartup() {
 }
 
 function prepare() {
-  # These are idempotent, so we can run them on every start-up
-  /opt/nrfcfixtures/bin/console doctrine:migrations:migrate --no-interaction
-  if [ ! -z "$ADMINPASS" ] && [ ! -a "$ADMINMAIL" ]; then
-    echo CREATE AN ADMIN USER HERE
-    # /opt/nrfcfixtures/bin/console nrfcfixtures:user:create admin "$ADMINMAIL" ROLE_SUPER_ADMIN "$ADMINPASS"
-  fi
+  ls -lart /opt/nrfcfixtures/.git/objects/
+  chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures
+  ls -lart /opt/nrfcfixtures/.git/objects/
+  chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures
+
   echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
   echo "NRFC Fixtures is ready"
+}
+
+function tweakSymfony() {
+  cp /assets/monolog.yaml /opt/nrfcfixtures/config/packages/monolog.yaml
+  touch .env
+  /opt/nrfcfixtures/bin/console cache:clear
+  composer install
+  /opt/nrfcfixtures/bin/console doctrine:migrations:migrate --no-interaction
+
   if [ "$APP_ENV" == "dev" ]; then
       bin/console doctrine:schema:create -n
       bin/console doctrine:fixtures:load -n
@@ -80,10 +87,6 @@ function prepare() {
 }
 
 function runServer() {
-  /opt/nrfcfixtures/bin/console cache:clear
-  # Just while I'm fixing things
-  chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures/var
-  rm -f .in_startup
   if [ -e /use_apache ]; then
     exec /usr/sbin/apache2 -D FOREGROUND
   elif [ -e /use_fpm ]; then
@@ -97,4 +100,5 @@ touch .in_startup
 waitForDB
 handleStartup
 prepare
+rm -f .in_startup
 runServer
