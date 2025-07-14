@@ -17,7 +17,7 @@ cd nrfc-fixtures
 tilt up
 ```
 
-Open the manager page in a browser, click on the fixtures container, and watch it build. It'll take a few minutes first time it runs. When it's up go to http://localhost:8001
+**WAIT** - the first run builds the app, it'll take minutes, go here to keep an eye on it: http://localhost:10350/r/nrfcfixtures/overview. When it's up go to http://localhost:8001
 
  * Login users are [here](https://github.com/tobybatch/nrfc-fixtures/blob/main/src/DataFixtures/Users.php)
  * Changes in your local should be reflected in the site.

@@ -336,9 +336,9 @@ ENV APP_ENV=prod
 WORKDIR /opt/nrfcfixtures
 # do the composer deps installation
 RUN export COMPOSER_HOME=/composer && \
-    touch /opt/nrfcfixtures/.env
-RUN composer --no-ansi install --working-dir=/opt/nrfcfixtures --no-dev --optimize-autoloader
-RUN composer --no-ansi clearcache && \
+    touch /opt/nrfcfixtures/.env && \
+    composer --no-ansi install --working-dir=/opt/nrfcfixtures --no-dev --optimize-autoloader && \
+    composer --no-ansi clearcache && \
     cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
     sed -i "s/expose_php = On/expose_php = Off/g" /usr/local/etc/php/php.ini && \
     sed -i "s/;opcache.enable=1/opcache.enable=1/g" /usr/local/etc/php/php.ini && \
