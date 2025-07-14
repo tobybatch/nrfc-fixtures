@@ -248,6 +248,56 @@ final class FixtureController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
+    #[Route('spond/{team}', name: 'app_fixture_spond', defaults: ['team' => null], methods: ['GET'])]
+    public function spond(Request $request, Team $team = null, FixtureRepository $fixtureRepository, SerializerInterface $serializer): Response|JsonResponse
+    {
+        if (!$team) {
+            return $this->render('fixture/spond.html.twig');
+        }
+
+        $fixtures = $fixtureRepository->findByTeam($team);
+        $handle = fopen('php://memory', 'r+');
+        /**
+         * @var Fixture $fixture
+         */
+        foreach ($fixtures as $fixture) {
+            if (!in_array(
+                $fixture->getCompetition(),
+                [Competition::None, Competition::Training, Competition::Pathway],
+            )) {
+                fputcsv($handle, [
+                    $fixture->getDate()->format('d/m/Y'),
+                    $fixture->getDate()->format('H:i:s') === '00:00:00' ? "11:00" : $fixture->getDate()->format('H:i:s'),
+                    '01:00',
+                    $fixture->getDate()->format('d/m/Y'),
+                    $fixture->getDate()->format('H:i:s') === '00:00:00' ? "13:00" : $fixture->getDate()->modify('+2 hours')->format('H:i:s'),
+                    $fixture->getHomeAway() == HomeAway::Home ? 'Home match' : 'Away match',
+                    $fixture->getHomeAway() == HomeAway::Home ? 'Norwich ' . $team->value : $fixture->getClub()?->getName() . $team->value,
+                    $fixture->getHomeAway() == HomeAway::Home ? $fixture->getClub()?->getName() . " " . $team->value : 'Norwich ' . $team->value,
+                    $fixture->format(),
+                    $fixture->getClub()?->getAddress(),
+                ]);
+            }
+        }
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        // Create response with appropriate headers
+        return new Response(
+            $csv,
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => sprintf('attachment; filename="%s-for-spond.csv"', $team->name),
+                'Cache-Control' => 'no-store, no-cache',
+            ]
+        );
+    }
+
     // This will be removed when we get to the new website
     #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
     public function forOldWebsite(Request $request, TeamService $teamService, SerializerInterface $serializer): Response|JsonResponse

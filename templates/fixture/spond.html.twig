@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All{% endblock %}
+
+{% block body %}
+    <section class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow">
+
+    <h2 class="text-3xl font-bold mb-6 text-gray-800">Export fixtures for spond</h2>
+
+    <div class="mb-4 text-gray-700">
+        <p class="mb-2">
+        This is an inexact process, but we'll do our best. Because the source data pulled from a human written
+        spreadsheet not all the data is totally accurate. You may get matches titled 'Mothering Sunday' etc, or where
+        we can't figure out the opposition it will just say the age category. BUT you can use this to start your list
+        of matches in Spond.
+        </p>
+    </div>
+    <div class="mb-6 text-gray-700">
+        <h3 class="text-xl font-semibold mb-2">On a computer:</h3>
+        <ul class="list-disc list-inside space-y-1 pl-4">
+            <li> go to your team</li>
+            <li>choose Events</li>
+            <li>click the red event link</li>
+            <li>choose season planner</li>
+            <li>choose create matches and next</li>
+            <li>paste in the spreadsheet you can download below</li>
+            <li>CHECK THE FIXTURES FOR ACCURACY</li>
+            <li>click select recipients and complete the creation process</li>
+        </ul>
+    </div>
+
+    <div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Download Fixtures:</h3>
+        <ul class="list-inside space-y-1 pl-4 text-blue-600">
+            <li><a href="{{ path('app_fixture_spond', { team: "Minis" }) }}" class="hover:underline">Minis</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U13B" }) }}" class="hover:underline">Under 13 Boys</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U14B" }) }}" class="hover:underline">Under 14 Boys</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U15B" }) }}" class="hover:underline">Under 15 Boys</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U16B" }) }}" class="hover:underline">Under 16 Boys</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U18B" }) }}" class="hover:underline">Colts</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U12G" }) }}" class="hover:underline">Under 12 Girls</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U14G" }) }}" class="hover:underline">Under 14 Girls</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U16G" }) }}" class="hover:underline">Under 16 Girls</a></li>
+            <li><a href="{{ path('app_fixture_spond', { team: "U18G" }) }}" class="hover:underline">Under 18 Girls</a></li>
+        </ul>
+    </div>
+
+{% endblock %}

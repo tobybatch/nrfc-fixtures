@@ -11,6 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Fixture>
+ *
+ * @method findByTeam(Team $team)
  */
 class FixtureRepository extends ServiceEntityRepository
 {
