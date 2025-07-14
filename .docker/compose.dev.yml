@@ -15,14 +15,8 @@ services:
       - database_data:/var/lib/postgresql/data:rw
 
   nrfcfixtures:
-    image: nrfc-fixtures:apache-dev
-    build:
-      context: ..
-      target: dev
-      args:
-        BASE: apache
+    image: ghcr.io/tobybatch/nrfc-fixtures:apache-dev
     container_name: nrfc-fixtures-dev
-    user: ${UID}:${GID}
     env_file:
       - path: ./dev.env
         required: true
@@ -35,7 +29,6 @@ services:
 
   encore:
     image: node
-    user: ${UID}:${GID}
     volumes:
       - ..:/opt/nrfcfixtures
     env_file:
