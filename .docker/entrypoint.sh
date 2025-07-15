@@ -27,21 +27,24 @@ function createUserAndGroup() {
     GROUP_ID=$(id -g www-data)
   fi
 
-  # if group doesn't exist
+  # Create group if needed
   if grep -w "$GROUP_ID" /etc/group &>/dev/null; then
-    echo Group already exists
+    echo "Group already exists"
   else
-    echo www-nrfcfixtures:x:"$GROUP_ID": >> /etc/group
+    echo "www-nrfcfixtures:x:$GROUP_ID:" >> /etc/group
     grpconv
   fi
 
-  # if user doesn't exist
-  if id "$USER_ID" &>/dev/null; then
-    echo User already exists
+  # Create user if needed
+  if getent passwd "$USER_ID" &>/dev/null; then
+    echo "User already exists"
   else
-    echo www-nrfcfixtures:x:"$USER_ID":"$GROUP_ID":www-nrfcfixtures:/var/www:/usr/sbin/nologin >> /etc/passwd
+    echo "www-nrfcfixtures:x:$USER_ID:$GROUP_ID:www-nrfcfixtures:/var/www:/usr/sbin/nologin" >> /etc/passwd
     pwconv
   fi
+
+  # Return the username for the UID
+  getent passwd "$USER_ID" | cut -d: -f1
 }
 
 function configureWebserver() {
@@ -63,16 +66,6 @@ function configureWebserver() {
   fi
 }
 
-function prepare() {
-  ls -lart /opt/nrfcfixtures/.git/objects/
-  chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures
-  ls -lart /opt/nrfcfixtures/.git/objects/
-  chown -R $USER_ID:$GROUP_ID /opt/nrfcfixtures
-
-  echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
-  echo "NRFC Fixtures is ready"
-}
-
 function tweakSymfony() {
   cp /assets/monolog.yaml /opt/nrfcfixtures/config/packages/monolog.yaml
   touch .env
@@ -87,6 +80,8 @@ function tweakSymfony() {
 }
 
 function runServer() {
+  echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
+  echo "NRFC Fixtures is ready"
   if [ -e /use_apache ]; then
     exec /usr/sbin/apache2 -D FOREGROUND
   elif [ -e /use_fpm ]; then
@@ -97,8 +92,14 @@ function runServer() {
 }
 
 touch .in_startup
-waitForDB
-handleStartup
-prepare
+# needs root
+setMemoryLimit
+createUserAndGroup
+configureWebserver
+
+# run as user
+DELEGATED_USER=$(createUserAndGroup)
+su - "$USERNAME" -c waitForDB
+su - "$USERNAME" -c tweakSymfony
 rm -f .in_startup
-runServer
+su - "$USERNAME" -c runServer
