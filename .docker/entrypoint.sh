@@ -102,3 +102,12 @@ handleStartup
 prepare
 rm -f .in_startup
 runServer
+
+# function setMemoryLimit() {
+# function createUserAndGroup() {
+# function configureWebserver() {
+
+# function tweakSymfony() {
+# function waitForDB() {
+# function prepare() {
+# function runServer() {
