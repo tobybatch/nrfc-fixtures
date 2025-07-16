@@ -39,47 +39,4 @@ class FixtureTest extends TestCase
         $fixture->setNotes('Postponed due to weather');
         $this->assertSame('Postponed due to weather', $fixture->getNotes());
     }
-
-    public function testFormatWithClub(): void
-    {
-        $club = $this->createMock(Club::class);
-        $club->method('getName')->willReturn('Norwich RFC');
-
-        $fixture = new Fixture();
-        $fixture->setClub($club);
-        $fixture->setCompetition(Competition::Friendly);
-        $fixture->setHomeAway(HomeAway::Home);
-
-        $this->assertSame('Norwich RFC (H)', $fixture->format());
-        $this->assertStringContainsString('Norwich RFC', (string) $fixture);
-    }
-
-    public function testFormatWithNameFallback(): void
-    {
-        $fixture = new Fixture();
-        $fixture->setName('Cambridge RFC');
-        $fixture->setCompetition(Competition::Friendly);
-        $fixture->setHomeAway(HomeAway::Away);
-
-        $this->assertSame('Cambridge RFC (A)', $fixture->format());
-    }
-
-    public function testFormatWithCompetitionIncluded(): void
-    {
-        $fixture = new Fixture();
-        $fixture->setName('Cambridge RFC');
-        $fixture->setCompetition(Competition::NationalCup);
-        $fixture->setHomeAway(HomeAway::Away);
-
-        $expected = 'Cambridge RFC (A) [' . Competition::NationalCup->shortValue() . ']';
-        $this->assertSame($expected, $fixture->format(true, true));
-    }
-
-    public function testFormatReturnsFallback(): void
-    {
-        $fixture = new Fixture();
-        $fixture->setCompetition(Competition::None);
-        $fixture->setHomeAway(HomeAway::Away);
-        $this->assertSame('Training?', $fixture->format());
-    }
 }

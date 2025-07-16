@@ -3,9 +3,7 @@
 namespace App\Tests\Unit\Command;
 
 use App\Command\NrfcFixturesDebugCommand;
-use App\Config\Team;
-use App\Entity\Club;
-use App\Entity\Fixture;
+use App\Command\NrfcFixturesImportCommand;
 use App\Repository\ClubRepository;
 use App\Service\TeamService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,8 +13,6 @@ use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\ExceptionInterface;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
@@ -37,7 +33,7 @@ class NrfcFixturesImportCommandTest extends TestCase
         $this->teamService = $this->createMock(TeamService::class);
 
         $application = new Application();
-        $application->add(new NrfcFixturesDebugCommand($this->entityManager, $this->teamService, $this->clubRepository));
+        $application->add(new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository));
         
         $command = $application->find('nrfc:fixtures:import');
         $this->commandTester = new CommandTester($command);
@@ -54,7 +50,7 @@ class NrfcFixturesImportCommandTest extends TestCase
     public function testCommandDescription(): void
     {
         $application = new Application();
-        $command = new NrfcFixturesDebugCommand($this->entityManager, $this->teamService, $this->clubRepository);
+        $command = new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository);
         $application->add($command);
         
         $this->assertEquals('Import data from CSV file and create entities', $command->getDescription());
@@ -110,18 +106,5 @@ class NrfcFixturesImportCommandTest extends TestCase
         $output = $this->commandTester->getDisplay();
         $this->assertStringContainsString('Import failed', trim($output));
         $this->assertEquals(Command::FAILURE, $this->commandTester->getStatusCode());
-    }
-
-    public function testFindClubEmptyName() :void
-    {
-        $command = new NrfcFixturesDebugCommand($this->entityManager, $this->teamService, $this->clubRepository);
-        $reflection = new ReflectionClass($command);
-
-        // set accessible for private method
-        $method = $reflection->getMethod('findClub');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($command, '');
-        $this->assertNull($result);
     }
 } 

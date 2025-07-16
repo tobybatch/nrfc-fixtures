@@ -33,7 +33,7 @@ class FixtureTypeTest extends TestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $formBuilder
-            ->expects($this->exactly(6))
+            ->expects($this->exactly(8))
             ->method('add')
             ->withConsecutive(
                 [
@@ -75,6 +75,25 @@ class FixtureTypeTest extends TestCase
                             && $options['required'] === false
                             && $options['choice_label'] === 'name'
                             && $options['placeholder'] === 'N/A';
+                    })
+                ],
+                [
+                    'opponent',
+                    EntityType::class,
+                    $this->callback(function (array $options) {
+                        return $options['label'] === 'Opposing team'
+                            && $options['class'] === Team::class
+                            && $options['required'] === false
+                            && $options['choice_label'] === 'name'
+                            && $options['placeholder'] === 'N/A';
+                    })
+                ],
+                [
+                    'notes',
+                    EntityType::class,
+                    $this->callback(function (array $options) {
+                        return $options['label'] === 'Notes'
+                            && $options['required'] === false
                     })
                 ]
             )

@@ -7,6 +7,7 @@ use App\Config\HomeAway;
 use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture;
+use App\Service\FixtureService;
 use App\Twig\FixtureExtension;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -17,14 +18,17 @@ class FixtureExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->extension = new FixtureExtension();
+        $this->extension = new FixtureExtension(
+            $this->createMock(FixtureService::class)
+        );
     }
 
     public function testGetFilters(): void
     {
         $filters = $this->extension->getFilters();
-        $this->assertCount(1, $filters);
+        $this->assertCount(2, $filters);
         $this->assertEquals('fixtureSummary', $filters[0]->getName());
+        $this->assertEquals('fixtureToString', $filters[1]->getName());
     }
 
     public function testGetFunctions(): void
