@@ -8,7 +8,7 @@
         {% if fixture.competition.value != "None" %}
             <thead>
                 <tr>
-                    <th colspan="2">{{ fixture.format }}</th>
+                    <th colspan="2">{{ fixture | fixtureToString }}</th>
                 </tr>
             </thead>
         {% endif %}
@@ -40,7 +40,7 @@
             </td>
         </tr>
         <tr>
-            <th class="text-left pr-2">Team</th>
+            <th class="text-left pr-2">Norwich Team</th>
             <td class="text-left">
                 {{ fixture.team.value }}
             </td>
@@ -49,6 +49,12 @@
             <th class="text-left pr-2">Competition</th>
             <td class="text-left">
                 {{ fixture.competition.value }}
+            </td>
+        </tr>
+        <tr>
+            <th class="text-left pr-2">Opponent</th>
+            <td class="text-left">
+                {{ fixture.club }} {% if fixture.opponent %}{{ fixture.opponent.value }}{% endif %}
             </td>
         </tr>
         {% if fixture.notes %}

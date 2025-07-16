@@ -4,6 +4,8 @@ namespace App\Twig;
 
 use App\Config\Competition;
 use App\Entity\Fixture;
+use App\Service\FixtureService;
+use App\Service\TeamService;
 use DateTimeImmutable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -11,10 +13,14 @@ use Twig\TwigFunction;
 
 class FixtureExtension extends AbstractExtension
 {
+    public function __construct(private FixtureService $fixtureService) {
+    }
+
     public function getFilters(): array
     {
         return [
             new TwigFilter('fixtureSummary', [$this, 'fixtureSummary']),
+            new TwigFilter('fixtureToString', [$this, 'fixtureToString']),
         ];
     }
 
@@ -118,5 +124,10 @@ class FixtureExtension extends AbstractExtension
                 $fixture->getHomeAway()->value,
             );
         }
+    }
+
+    public function fixtureToString(Fixture $fixture): string
+    {
+        return $this->fixtureService->format($fixture);
     }
 }

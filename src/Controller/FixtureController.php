@@ -10,8 +10,10 @@ use App\Form\FixturesDisplayOptionsForm;
 use App\Form\FixtureType;
 use App\Form\Model\FixturesDisplayOptionsDTO;
 use App\Repository\FixtureRepository;
+use App\Service\FixtureService;
 use App\Service\PreferencesService;
 use App\Service\TeamService;
+use DateMalformedStringException;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -45,9 +47,6 @@ final class FixtureController extends AbstractController
         $this->logger = $logger;
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     */
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
     {
@@ -165,7 +164,7 @@ final class FixtureController extends AbstractController
 
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_fixture_show', ['id' => $fixture->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('fixture/edit.html.twig', [
@@ -249,10 +248,10 @@ final class FixtureController extends AbstractController
     }
 
     /**
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     #[Route('spond/{team}', name: 'app_fixture_spond', defaults: ['team' => null], methods: ['GET'])]
-    public function spond(Request $request, Team $team = null, FixtureRepository $fixtureRepository, SerializerInterface $serializer): Response|JsonResponse
+    public function spond(FixtureRepository $fixtureRepository, FixtureService $fixtureService, Team $team = null): Response|JsonResponse
     {
         if (!$team) {
             return $this->render('fixture/spond.html.twig');
@@ -277,7 +276,7 @@ final class FixtureController extends AbstractController
                     $fixture->getHomeAway() == HomeAway::Home ? 'Home match' : 'Away match',
                     $fixture->getHomeAway() == HomeAway::Home ? 'Norwich ' . $team->value : $fixture->getClub()?->getName() . $team->value,
                     $fixture->getHomeAway() == HomeAway::Home ? $fixture->getClub()?->getName() . " " . $team->value : 'Norwich ' . $team->value,
-                    $fixture->format(),
+                    $fixtureService->format($fixture),
                     $fixture->getClub()?->getAddress(),
                 ]);
             }

@@ -117,7 +117,7 @@ class NrfcFixturesImportCommand extends Command
                         foreach ($teamList as $team => $column) {
                             $team = $this->teamService->getBy($team);
                             if (!$team) {
-                                $this->io->warning(sprintf('Team "%s" not found', $team));
+                                $this->io->warning(sprintf('Team "%s" not found', $team->value));
                                 continue;
                             }
                             $this->createFixture($team, $date, $row[$column]);
@@ -182,7 +182,7 @@ class NrfcFixturesImportCommand extends Command
     private function createFixture(Team $team, DateTimeImmutable $date, mixed $detail): void
     {
         $fixture = new FixtureEntity();
-        list($sessionName, $comp, $home, $club) = $this->parseDetail($detail);
+        list($sessionName, $comp, $home, $club, $opponent) = $this->parseDetail($detail);
         $fixture->setTeam($team);
         if ($club) {
             $fixture->setClub($club);
@@ -193,13 +193,14 @@ class NrfcFixturesImportCommand extends Command
         $fixture->setHomeAway($home);
         $fixture->setDate($date);
         $fixture->setTeam($team);
+        $fixture->setOpponent($opponent);
 //        $this->io->info(sprintf('Creating fixture for %s on %s', $team->value, $date->format('Y-m-d')));
 
         $this->em->persist($fixture);
     }
 
     /**
-     * @return array{string, Competition, HomeAway, Club|null}
+     * @return array{string, Competition, HomeAway, Club|null, Team|null}
      */
     private function parseDetail(string $detail): array
     {
@@ -248,10 +249,11 @@ class NrfcFixturesImportCommand extends Command
         }
 
         // we've got this far, we think it's a club game
-        $cleanedName = preg_replace('/\s*\([^)]*\)/', '', $detail);
+        $cleanParentheses = preg_replace('/\s*\([^)]*\)/', '', $detail);
         $club = null;
-        if ($cleanedName) {
-            $club = $this->findClub($cleanedName);
+        $team = null;
+        if ($cleanParentheses) {
+            list($club, $team) = $this->findClubAndOpponent($cleanParentheses);
         }
 
         return [
@@ -259,6 +261,7 @@ class NrfcFixturesImportCommand extends Command
             Competition::Friendly,
             $this->isHomeOrAway($detail),
             $club,
+            $team
         ];
     }
 
@@ -274,11 +277,15 @@ class NrfcFixturesImportCommand extends Command
         return HomeAway::TBA;
     }
 
-    private function findClub(string $name): Club|null
+    /**
+     * @param string $name
+     * @return array<Club|Team>
+     */
+    private function findClubAndOpponent(string $name): array
     {
         $n = ucwords(trim(strtolower($name)));
         if (empty($n)) {
-            return null;
+            return [null, null];
         }
 
         switch ($n) {
@@ -300,6 +307,6 @@ class NrfcFixturesImportCommand extends Command
             $this->em->flush();
         }
 
-        return $club;
+        return [$club, null];
     }
 }

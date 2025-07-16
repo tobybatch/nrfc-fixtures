@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
+ * @method findOneByEmail(mixed $email)
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {

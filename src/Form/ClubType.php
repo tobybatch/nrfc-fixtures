@@ -20,6 +20,7 @@ class ClubType extends AbstractType
             ->add('address', TextareaType::class)
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes',
+                'required' => false,
             ])
         ;
     }

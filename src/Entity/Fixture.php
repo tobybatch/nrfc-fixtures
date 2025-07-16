@@ -43,6 +43,9 @@ class Fixture
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(nullable: true, enumType: Team::class)]
+    private ?Team $opponent = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,7 +123,6 @@ class Fixture
         return $this;
     }
 
-
     public function getNotes(): ?string
     {
         return $this->notes;
@@ -133,38 +135,15 @@ class Fixture
         return $this;
     }
 
-    public function __toString()
+    public function getOpponent(): ?Team
     {
-        return $this->format();
+        return $this->opponent;
     }
 
-    public function getFullName(): string
+    public function setOpponent(?Team $opponent): static
     {
-        return $this->format();
-    }
+        $this->opponent = $opponent;
 
-    public function format(
-        bool $incHA = true,
-        bool $incComp = false,
-    ): string {
-        if (null != $this->getClub()) {
-            $text = $this->getClub()->getName();
-        } elseif (!empty($this->getName())) {
-            $text = $this->getName();
-        } else if (Competition::None != $this->getCompetition()) {
-            $text = $this->getCompetition()->value;
-        } else {
-            $text = 'Training?';
-        }
-
-        if ($incHA && Competition::None != $this->getCompetition()) {
-            $text .= ' ('.$this->getHomeAway()->value . ')';
-        }
-
-        if ($incComp) {
-            $text .= ' ['.$this->getCompetition()->shortValue().']';
-        }
-
-        return $text;
+        return $this;
     }
 }

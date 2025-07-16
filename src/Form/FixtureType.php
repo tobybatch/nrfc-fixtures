@@ -35,17 +35,20 @@ class FixtureType extends AbstractType
             ])
             ->add('homeAway', EnumType::class, [
                 'class' => HomeAway::class,
-                'data' => HomeAway::TBA,
+                'choice_label' => fn (HomeAway $choice) => $choice->name,
+                'choice_value' => fn (?HomeAway $choice) => $choice?->value,
             ])
             ->add('competition', EnumType::class, [
                 'label' => 'Competition/Training',
                 'class' => Competition::class,
-                'data' => Competition::Training,
+                'choice_label' => fn (Competition $choice) => $choice->name,
+                'choice_value' => fn (?Competition $choice) => $choice?->value,
             ])
             ->add('team', EnumType::class, [
                 'class' => Team::class,
                 'placeholder' => '-- choose team --',
                 'label' => 'Team/Age group',
+                'choice_label' => fn (Team $team) => $team->value,
             ])
             ->add('club', EntityType::class, [
                 'label' => 'Opponent/Training partner',
@@ -53,6 +56,14 @@ class FixtureType extends AbstractType
                 'required' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'N/A',
+            ])
+            ->add('opponent', EnumType::class, [
+                'class' => Team::class,
+                'placeholder' => '-- choose team --',
+                'label' => 'Opposing team',
+                'choice_label' => fn (Team $team) => $team->value,
+                'required' => false,
+                'help' => 'For youth fixtures you can leave this blank.',
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes',

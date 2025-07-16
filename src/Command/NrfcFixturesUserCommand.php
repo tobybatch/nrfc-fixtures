@@ -33,7 +33,7 @@ class NrfcFixturesUserCommand extends Command
     {
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'The email address of the new user')
-            ->addArgument('role', InputArgument::OPTIONAL, 'Role to add to the new user')
+            ->addArgument('role', InputArgument::OPTIONAL, 'Role to add to the new user, EDITOR, ADMIN')
         ;
     }
 
@@ -46,11 +46,11 @@ class NrfcFixturesUserCommand extends Command
         if ($input->getArgument('role')) {
             $role = $input->getArgument('role');
             $io->info('Role ' . json_encode($role));
-            if ($role === 'EDITOR' || $role === 'ADMIN') {
-                $roles[] = 'EDITOR';
+            if (in_array($role, ['EDITOR', 'ADMIN', 'ROLE_EDITOR', 'ROLE_ADMIN'])) {
+                $roles[] = 'ROLE_EDITOR';
             }
-            if ($role === 'ADMIN') {
-                $roles[] = 'ADMIN';
+            if (in_array($role, ['ADMIN', 'ROLE_ADMIN'])) {
+                $roles[] = 'ROLE_ADMIN';
             }
         }
             $io->info('Roles ' . implode(', ', $roles));

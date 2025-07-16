@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Command;
 
-use App\Command\NrfcFixturesImportCommand;
+use App\Command\NrfcFixturesDebugCommand;
 use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture;
@@ -37,7 +37,7 @@ class NrfcFixturesImportCommandTest extends TestCase
         $this->teamService = $this->createMock(TeamService::class);
 
         $application = new Application();
-        $application->add(new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository));
+        $application->add(new NrfcFixturesDebugCommand($this->entityManager, $this->teamService, $this->clubRepository));
         
         $command = $application->find('nrfc:fixtures:import');
         $this->commandTester = new CommandTester($command);
@@ -54,7 +54,7 @@ class NrfcFixturesImportCommandTest extends TestCase
     public function testCommandDescription(): void
     {
         $application = new Application();
-        $command = new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository);
+        $command = new NrfcFixturesDebugCommand($this->entityManager, $this->teamService, $this->clubRepository);
         $application->add($command);
         
         $this->assertEquals('Import data from CSV file and create entities', $command->getDescription());
@@ -114,7 +114,7 @@ class NrfcFixturesImportCommandTest extends TestCase
 
     public function testFindClubEmptyName() :void
     {
-        $command = new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository);
+        $command = new NrfcFixturesDebugCommand($this->entityManager, $this->teamService, $this->clubRepository);
         $reflection = new ReflectionClass($command);
 
         // set accessible for private method

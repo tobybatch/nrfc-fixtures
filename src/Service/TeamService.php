@@ -29,9 +29,9 @@ class TeamService
 
     public function getSeniors(): array {
         return array(
-            Team::FIRST_XV,
-            Team::LIONS,
-            Team::SENIOR_WOMEN,
+            Team::FIRST_XV_MEN,
+            Team::SECOND_XV_MEN,
+            Team::FIRST_XV_WOMEN,
         );
     }
 
@@ -63,10 +63,15 @@ class TeamService
             'U14G' => Team::U14G,
             'U16G' => Team::U16G,
             'U18G' => Team::U18G,
-            '1st Team (Mens)', 'FIRST_XV', '1st XV Fixture' => Team::FIRST_XV,
-            '2nd Team (Mens)', 'LIONS', 'Lions Fixture' => Team::LIONS,
-            '1st Team (Women)', 'SENIOR_WOMEN' => Team::SENIOR_WOMEN,
+            '1st Team (Mens)', 'FIRST_XV_MEN', '1st XV Fixture' => Team::FIRST_XV_MEN,
+            '2nd Team (Mens)', 'SECOND_XV_MEN', 'Lions Fixture' => Team::SECOND_XV_MEN,
+            '1st Team (Women)', 'FIRST_XV_WOMEN' => Team::FIRST_XV_WOMEN,
             default => null,
         };
+    }
+
+    public function isSenior(Team $team)
+    {
+        return in_array($team, $this->getSeniors());
     }
 }

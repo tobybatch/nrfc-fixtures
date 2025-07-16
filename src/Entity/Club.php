@@ -40,6 +40,9 @@ class Club
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $aliases = null;
+
     public function __construct()
     {
         $this->fixtures = new ArrayCollection();
@@ -144,6 +147,18 @@ class Club
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    public function getAliases(): array
+    {
+        return $this->aliases;
+    }
+
+    public function setAliases(array $aliases): static
+    {
+        $this->aliases = $aliases;
 
         return $this;
     }
