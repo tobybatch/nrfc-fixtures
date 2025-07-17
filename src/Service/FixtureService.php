@@ -34,14 +34,19 @@ class FixtureService
             $text = 'Training?';
         }
 
-        if ($incHA && Competition::None != $fixture->getCompetition()) {
+        if ($incHA) {
             $text .= ' ('.$fixture->getHomeAway()->value.')';
         }
 
-        if ($incComp) {
+        if ($incComp && $fixture->getCompetition() !== Competition::None) {
             $text .= ' ['.$fixture->getCompetition()->shortValue().']';
         }
 
         return $text;
+    }
+
+    public function fullName(Fixture $fixture): string
+    {
+        return $this->format($fixture);
     }
 }

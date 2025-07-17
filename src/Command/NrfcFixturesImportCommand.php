@@ -179,11 +179,8 @@ class NrfcFixturesImportCommand extends Command
         $fixture = new FixtureEntity();
         list($sessionName, $comp, $home, $club, $opponent) = $this->parseDetail($detail);
         $fixture->setTeam($team);
-        if ($club) {
-            $fixture->setClub($club);
-        } else {
-            $fixture->setName($sessionName);
-        }
+        $fixture->setClub($club);
+        $fixture->setName($sessionName);
         $fixture->setCompetition($comp);
         $fixture->setHomeAway($home);
         $fixture->setDate($date);
