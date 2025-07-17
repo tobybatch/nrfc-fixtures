@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### 🚀 Features
+
+- Improved names for fixtures
+- Split arm/amd build to speed amd build
+- Added export to spond
+- Improved fixture editing
+
+### 🐛 Bug Fixes
+
+- Correct error where all fixtures were left aligned
+- Type in load fixtures
+- Swaps vale for name in the index of fixtures
+- Moved some team logic to a teams service
+- Senior teams render correctly
+- Tests
+- Switched back to dual platform build
+
+### 🧪 Testing
+
+- Fixing e2e tests
+- Fixed e2e tests
+- E2e tests for fixtures
+- E2e tests pass
+- E2e fixed
+- Unit tests for better coverage
+
+### ⚙️ Miscellaneous Tasks
+
+- Phpstan
+- Phpcs psr12
+
+## [1.0.2] - 2025-06-29
+
+### ⚙️ Miscellaneous Tasks
+
+- Tests
+
+## [1.0.1] - 2025-06-26
+
+### 🚀 Features
+
+- Import respects team names in the csv header
+
+### 🐛 Bug Fixes
+
+- Updated .gitignore, touched .env
+- Empty rows no longer render
+- Changelog workflow had bad indenting
+- Auto create clubs on import
+- Tidied up address links on clubs
+- Tidied up commit lint tooling
+- Debugging the tilt up
+
 ## [1.0.0] - 2025-06-25
 
 ### 💼 Other
