@@ -10,10 +10,10 @@ use App\Entity\Fixture;
 use App\Form\FixtureType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -33,7 +33,7 @@ class FixtureTypeTest extends TestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $formBuilder
-            ->expects($this->exactly(8))
+            ->expects($this->exactly(7))
             ->method('add')
             ->withConsecutive(
                 [
@@ -61,9 +61,11 @@ class FixtureTypeTest extends TestCase
                     'team',
                     EnumType::class,
                     $this->callback(function (array $options) {
-                        return $options['class'] === Team::class
-                            && $options['placeholder'] === '-- choose team --'
-                            && $options['label'] === 'Team/Age group';
+                        return
+                            isset($options['class']) && $options['class'] === \App\Config\Team::class &&
+                            isset($options['placeholder']) && $options['placeholder'] === '-- choose team --' &&
+                            isset($options['label']) && $options['label'] === 'Team/Age group' &&
+                            isset($options['choice_label']) && is_callable($options['choice_label']);
                     })
                 ],
                 [
@@ -79,21 +81,23 @@ class FixtureTypeTest extends TestCase
                 ],
                 [
                     'opponent',
-                    EntityType::class,
-                    $this->callback(function (array $options) {
-                        return $options['label'] === 'Opposing team'
-                            && $options['class'] === Team::class
-                            && $options['required'] === false
-                            && $options['choice_label'] === 'name'
-                            && $options['placeholder'] === 'N/A';
+                    EnumType::class,
+                    $this->callback(function ($options) {
+                        return
+                            isset($options['class']) && $options['class'] === Team::class &&
+                            isset($options['placeholder']) && $options['placeholder'] === '-- choose team --' &&
+                            isset($options['label']) && $options['label'] === 'Opposing team' &&
+                            isset($options['required']) && $options['required'] === false &&
+                            isset($options['help']) && $options['help'] === 'For youth fixtures you can leave this blank.' &&
+                            isset($options['choice_label']) && is_callable($options['choice_label']);
                     })
                 ],
                 [
                     'notes',
-                    EntityType::class,
+                    TextareaType::class,
                     $this->callback(function (array $options) {
                         return $options['label'] === 'Notes'
-                            && $options['required'] === false
+                            && $options['required'] === false;
                     })
                 ]
             )
