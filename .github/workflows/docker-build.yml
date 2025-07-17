@@ -1,4 +1,4 @@
-name: Build and Push Docker Image (ARM)
+name: Build and Push Docker Image (AMD)
 
 on:
   push:
@@ -66,7 +66,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/arm64
+          platforms: linux/amd64,linux/arm64
           build-args: |
             BASE=${{ matrix.BASE }}
             TARGET=${{ matrix.TARGET }}
