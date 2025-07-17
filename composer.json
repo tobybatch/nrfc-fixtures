@@ -121,6 +121,7 @@
         "dama/doctrine-test-bundle": "^8.2",
         "dbrekelmans/bdi": "^1.4",
         "doctrine/doctrine-fixtures-bundle": "^4.1",
+        "friendsofphp/php-cs-fixer": "^3.84",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^9.5",

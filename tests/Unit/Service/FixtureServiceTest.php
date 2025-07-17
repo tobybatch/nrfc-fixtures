@@ -3,10 +3,10 @@
 namespace App\Tests\Unit\Service;
 
 use App\Config\Competition;
+use App\Config\HomeAway;
+use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture;
-use App\Config\Team;
-use App\Config\HomeAway;
 use App\Service\FixtureService;
 use App\Service\TeamService;
 use PHPUnit\Framework\TestCase;
@@ -112,7 +112,7 @@ class FixtureServiceTest extends TestCase
         $fixture->method('getCompetition')->willReturn($competition);
         $fixture->method('getHomeAway')->willReturn(HomeAway::Away);
 
-        $expected = 'League (A) [' . $competition->shortValue() . ']';
+        $expected = 'League (A) ['.$competition->shortValue().']';
         $this->assertSame($expected, $this->fixtureService->format($fixture, true, true));
     }
 }

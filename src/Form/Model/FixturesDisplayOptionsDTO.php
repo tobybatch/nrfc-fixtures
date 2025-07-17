@@ -10,5 +10,4 @@ class FixturesDisplayOptionsDTO
     public array $teams = [];
 
     public bool $showPastDates = false;
-
 }

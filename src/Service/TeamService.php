@@ -9,46 +9,50 @@ class TeamService
     /**
      * @return array<Team>
      */
-    public function getBoys(): array {
-        return array(
+    public function getBoys(): array
+    {
+        return [
             Team::Minis,
             Team::U13B,
             Team::U14B,
             Team::U15B,
             Team::U16B,
-            TEAM::U18B,
-        );
+            Team::U18B,
+        ];
     }
 
     /**
      * @return array<Team>
      */
-    public function getGirls(): array {
-        return array(
+    public function getGirls(): array
+    {
+        return [
             Team::Minis,
             Team::U12G,
             Team::U14G,
             Team::U16G,
             Team::U18G,
-        );
+        ];
     }
 
     /**
      * @return array<Team>
      */
-    public function getSeniors(): array {
-        return array(
+    public function getSeniors(): array
+    {
+        return [
             Team::FIRST_XV_MEN,
             Team::SECOND_XV_MEN,
             Team::FIRST_XV_WOMEN,
-        );
+        ];
     }
 
     /**
      * @return array<Team>
      */
-    public function getYouth(): array {
-        return array(
+    public function getYouth(): array
+    {
+        return [
             Team::Minis,
             Team::U13B,
             Team::U14B,
@@ -59,11 +63,11 @@ class TeamService
             Team::U14G,
             Team::U16G,
             Team::U18G,
-        );
-
+        ];
     }
 
-    public function getBy(string $value): Team|null {
+    public function getBy(string $value): ?Team
+    {
         return match ($value) {
             'Minis' => Team::Minis,
             'U13B' => Team::U13B,

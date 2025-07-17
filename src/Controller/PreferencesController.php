@@ -4,13 +4,11 @@ namespace App\Controller;
 
 use App\Form\FixturesDisplayOptionsForm;
 use App\Form\Model\FixturesDisplayOptionsDTO;
-use App\Repository\FixtureRepository;
 use App\Service\PreferencesService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/preferences')]
@@ -22,8 +20,7 @@ final class PreferencesController extends AbstractController
     public function __construct(
         PreferencesService $preferencesService,
         LoggerInterface $logger,
-    )
-    {
+    ) {
         $this->preferencesService = $preferencesService;
         $this->logger = $logger;
     }
@@ -44,9 +41,11 @@ final class PreferencesController extends AbstractController
         $next = $request->query->get('team');
         if (null !== $next) {
             $this->logger->debug('Next set', ['next' => $next]);
+
             return new RedirectResponse($next);
         }
         $this->logger->debug('Next not set');
+
         return $this->redirectToRoute('app_fixture_index');
     }
 }

@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Config\Team;
 use App\Entity\Fixture;
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,7 +24,7 @@ class FixtureRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return DateTimeImmutable[]
+     * @return \DateTimeImmutable[]
      */
     public function getDates(): array
     {
@@ -49,15 +48,15 @@ class FixtureRepository extends ServiceEntityRepository
             }
         }
 
-        return array_map(fn($date) => new \DateTimeImmutable($date), $dates);
+        return array_map(fn ($date) => new \DateTimeImmutable($date), $dates);
     }
 
     /**
      * @param array<Team> $teams
-     * @param DateTimeImmutable|null $date
+     *
      * @return array<string, array{Fixture}>
      */
-    public function getFixturesForTeams(array $teams, DateTimeImmutable $date = null): array
+    public function getFixturesForTeams(array $teams, ?\DateTimeImmutable $date = null): array
     {
         $fixtures = [];
 
@@ -68,13 +67,10 @@ class FixtureRepository extends ServiceEntityRepository
         return $fixtures;
     }
 
-
     /**
-     * @param Team $team
-     * @param DateTimeImmutable|null $date
      * @return array{Fixture}
      */
-    public function getFixturesForTeam(Team $team, DateTimeImmutable $date = null): array
+    public function getFixturesForTeam(Team $team, ?\DateTimeImmutable $date = null): array
     {
         $statement = $this->createQueryBuilder('f')
             ->leftJoin('f.club', 'c')
@@ -97,10 +93,9 @@ class FixtureRepository extends ServiceEntityRepository
      * @return Fixture[] Returns an array of Fixture objects
      */
     public function findByDateRange(
-        DateTimeImmutable $startDate,
-        DateTimeImmutable $endDate,
-    ): array
-    {
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
         return $this->createQueryBuilder('f')
             ->where('f.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)

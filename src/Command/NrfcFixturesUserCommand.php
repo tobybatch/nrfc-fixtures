@@ -9,7 +9,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -45,7 +44,7 @@ class NrfcFixturesUserCommand extends Command
         $roles = [];
         if ($input->getArgument('role')) {
             $role = $input->getArgument('role');
-            $io->info('Role ' . json_encode($role));
+            $io->info('Role '.json_encode($role));
             if (in_array($role, ['EDITOR', 'ADMIN', 'ROLE_EDITOR', 'ROLE_ADMIN'])) {
                 $roles[] = 'ROLE_EDITOR';
             }
@@ -53,22 +52,22 @@ class NrfcFixturesUserCommand extends Command
                 $roles[] = 'ROLE_ADMIN';
             }
         }
-            $io->info('Roles ' . implode(', ', $roles));
+        $io->info('Roles '.implode(', ', $roles));
 
         $user = $this->userRepository->findOneByEmail($email);
         if (!$user) {
-            $io->info('Creating a new user with email of ' . $email);
+            $io->info('Creating a new user with email of '.$email);
             $user = new User();
             $user->setEmail($email);
             $user->setPassword(strval(sha1(rand())));
         }
-        $io->info('Updating user with email of ' . $email);
+        $io->info('Updating user with email of '.$email);
         $user->setRoles($roles);
 
         $this->em->persist($user);
         $this->em->flush();
 
-        $io->success('Set roles on ' . $email . ' to ' . implode(',', $roles));
+        $io->success('Set roles on '.$email.' to '.implode(',', $roles));
 
         return Command::SUCCESS;
     }

@@ -27,7 +27,6 @@ foreach ($commands as $command) {
 }
 // executes the "php bin/console cache:clear" command
 
-
 $_SERVER['APP_ENV'] = 'test';
 $_SERVER['APP_DEBUG'] = '0';
 $_SERVER['KERNEL_CLASS'] = 'App\Tests\Kernel';

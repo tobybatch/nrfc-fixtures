@@ -33,7 +33,7 @@ class RegistrationFormTypeTest extends TestCase
                     null,
                     $this->callback(function (array $options) {
                         return empty($options); // No specific options for email field
-                    })
+                    }),
                 ],
                 [
                     'plainPassword',
@@ -45,13 +45,14 @@ class RegistrationFormTypeTest extends TestCase
                             'minMessage' => 'Your password should be at least {{ limit }} characters',
                             'max' => 4096,
                         ]);
-                        return $options['mapped'] === false
-                            && $options['attr']['autocomplete'] === 'new-password'
+
+                        return false === $options['mapped']
+                            && 'new-password' === $options['attr']['autocomplete']
                             && $options['constraints'][0]->message === $notBlankConstraint->message
                             && $options['constraints'][1]->min === $lengthConstraint->min
                             && $options['constraints'][1]->minMessage === $lengthConstraint->minMessage
                             && $options['constraints'][1]->max === $lengthConstraint->max;
-                    })
+                    }),
                 ]
             );
 

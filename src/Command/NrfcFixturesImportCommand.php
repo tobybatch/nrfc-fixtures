@@ -11,11 +11,8 @@ use App\Entity\Club;
 use App\Entity\Fixture as FixtureEntity;
 use App\Repository\ClubRepository;
 use App\Service\TeamService;
-use DateTime;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
-use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -68,8 +65,9 @@ class NrfcFixturesImportCommand extends Command
             return Command::SUCCESS;
         }
 
-        if ($type != 'fixture' && $type != 'club') {
+        if ('fixture' != $type && 'club' != $type) {
             $io->error('Invalid type');
+
             return Command::FAILURE;
         }
 
@@ -87,7 +85,7 @@ class NrfcFixturesImportCommand extends Command
         // Process title row
         $row = fgetcsv($file, 0, $delimiter);
         $teamList = [];
-        if ($type == 'fixture') {
+        if ('fixture' == $type) {
             foreach ($row as $column => $team) {
                 $t = $this->teamService->getBy(trim($team));
                 if (!$t) {
@@ -103,16 +101,16 @@ class NrfcFixturesImportCommand extends Command
                 ++$rowNumber;
 
                 try {
-                    if ($type == 'fixture') {
+                    if ('fixture' == $type) {
                         if (empty($row[0])) {
-                            $io->warning(sprintf("Row %d, has no date: %s", $rowNumber, implode(", ", $row)));
+                            $io->warning(sprintf('Row %d, has no date: %s', $rowNumber, implode(', ', $row)));
                         }
-                        $_date = DateTime::createFromFormat('j-M-y', $row[0]);
+                        $_date = \DateTime::createFromFormat('j-M-y', $row[0]);
                         if (!$_date) {
-                            $io->warning(sprintf("Row %d has an invalid date: %s", $rowNumber, implode(", ", $row)));
+                            $io->warning(sprintf('Row %d has an invalid date: %s', $rowNumber, implode(', ', $row)));
                             continue;
                         }
-                        $date = DateTimeImmutable::createFromMutable($_date)->setTime(0, 0);
+                        $date = \DateTimeImmutable::createFromMutable($_date)->setTime(0, 0);
                         foreach ($teamList as $t => $column) {
                             $team = $this->teamService->getBy($t);
                             if (!$team) {
@@ -133,7 +131,7 @@ class NrfcFixturesImportCommand extends Command
                         $this->em->clear(); // Detaches all objects from Doctrine
                         $io->comment(sprintf('Processed %d records', $importedCount));
                     }
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $io->warning(sprintf(
                         'Error processing row %d: %s. Row data: %s',
                         $rowNumber,
@@ -153,7 +151,7 @@ class NrfcFixturesImportCommand extends Command
             $io->success(sprintf('Successfully imported %d records', $importedCount));
 
             return Command::SUCCESS;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $io->error(sprintf('Import failed: %s', $e->getMessage()));
 
             return Command::FAILURE;
@@ -162,7 +160,6 @@ class NrfcFixturesImportCommand extends Command
 
     /**
      * @param string[] $row
-     * @return void
      */
     private function processClubRow(array $row): void
     {
@@ -172,13 +169,12 @@ class NrfcFixturesImportCommand extends Command
             $c->setName($row[0]);
         }
         $c->setAddress($row[1]);
-        $c->setLatitude((float)$row[2]);
-        $c->setLongitude((float)$row[3]);
+        $c->setLatitude((float) $row[2]);
+        $c->setLongitude((float) $row[3]);
         $this->em->persist($c);
     }
 
-
-    private function createFixture(Team $team, DateTimeImmutable $date, mixed $detail): void
+    private function createFixture(Team $team, \DateTimeImmutable $date, mixed $detail): void
     {
         $fixture = new FixtureEntity();
         list($sessionName, $comp, $home, $club, $opponent) = $this->parseDetail($detail);
@@ -193,7 +189,7 @@ class NrfcFixturesImportCommand extends Command
         $fixture->setDate($date);
         $fixture->setTeam($team);
         $fixture->setOpponent($opponent);
-//        $this->io->info(sprintf('Creating fixture for %s on %s', $team->value, $date->format('Y-m-d')));
+        //        $this->io->info(sprintf('Creating fixture for %s on %s', $team->value, $date->format('Y-m-d')));
 
         $this->em->persist($fixture);
     }
@@ -260,7 +256,7 @@ class NrfcFixturesImportCommand extends Command
             Competition::Friendly,
             $this->isHomeOrAway($detail),
             $club,
-            $team
+            $team,
         ];
     }
 
@@ -277,7 +273,6 @@ class NrfcFixturesImportCommand extends Command
     }
 
     /**
-     * @param string $name
      * @return array<Club|Team>
      */
     private function findClubAndOpponent(string $name): array
@@ -296,12 +291,12 @@ class NrfcFixturesImportCommand extends Command
                 break;
         }
 
-//        $this->io->info(sprintf('Searching for club: "%s"', $n));
+        //        $this->io->info(sprintf('Searching for club: "%s"', $n));
         $club = $this->clubRepository->findOneBy(['name' => $n]);
         if (null == $club) {
             $club = new Club();
             $club->setName($n);
-//            $this->io->info(sprintf('Creating club for "%s"', $n));
+            //            $this->io->info(sprintf('Creating club for "%s"', $n));
             $this->em->persist($club);
             $this->em->flush();
         }

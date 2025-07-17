@@ -7,7 +7,6 @@ use App\Config\Competition;
 use App\Config\HomeAway;
 use App\Config\Team;
 use App\Repository\FixtureRepository;
-use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,7 +21,7 @@ class Fixture
 
     #[ORM\Column]
     #[ORM\OrderBy(['date' => 'DESC'])]
-    private ?DateTimeImmutable $date = null;
+    private ?\DateTimeImmutable $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'fixtures')]
     #[ORM\JoinColumn(nullable: true)]
@@ -51,12 +50,12 @@ class Fixture
         return $this->id;
     }
 
-    public function getDate(): ?DateTimeImmutable
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(DateTimeImmutable $date): static
+    public function setDate(\DateTimeImmutable $date): static
     {
         $this->date = $date;
 

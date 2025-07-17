@@ -9,7 +9,6 @@ use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Service\FixtureService;
 use App\Twig\FixtureExtension;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class FixtureExtensionTest extends TestCase
@@ -41,12 +40,11 @@ class FixtureExtensionTest extends TestCase
         $this->assertEquals('hasPastDates', $filters[3]->getName());
     }
 
-
     public function testDateIsNew(): void
     {
-        $date1 = new DateTimeImmutable('2023-01-01');
-        $date2 = new DateTimeImmutable('2023-01-01');
-        $date3 = new DateTimeImmutable('2023-01-02');
+        $date1 = new \DateTimeImmutable('2023-01-01');
+        $date2 = new \DateTimeImmutable('2023-01-01');
+        $date3 = new \DateTimeImmutable('2023-01-02');
 
         $this->assertTrue($this->extension->dateIsNew($date1, $date2));
         $this->assertFalse($this->extension->dateIsNew($date1, $date3));

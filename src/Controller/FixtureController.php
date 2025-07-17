@@ -13,11 +13,8 @@ use App\Repository\FixtureRepository;
 use App\Service\FixtureService;
 use App\Service\PreferencesService;
 use App\Service\TeamService;
-use DateMalformedStringException;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,12 +32,11 @@ final class FixtureController extends AbstractController
     private TeamService $teamService;
 
     public function __construct(
-        FixtureRepository  $fixtureRepository,
+        FixtureRepository $fixtureRepository,
         PreferencesService $preferencesService,
-        TeamService        $teamService,
-        LoggerInterface    $logger,
-    )
-    {
+        TeamService $teamService,
+        LoggerInterface $logger,
+    ) {
         $this->fixtureRepository = $fixtureRepository;
         $this->preferencesService = $preferencesService;
         $this->teamService = $teamService;
@@ -61,7 +57,7 @@ final class FixtureController extends AbstractController
                     'seniors' => $this->teamService->getSeniors(),
                     default => [$this->teamService->getBy($team)],
                 };
-                $this->preferencesService->setPreferences('teamsSelected', array_map(static fn(Team $team) => $team->value, $selectedTeams));
+                $this->preferencesService->setPreferences('teamsSelected', array_map(static fn (Team $team) => $team->value, $selectedTeams));
             }
         }
 
@@ -83,7 +79,7 @@ final class FixtureController extends AbstractController
         if (empty($_teams)) {
             $teams = $this->teamService->getYouth();
         } else {
-            $teams = array_map(fn($team) => $this->teamService->getBy($team), $_teams);
+            $teams = array_map(fn ($team) => $this->teamService->getBy($team), $_teams);
         }
 
         $this->logger->debug('Teams', ['teams' => $teams]);
@@ -94,7 +90,7 @@ final class FixtureController extends AbstractController
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
             // check date is today or later, or force show is set
-            if ($showPastDates || $date >= new DateTimeImmutable()) {
+            if ($showPastDates || $date >= new \DateTimeImmutable()) {
                 $fixturesForDate = [];
                 foreach ($teams as $team) {
                     if ($team) {
@@ -117,7 +113,7 @@ final class FixtureController extends AbstractController
         ];
 
         // This could be done in an event listener
-        if ($request->getAcceptableContentTypes()[0] === 'application/json') {
+        if ('application/json' === $request->getAcceptableContentTypes()[0]) {
             $json = $serializer->serialize($context, 'json');
 
             return new JsonResponse($json, 200, [], true);
@@ -161,7 +157,6 @@ final class FixtureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $entityManager->flush();
 
             return $this->redirectToRoute('app_fixture_show', ['id' => $fixture->getId()], Response::HTTP_SEE_OTHER);
@@ -177,10 +172,10 @@ final class FixtureController extends AbstractController
     public function delete(Request $request, Fixture $fixture, EntityManagerInterface $entityManager): Response
     {
         $id = $fixture->getId();
-        if ($this->isCsrfTokenValid('delete' . $fixture->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$fixture->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($fixture);
             $entityManager->flush();
-            $this->addFlash('success', 'Fixture ' . $id . ' deleted');
+            $this->addFlash('success', 'Fixture '.$id.' deleted');
         }
 
         return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
@@ -188,12 +183,11 @@ final class FixtureController extends AbstractController
 
     #[Route('/byDate/{date}', name: 'app_fixture_byDate', methods: ['GET'])]
     public function byDate(
-        string            $date,
+        string $date,
         FixtureRepository $fixtureRepository,
-    ): Response
-    {
+    ): Response {
         // Manually validate the date format
-        $dateObj = DateTimeImmutable::createFromFormat('Ymd', $date);
+        $dateObj = \DateTimeImmutable::createFromFormat('Ymd', $date);
 
         if (!$dateObj || $dateObj->format('Ymd') !== $date) {
             return $this->json([
@@ -203,10 +197,10 @@ final class FixtureController extends AbstractController
 
         try {
             // Create DateTimeImmutable from the input string
-            $dateObj = DateTimeImmutable::createFromFormat('Ymd', $date);
+            $dateObj = \DateTimeImmutable::createFromFormat('Ymd', $date);
 
             if (!$dateObj) {
-                throw new InvalidArgumentException('Invalid date');
+                throw new \InvalidArgumentException('Invalid date');
             }
 
             // Set the start and end of the day
@@ -234,7 +228,7 @@ final class FixtureController extends AbstractController
             }
 
             // now sort into training, home games, away games, TBA
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $this->json([
                 'error' => 'An error occurred while processing your request.',
                 'details' => $e->getMessage(),
@@ -248,10 +242,10 @@ final class FixtureController extends AbstractController
     }
 
     /**
-     * @throws DateMalformedStringException
+     * @throws \DateMalformedStringException
      */
     #[Route('spond/{team}', name: 'app_fixture_spond', defaults: ['team' => null], methods: ['GET'])]
-    public function spond(FixtureRepository $fixtureRepository, FixtureService $fixtureService, Team $team = null): Response|JsonResponse
+    public function spond(FixtureRepository $fixtureRepository, FixtureService $fixtureService, ?Team $team = null): Response|JsonResponse
     {
         if (!$team) {
             return $this->render('fixture/spond.html.twig');
@@ -269,13 +263,13 @@ final class FixtureController extends AbstractController
             )) {
                 fputcsv($handle, [
                     $fixture->getDate()->format('d/m/Y'),
-                    $fixture->getDate()->format('H:i:s') === '00:00:00' ? "11:00" : $fixture->getDate()->format('H:i:s'),
+                    '00:00:00' === $fixture->getDate()->format('H:i:s') ? '11:00' : $fixture->getDate()->format('H:i:s'),
                     '01:00',
                     $fixture->getDate()->format('d/m/Y'),
-                    $fixture->getDate()->format('H:i:s') === '00:00:00' ? "13:00" : $fixture->getDate()->modify('+2 hours')->format('H:i:s'),
-                    $fixture->getHomeAway() == HomeAway::Home ? 'Home match' : 'Away match',
-                    $fixture->getHomeAway() == HomeAway::Home ? 'Norwich ' . $team->value : $fixture->getClub()?->getName() . $team->value,
-                    $fixture->getHomeAway() == HomeAway::Home ? $fixture->getClub()?->getName() . " " . $team->value : 'Norwich ' . $team->value,
+                    '00:00:00' === $fixture->getDate()->format('H:i:s') ? '13:00' : $fixture->getDate()->modify('+2 hours')->format('H:i:s'),
+                    HomeAway::Home == $fixture->getHomeAway() ? 'Home match' : 'Away match',
+                    HomeAway::Home == $fixture->getHomeAway() ? 'Norwich '.$team->value : $fixture->getClub()?->getName().$team->value,
+                    HomeAway::Home == $fixture->getHomeAway() ? $fixture->getClub()?->getName().' '.$team->value : 'Norwich '.$team->value,
                     $fixtureService->format($fixture),
                     $fixture->getClub()?->getAddress(),
                 ]);
@@ -309,25 +303,26 @@ final class FixtureController extends AbstractController
             if (!empty($_fixtures)) {
                 $fixture = $_fixtures[0];
                 $fixtures[] = [
-                    "id" => $fixture->getId(),
-                    "opponent" => $fixtureService->format($fixture, false),
-                    "competition" => $this->translateCompetition($fixture->getCompetition()),
-                    "venue" => $fixture->getHomeAway() == HomeAway::Home ? 'home' : 'away',
-                    "date" => $date,
+                    'id' => $fixture->getId(),
+                    'opponent' => $fixtureService->format($fixture, false),
+                    'competition' => $this->translateCompetition($fixture->getCompetition()),
+                    'venue' => HomeAway::Home == $fixture->getHomeAway() ? 'home' : 'away',
+                    'date' => $date,
                 ];
             }
         }
 
         // This could be done in an event listener
-        if ($request->getAcceptableContentTypes()[0] === 'application/json') {
+        if ('application/json' === $request->getAcceptableContentTypes()[0]) {
             $json = $serializer->serialize($fixtures, 'json');
+
             return new JsonResponse($json, 200, [], true);
         }
 
-        return new Response("Unsupported accept type", 400);
+        return new Response('Unsupported accept type', 400);
     }
 
-    private function translateCompetition(Competition $competition): string|null
+    private function translateCompetition(Competition $competition): ?string
     {
         return match ($competition) {
             Competition::CountyCup, Competition::NationalCup => 'cup',

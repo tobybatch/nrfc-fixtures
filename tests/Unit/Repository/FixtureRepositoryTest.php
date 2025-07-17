@@ -59,7 +59,6 @@ class FixtureRepositoryTest extends TestCase
         ], $dates);
     }
 
-
     public function testGetFixturesForTeam(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
@@ -86,7 +85,7 @@ class FixtureRepositoryTest extends TestCase
 
         $query->method('getResult')->willReturn([$fixture]);
 
-        $results = $fixtureRepo->getFixturesForTeam($team, DateTimeImmutable::createFromFormat('Y-m-d', '2024-05-01'));
+        $results = $fixtureRepo->getFixturesForTeam($team, \DateTimeImmutable::createFromFormat('Y-m-d', '2024-05-01'));
 
         $this->assertCount(1, $results);
         $this->assertSame($fixture, $results[0]);
@@ -111,8 +110,8 @@ class FixtureRepositoryTest extends TestCase
 
         $query->method('getResult')->willReturn([$fixture]);
 
-        $start = new DateTimeImmutable('2024-05-01');
-        $end = new DateTimeImmutable('2024-05-31');
+        $start = new \DateTimeImmutable('2024-05-01');
+        $end = new \DateTimeImmutable('2024-05-31');
 
         $results = $fixtureRepo->findByDateRange($start, $end);
 

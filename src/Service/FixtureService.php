@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Config\Competition;
 use App\Entity\Fixture;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class FixtureService
 {
@@ -23,20 +22,20 @@ class FixtureService
         if (null != $fixture->getClub()) {
             $text = $fixture->getClub()->getName();
             if ($this->teamService->isSenior($fixture->getTeam())) {
-                $text .= ' ' . substr($fixture->getTeam()->value, 0, 1);
+                $text .= ' '.substr($fixture->getTeam()->value, 0, 1);
             } else {
-                $text .= " " . $fixture->getTeam()->value;
+                $text .= ' '.$fixture->getTeam()->value;
             }
         } elseif (!empty($fixture->getName())) {
             $text = $fixture->getName();
-        } else if (Competition::None != $fixture->getCompetition()) {
+        } elseif (Competition::None != $fixture->getCompetition()) {
             $text = $fixture->getCompetition()->value;
         } else {
             $text = 'Training?';
         }
 
         if ($incHA && Competition::None != $fixture->getCompetition()) {
-            $text .= ' ('.$fixture->getHomeAway()->value . ')';
+            $text .= ' ('.$fixture->getHomeAway()->value.')';
         }
 
         if ($incComp) {

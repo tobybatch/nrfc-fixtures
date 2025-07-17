@@ -2,20 +2,19 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\Fixture;
-use App\Entity\Club;
-use App\Config\HomeAway;
 use App\Config\Competition;
+use App\Config\HomeAway;
 use App\Config\Team;
+use App\Entity\Club;
+use App\Entity\Fixture;
 use PHPUnit\Framework\TestCase;
-use DateTimeImmutable;
 
 class FixtureTest extends TestCase
 {
     public function testSettersAndGetters(): void
     {
         $fixture = new Fixture();
-        $date = new DateTimeImmutable('2025-05-17');
+        $date = new \DateTimeImmutable('2025-05-17');
         $club = $this->createMock(Club::class);
 
         $fixture->setDate($date);

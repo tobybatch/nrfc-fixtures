@@ -16,10 +16,10 @@ enum Team: string
     case U14G = 'U14G';
     case U16G = 'U16G';
     case U18G = 'U18G';
-    case FIRST_XV_MEN = "1st Team (Mens)";
-    case SECOND_XV_MEN = "2nd Team (Mens)";
-    case THIRD_XV_MEN = "3rd Team (Mens)";
-    case FOURTH_XV_MEN = "4th Team (Mens)";
-    case FIRST_XV_WOMEN = "1st Team (Women)";
-    case SECOND_XV_WOMEN = "2st Team (Women)";
+    case FIRST_XV_MEN = '1st Team (Mens)';
+    case SECOND_XV_MEN = '2nd Team (Mens)';
+    case THIRD_XV_MEN = '3rd Team (Mens)';
+    case FOURTH_XV_MEN = '4th Team (Mens)';
+    case FIRST_XV_WOMEN = '1st Team (Women)';
+    case SECOND_XV_WOMEN = '2st Team (Women)';
 }

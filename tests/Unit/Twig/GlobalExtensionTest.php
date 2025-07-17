@@ -79,8 +79,8 @@ class GlobalExtensionTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $session->set('preferences', [
             'showHelp' => [
-                'other_route' => true
-            ]
+                'other_route' => true,
+            ],
         ]);
 
         $request = Request::create('/some/route');
@@ -96,8 +96,8 @@ class GlobalExtensionTest extends TestCase
         $user = $this->createMock(User::class);
         $user->method('getPreferences')->willReturn([
             'showHelp' => [
-                'some_route' => true
-            ]
+                'some_route' => true,
+            ],
         ]);
 
         $session = new Session(new MockArraySessionStorage());

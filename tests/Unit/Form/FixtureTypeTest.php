@@ -10,8 +10,8 @@ use App\Entity\Fixture;
 use App\Form\FixtureType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -40,65 +40,65 @@ class FixtureTypeTest extends TestCase
                     'date',
                     DateType::class,
                     $this->callback(function (array $options) {
-                        return $options['widget'] === 'single_text';
-                    })
+                        return 'single_text' === $options['widget'];
+                    }),
                 ],
                 [
                     'homeAway',
                     EnumType::class,
                     $this->callback(function (array $options) {
-                        return $options['class'] === HomeAway::class;
-                    })
+                        return HomeAway::class === $options['class'];
+                    }),
                 ],
                 [
                     'competition',
                     EnumType::class,
                     $this->callback(function (array $options) {
-                        return $options['class'] === Competition::class;
-                    })
+                        return Competition::class === $options['class'];
+                    }),
                 ],
                 [
                     'team',
                     EnumType::class,
                     $this->callback(function (array $options) {
                         return
-                            isset($options['class']) && $options['class'] === \App\Config\Team::class &&
-                            isset($options['placeholder']) && $options['placeholder'] === '-- choose team --' &&
-                            isset($options['label']) && $options['label'] === 'Team/Age group' &&
-                            isset($options['choice_label']) && is_callable($options['choice_label']);
-                    })
+                            isset($options['class']) && Team::class === $options['class']
+                            && isset($options['placeholder']) && '-- choose team --' === $options['placeholder']
+                            && isset($options['label']) && 'Team/Age group' === $options['label']
+                            && isset($options['choice_label']) && is_callable($options['choice_label']);
+                    }),
                 ],
                 [
                     'club',
                     EntityType::class,
                     $this->callback(function (array $options) {
-                        return $options['label'] === 'Opponent/Training partner'
-                            && $options['class'] === Club::class
-                            && $options['required'] === false
-                            && $options['choice_label'] === 'name'
-                            && $options['placeholder'] === 'N/A';
-                    })
+                        return 'Opponent/Training partner' === $options['label']
+                            && Club::class === $options['class']
+                            && false === $options['required']
+                            && 'name' === $options['choice_label']
+                            && 'N/A' === $options['placeholder'];
+                    }),
                 ],
                 [
                     'opponent',
                     EnumType::class,
                     $this->callback(function ($options) {
                         return
-                            isset($options['class']) && $options['class'] === Team::class &&
-                            isset($options['placeholder']) && $options['placeholder'] === '-- choose team --' &&
-                            isset($options['label']) && $options['label'] === 'Opposing team' &&
-                            isset($options['required']) && $options['required'] === false &&
-                            isset($options['help']) && $options['help'] === 'For youth fixtures you can leave this blank.' &&
-                            isset($options['choice_label']) && is_callable($options['choice_label']);
-                    })
+                            isset($options['class']) && Team::class === $options['class']
+                            && isset($options['placeholder']) && '-- choose team --' === $options['placeholder']
+                            && isset($options['label']) && 'Opposing team' === $options['label']
+                            && isset($options['required']) && false === $options['required']
+                            && isset($options['help']) && 'For youth fixtures you can leave this blank.' === $options['help']
+                            && isset($options['choice_label']) && is_callable($options['choice_label']);
+                    }),
                 ],
                 [
                     'notes',
                     TextareaType::class,
                     $this->callback(function (array $options) {
-                        return $options['label'] === 'Notes'
-                            && $options['required'] === false;
-                    })
+                        return 'Notes' === $options['label']
+                            && false === $options['required'];
+                    }),
                 ]
             )
             ->willReturnSelf();

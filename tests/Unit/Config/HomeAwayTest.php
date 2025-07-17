@@ -13,4 +13,4 @@ class HomeAwayTest extends TestCase
         $this->assertEquals('A', HomeAway::Away->value);
         $this->assertEquals('TBA', HomeAway::TBA->value);
     }
-} 
+}

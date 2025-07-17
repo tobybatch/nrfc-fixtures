@@ -2,10 +2,7 @@
 
 namespace App\Twig;
 
-use App\Config\Competition;
 use App\Entity\Club;
-use App\Entity\Fixture;
-use DateTimeImmutable;
 use Symfony\UX\Map\Map;
 use Symfony\UX\Map\Marker;
 use Symfony\UX\Map\Point;
@@ -14,7 +11,6 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class MapExtension extends AbstractExtension

@@ -9,7 +9,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkDetails;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
@@ -66,6 +65,7 @@ class MagicLinkServiceTest extends TestCase
                 $this->assertStringContainsString($loginLink, $email->getTextBody());
                 $this->assertEquals('login/magic_login_link_email.html.twig', $email->getHtmlTemplate());
                 $this->assertEquals(['loginLink' => $loginLink], $email->getContext());
+
                 return true;
             }));
 

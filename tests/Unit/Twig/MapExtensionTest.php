@@ -9,9 +9,7 @@ use Symfony\UX\Map\Map;
 use Symfony\UX\Map\Marker;
 use Symfony\UX\Map\Point;
 use Twig\Environment;
-use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 class MapExtensionTest extends TestCase
 {
@@ -80,8 +78,8 @@ class MapExtensionTest extends TestCase
             ->method('render')
             ->with(
                 $this->equalTo('components/map.html.twig'),
-                $this->callback(function($parameters) use ($expectedMap) {
-                    return $parameters['address'] === '123 Test Street'
+                $this->callback(function ($parameters) {
+                    return '123 Test Street' === $parameters['address']
                         && $parameters['map'] instanceof Map;
                 })
             )

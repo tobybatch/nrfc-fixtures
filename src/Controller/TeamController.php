@@ -18,27 +18,29 @@ final class TeamController extends AbstractController
         $name = $request->get('name');
         if (empty($name)) {
             return new JsonResponse(
-                $this->error("No team name provided"),
+                $this->error('No team name provided'),
                 400
             );
         }
+
         return match ($name) {
-            "Mini Section Teams" => new JsonResponse(['name' => Team::Minis]),
-            "Under 13s" => new JsonResponse(['name' => Team::U13B]),
-            "Under 14s" => new JsonResponse(['name' => Team::U14B]),
-            "Under 15s" => new JsonResponse(['name' => Team::U15B]),
-            "Under 16s" => new JsonResponse(['name' => Team::U16B]),
-            "Colts Under 18s" => new JsonResponse(['name' => Team::U18B]),
-            "Under 12s Girls" => new JsonResponse(['name' => Team::U12G]),
-            "Under 14s Girls" => new JsonResponse(['name' => Team::U14G]),
-            "Under 16s Girls" => new JsonResponse(['name' => Team::U16G]),
-            "Under 18s Girls" => new JsonResponse(['name' => Team::U18G]),
-            "1st XV" => new JsonResponse(['name' => Team::FIRST_XV_MEN]),
-            "2nd XV Team (Lions)" => new JsonResponse(['name' => Team::SECOND_XV_MEN]),
-            "3rd XV (AXV)" => new JsonResponse(['name' => Team::THIRD_XV_MEN]),
-            "Senior Women" => new JsonResponse(['name' => Team::FIRST_XV_WOMEN]),
+            'Mini Section Teams' => new JsonResponse(['name' => Team::Minis]),
+            'Under 13s' => new JsonResponse(['name' => Team::U13B]),
+            'Under 14s' => new JsonResponse(['name' => Team::U14B]),
+            'Under 15s' => new JsonResponse(['name' => Team::U15B]),
+            'Under 16s' => new JsonResponse(['name' => Team::U16B]),
+            'Colts Under 18s' => new JsonResponse(['name' => Team::U18B]),
+            'Under 12s Girls' => new JsonResponse(['name' => Team::U12G]),
+            'Under 14s Girls' => new JsonResponse(['name' => Team::U14G]),
+            'Under 16s Girls' => new JsonResponse(['name' => Team::U16G]),
+            'Under 18s Girls' => new JsonResponse(['name' => Team::U18G]),
+            '1st XV' => new JsonResponse(['name' => Team::FIRST_XV_MEN]),
+            '2nd XV Team (Lions)' => new JsonResponse(['name' => Team::SECOND_XV_MEN]),
+            '3rd XV (AXV)' => new JsonResponse(['name' => Team::THIRD_XV_MEN]),
+            'Senior Women' => new JsonResponse(['name' => Team::FIRST_XV_WOMEN]),
             default => (function () use ($name, $logger) {
                 $logger->error("Unsupported team name: $name");
+
                 return new JsonResponse(
                     $this->error("Unsupported team name: $name"),
                     404
@@ -48,7 +50,6 @@ final class TeamController extends AbstractController
     }
 
     /**
-     * @param string $message
      * @return string[]
      */
     private function error(string $message): array

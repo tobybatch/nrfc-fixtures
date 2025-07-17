@@ -115,6 +115,7 @@ class Club
         if (null == $this->name) {
             return '???';
         }
+
         return $this->name;
     }
 
@@ -164,6 +165,7 @@ class Club
 
     /**
      * @param array<string> $aliases
+     *
      * @return $this
      */
     public function setAliases(array $aliases): static

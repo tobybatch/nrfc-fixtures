@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Controller;
 use App\Entity\Club;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 class ClubControllerTest extends WebTestCase
 {
@@ -64,7 +63,7 @@ class ClubControllerTest extends WebTestCase
         $em->persist($club);
         $em->flush();
 
-        $this->client->request('GET', '/club/' . $club->getId());
+        $this->client->request('GET', '/club/'.$club->getId());
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Visible Club');
@@ -81,7 +80,7 @@ class ClubControllerTest extends WebTestCase
         $em->persist($club);
         $em->flush();
 
-        $crawler = $this->client->request('GET', '/club/' . $club->getId() . '/edit');
+        $crawler = $this->client->request('GET', '/club/'.$club->getId().'/edit');
 
         $form = $crawler->selectButton('Update')->form([
             'club[name]' => 'New Name',

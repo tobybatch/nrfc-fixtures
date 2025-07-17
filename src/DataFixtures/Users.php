@@ -28,10 +28,7 @@ class Users extends Fixture
     }
 
     /**
-     * @param ObjectManager $manager
-     * @param string $email
      * @param string[] $roles
-     * @return void
      */
     private function makeUser(ObjectManager $manager, string $email, array $roles = []): void
     {

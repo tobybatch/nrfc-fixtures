@@ -4,8 +4,6 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Exception;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -22,7 +20,7 @@ class ClubsAndFixtures extends Fixture
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function load(ObjectManager $manager): void
     {
@@ -42,8 +40,8 @@ class ClubsAndFixtures extends Fixture
 
     /**
      * @param array<string, string|true> $arguments
-     * @return void
-     * @throws Exception
+     *
+     * @throws \Exception
      */
     private function runCommand(array $arguments): void
     {
@@ -59,7 +57,7 @@ class ClubsAndFixtures extends Fixture
         $exitCode = $application->run($input, $output);
 
         if (0 !== $exitCode) {
-            throw new RuntimeException(sprintf('Command "nrfc:fixtures:import" failed with code %d. Output: %s', $exitCode, $output->fetch()));
+            throw new \RuntimeException(sprintf('Command "nrfc:fixtures:import" failed with code %d. Output: %s', $exitCode, $output->fetch()));
         }
 
         (new ConsoleOutput())->writeln($output->fetch());

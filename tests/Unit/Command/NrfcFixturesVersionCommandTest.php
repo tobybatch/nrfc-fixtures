@@ -15,7 +15,7 @@ class NrfcFixturesVersionCommandTest extends TestCase
     {
         $application = new Application();
         $application->add(new NrfcFixturesVersionCommand());
-        
+
         $command = $application->find('nrfc:fixtures:version');
         $this->commandTester = new CommandTester($command);
     }
@@ -23,7 +23,7 @@ class NrfcFixturesVersionCommandTest extends TestCase
     public function testExecute(): void
     {
         $this->commandTester->execute([]);
-        
+
         $output = $this->commandTester->getDisplay();
         $this->assertStringContainsString('0.0.1', $output);
         $this->assertEquals(0, $this->commandTester->getStatusCode());
@@ -32,9 +32,9 @@ class NrfcFixturesVersionCommandTest extends TestCase
     public function testCommandDescription(): void
     {
         $this->commandTester->execute(['--help' => true]);
-        
+
         $output = $this->commandTester->getDisplay();
         $this->assertStringContainsString('Receive version information', $output);
         $this->assertStringContainsString('This command allows you to fetch various version information about the app', $output);
     }
-} 
+}

@@ -68,30 +68,29 @@ class ViewClubsTest extends PantherTestCase
         $client = static::createPantherClient();
         $client->request('GET', '/club');
 
-        $client->ClickLink("Beccles");
+        $client->ClickLink('Beccles');
 
-        $crawler = $client->waitForElementToContain('h2', "Beccles");
+        $crawler = $client->waitForElementToContain('h2', 'Beccles');
 
         $this->assertStringStartsWith(
-            "Beef Meadow",
+            'Beef Meadow',
             $crawler->filter('.nrfc-address')->text(),
             'Club name should be displayed on the club page.'
         );
         // TODO - test notes, this is tested by the CRUD tests
-//        $this->assertEquals(
-//            "Some notes",
-//            $crawler->filter('.nrfc-club-notes')->text(),
-//            'Club notes should displayed on the club page.'
-//        );
+        //        $this->assertEquals(
+        //            "Some notes",
+        //            $crawler->filter('.nrfc-club-notes')->text(),
+        //            'Club notes should displayed on the club page.'
+        //        );
         $this->assertNotNull(
             $crawler->filter('.leaflet-container')->text(),
             'Club map should displayed on the club page.'
         );
 
-        $client->clickLink("Back to list");
+        $client->clickLink('Back to list');
         $client->waitForElementToContain('h1', 'Clubs');
         $this->assertSelectorTextContains('h1', 'Clubs');
         $this->assertEquals('/club', parse_url($client->getCurrentURL(), PHP_URL_PATH));
-
     }
 }

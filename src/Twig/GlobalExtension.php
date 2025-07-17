@@ -2,18 +2,8 @@
 
 namespace App\Twig;
 
-use App\Entity\Club;
 use App\Service\PreferencesService;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\UX\Map\Map;
-use Symfony\UX\Map\Marker;
-use Symfony\UX\Map\Point;
-use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -52,6 +42,7 @@ class GlobalExtension extends AbstractExtension
 
             $current = $current[$segment];
         }
+
         return $current;
     }
 
@@ -65,7 +56,7 @@ class GlobalExtension extends AbstractExtension
 
         $routeName = $request->attributes->get('_route');
 
-        return $routeName == 'app_fixture_index';
+        return 'app_fixture_index' == $routeName;
     }
 
     public function pageHelpIsVisible(): bool
@@ -80,11 +71,12 @@ class GlobalExtension extends AbstractExtension
         $routeName = $request->attributes->get('_route');
 
         if (
-            array_key_exists('showHelp', $preferences) &&
-            array_key_exists($routeName, $preferences['showHelp'])
+            array_key_exists('showHelp', $preferences)
+            && array_key_exists($routeName, $preferences['showHelp'])
         ) {
             return $preferences['showHelp'][$routeName];
         }
+
         return true;
     }
 }

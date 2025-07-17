@@ -1,12 +1,12 @@
 <?php
 
 // src/Repository/ClubRepository.php
+
 namespace App\Repository;
 
 use App\Entity\Club;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * @extends ServiceEntityRepository<Club>

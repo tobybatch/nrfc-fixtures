@@ -10,18 +10,17 @@ use Symfony\Component\Panther\PantherTestCase;
 // TODO bad email
 class RegisterUserTest extends PantherTestCase
 {
-
     /**
      * @throws NoSuchElementException
      * @throws TimeoutException
      */
     public function testRegister(): void
     {
-        $email = "newuser@eaxmple.com";
+        $email = 'newuser@eaxmple.com';
 
         $entityManager = static::getContainer()->get('doctrine')->getManager();
         $entities = $entityManager->getRepository(User::class)->findBy([
-            'email' => $email
+            'email' => $email,
         ]);
         $this->assertCount(0, $entities);
 
@@ -36,7 +35,7 @@ class RegisterUserTest extends PantherTestCase
         $this->assertStringContainsString('Account created, you can log in now!', $crawler->text());
 
         $entities = $entityManager->getRepository(User::class)->findBy([
-            'email' => $email
+            'email' => $email,
         ]);
         $this->assertCount(1, $entities);
     }

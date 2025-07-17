@@ -8,13 +8,9 @@ use App\Config\Team;
 use App\DataFixtures\Users;
 use App\Entity\Club;
 use App\Entity\Fixture;
-use App\Repository\ClubRepository;
 use App\Repository\FixtureRepository;
-use DateMalformedStringException;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
 use Symfony\Component\Panther\Client;
@@ -52,13 +48,13 @@ class CrudFixturesTest extends PantherTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function tearDown(): void
     {
         if ($this->hasFailed()) {
             $client = $this->client;
-            $client->takeScreenshot('var/screenshots/error-' . time() . '.png');
+            $client->takeScreenshot('var/screenshots/error-'.time().'.png');
         }
 
         $this->client->manage()->deleteAllCookies();
@@ -71,7 +67,7 @@ class CrudFixturesTest extends PantherTestCase
     /**
      * @throws NoSuchElementException
      * @throws TimeoutException
-     * @throws DateMalformedStringException
+     * @throws \DateMalformedStringException
      */
     public function testCreateNewFixture(): void
     {
@@ -81,7 +77,7 @@ class CrudFixturesTest extends PantherTestCase
 
         $this->client->waitForElementToContain('body', 'Save');
 
-        $date = (new DateTime())->modify('+17 months');
+        $date = (new \DateTime())->modify('+17 months');
         $dateIn = $date->format('d/m/Y');
         $dateOut = $date->format('j M y');
 
@@ -91,7 +87,7 @@ class CrudFixturesTest extends PantherTestCase
         $club = $this->randomClub();
         $notes = 'I\'m a shade tree mechanic, got a one-ton truck';
 
-        $fixtureAsText = sprintf("%s (%s)", $club->getName(), $homeAway);
+        $fixtureAsText = sprintf('%s (%s)', $club->getName(), $homeAway);
 
         $this->client->submitForm('Save', [
             'fixture[date]' => $dateIn,
@@ -114,19 +110,18 @@ class CrudFixturesTest extends PantherTestCase
     {
         $fixture = $this->randomFixture();
 
-        $this->client->request('GET', '/' . $fixture->getId());
+        $this->client->request('GET', '/'.$fixture->getId());
         $this->client->waitForElementToContain('body', 'Edit');
         $this->client->clickLink('Edit');
         $this->client->waitForElementToContain('body', 'Update');
 
-        $date = (new DateTime())->modify('+3 months');
+        $date = (new \DateTime())->modify('+3 months');
         $dateIn = $date->format('d/m/Y');
-        $homeAway = $fixture->getHomeAway() == HomeAway::Away ? HomeAway::Home->value : HomeAway::Away->value;
-        $competition = $fixture->getCompetition() == Competition::CountyCup ? Competition::NationalCup->value : Competition::CountyCup->value;
-        $team = $fixture->getTeam() == Team::U15B ? Team::U16B->value : Team::U15B->value;
+        $homeAway = HomeAway::Away == $fixture->getHomeAway() ? HomeAway::Home->value : HomeAway::Away->value;
+        $competition = Competition::CountyCup == $fixture->getCompetition() ? Competition::NationalCup->value : Competition::CountyCup->value;
+        $team = Team::U15B == $fixture->getTeam() ? Team::U16B->value : Team::U15B->value;
         $club = $this->randomClub();
         $notes = 'I\'m a shade tree mechanic, got a one-ton truck';
-
 
         $this->client->submitForm('Update', [
             'fixture[date]' => $dateIn,
@@ -160,7 +155,7 @@ class CrudFixturesTest extends PantherTestCase
         $fixture = $this->randomFixture();
         $id = $fixture->getId();
 
-        $this->client->request('GET', '/' . $id);
+        $this->client->request('GET', '/'.$id);
         $crawler = $this->client->waitForElementToContain('body', 'Delete');
         $this->client->waitFor('.btn-delete');
         $crawler->filter('.btn-delete')->click();
@@ -169,28 +164,32 @@ class CrudFixturesTest extends PantherTestCase
         $this->client->wait(5, function () use ($client) {
             try {
                 $client->getWebDriver()->switchTo()->alert();
+
                 return true;
             } catch (\Facebook\WebDriver\Exception\NoAlertOpenException $e) {
                 return false;
             }
         });
         $this->client->getWebDriver()->switchTo()->alert()->accept();
-        $this->client->waitForElementToContain('body', 'Fixture ' . $id . ' deleted');
-        $this->assertStringContainsString('Fixture ' . $id . ' deleted', $crawler->text());
+        $this->client->waitForElementToContain('body', 'Fixture '.$id.' deleted');
+        $this->assertStringContainsString('Fixture '.$id.' deleted', $crawler->text());
 
         // TODO - why doesn't this work
-//        $updatedFixture = $this->fixtureRepository->find($id);
-//        $this->assertNull($updatedFixture);
+        //        $updatedFixture = $this->fixtureRepository->find($id);
+        //        $this->assertNull($updatedFixture);
     }
+
     private function randomClub(): Club
     {
         $all = $this->clubRepository->findAll();
+
         return $all[array_rand($all)];
     }
 
     private function randomFixture(): Fixture
     {
         $all = $this->fixtureRepository->findAll();
+
         return $all[array_rand($all)];
     }
 }

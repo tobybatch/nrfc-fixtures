@@ -46,10 +46,10 @@ class ClubTest extends TestCase
     public function testToStringMethod(): void
     {
         $club = new Club();
-        $this->assertSame('???', (string)$club);
+        $this->assertSame('???', (string) $club);
 
         $club->setName('Norwich RFC');
-        $this->assertSame('Norwich RFC', (string)$club);
+        $this->assertSame('Norwich RFC', (string) $club);
     }
 
     public function testAddAndRemoveFixture(): void

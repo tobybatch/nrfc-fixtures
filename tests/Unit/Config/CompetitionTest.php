@@ -32,4 +32,4 @@ class CompetitionTest extends TestCase
         $this->assertEquals('Norfolk10s', Competition::Norfolk10s->value);
         $this->assertEquals('Conference', Competition::Conference->value);
     }
-} 
+}

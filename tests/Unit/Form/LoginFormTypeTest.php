@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Test\FormBuilderInterface as TestFormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -33,19 +32,20 @@ class LoginFormTypeTest extends TestCase
                     '_username',
                     TextType::class,
                     $this->callback(function (array $options) {
-                        return $options['label'] === 'Email'
-                            && $options['attr']['autocomplete'] === 'username email';
-                    })
+                        return 'Email' === $options['label']
+                            && 'username email' === $options['attr']['autocomplete'];
+                    }),
                 ],
                 [
                     '_password',
                     PasswordType::class,
                     $this->callback(function (array $options) {
                         $notBlankConstraint = new NotBlank(['message' => 'Please enter a password']);
-                        return $options['mapped'] === false
-                            && $options['attr']['autocomplete'] === 'current-password'
+
+                        return false === $options['mapped']
+                            && 'current-password' === $options['attr']['autocomplete']
                             && $options['constraints'][0]->message === $notBlankConstraint->message;
-                    })
+                    }),
                 ]
             );
 

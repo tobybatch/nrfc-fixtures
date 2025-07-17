@@ -4,7 +4,6 @@ namespace App\Service;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PreferencesService
@@ -30,6 +29,7 @@ class PreferencesService
     {
         $preferences = $this->getSession()->get('preferences', []) ?? [];
         $this->logger->debug('Getting preferences', $preferences);
+
         return $preferences;
     }
 

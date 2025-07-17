@@ -2,14 +2,11 @@
 
 namespace App\Tests\E2E;
 
-use AllowDynamicProperties;
 use App\Entity\User;
-use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\PantherTestCase;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserTest extends PantherTestCase
 {
@@ -23,11 +20,10 @@ class UserTest extends PantherTestCase
 
         // Create client once
         $this->client = static::createPantherClient();
-
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function tearDown(): void
     {
@@ -51,7 +47,8 @@ class UserTest extends PantherTestCase
      * @throws NoSuchElementException
      * @throws TimeoutException
      */
-    public function testLogin(): void {
+    public function testLogin(): void
+    {
         $this->createUser();
 
         $this->client->request('GET', '/user/login');
@@ -109,23 +106,23 @@ class UserTest extends PantherTestCase
         $this->assertStringContainsString('Check your email for a magic login link', $crawler->text());
     }
 
-//    /**
-//     * @throws NoSuchElementException
-//     * @throws TimeoutException
-//     */
-//    public function testProfilePage(): void
-//    {
-//        $this->createUser();
-//        $this->client->request('GET', '/user/login');
-//        $this->client->submitForm('Login', [
-//            '_username' => $this->email,
-//            '_password' => $this->password,
-//        ]);
-//        $this->client->waitForElementToContain('body', 'Fixtures for 2025/26');
-//        $this->client->clickLink($this->email);
-//        $this->client->waitForElementToContain('body', 'Your Profile');
-//        // TODO test page elements
-//    }
+    //    /**
+    //     * @throws NoSuchElementException
+    //     * @throws TimeoutException
+    //     */
+    //    public function testProfilePage(): void
+    //    {
+    //        $this->createUser();
+    //        $this->client->request('GET', '/user/login');
+    //        $this->client->submitForm('Login', [
+    //            '_username' => $this->email,
+    //            '_password' => $this->password,
+    //        ]);
+    //        $this->client->waitForElementToContain('body', 'Fixtures for 2025/26');
+    //        $this->client->clickLink($this->email);
+    //        $this->client->waitForElementToContain('body', 'Your Profile');
+    //        // TODO test page elements
+    //    }
 
     private function createUser(): void
     {

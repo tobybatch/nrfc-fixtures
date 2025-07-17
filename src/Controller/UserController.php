@@ -10,11 +10,9 @@ use App\Form\RegistrationFormType;
 use App\Service\MagicLinkService;
 use App\Service\PreferencesService;
 use Doctrine\ORM\EntityManagerInterface;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -27,7 +25,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 #[Route('/user')]
 class UserController extends AbstractController
 {
-
     #[Route('/login', name: 'app_login')]
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
@@ -47,7 +44,7 @@ class UserController extends AbstractController
     #[Route('/login_check', name: 'login_check')]
     public function check(): never
     {
-        throw new LogicException('This code should never be reached');
+        throw new \LogicException('This code should never be reached');
     }
 
     /**
@@ -55,7 +52,7 @@ class UserController extends AbstractController
      */
     #[Route('/magic_login', name: 'app_magic_login')]
     public function requestLoginLink(
-        Request          $request,
+        Request $request,
         MagicLinkService $magicLinkService): Response
     {
         // check if form is submitted
@@ -68,12 +65,14 @@ class UserController extends AbstractController
                     'success', // The type (can be anything: success, error, warning, etc.)
                     'Check your email for a magic login link' // The message
                 );
+
                 return $this->redirectToRoute('app_login');
             } else {
                 $this->addFlash(
                     'error', // The type (can be anything: success, error, warning, etc.)
                     'Unknown email address' // The message
                 );
+
                 return $this->redirectToRoute('app_magic_login');
             }
         }
@@ -85,7 +84,7 @@ class UserController extends AbstractController
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
     /**
@@ -93,12 +92,11 @@ class UserController extends AbstractController
      */
     #[Route('/register', name: 'app_register')]
     public function register(
-        Request                     $request,
+        Request $request,
         UserPasswordHasherInterface $userPasswordHashTool,
-        EntityManagerInterface      $entityManager,
-        MailerInterface             $mailer,
-    ): Response
-    {
+        EntityManagerInterface $entityManager,
+        MailerInterface $mailer,
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -115,7 +113,7 @@ class UserController extends AbstractController
 
             $email = (new TemplatedEmail())
                 ->from(new Address('no-reply@norwichrugby.com', 'Norwich Rugby admin bot'))
-                ->to((string)$user->getEmail())
+                ->to((string) $user->getEmail())
                 ->subject('Welcome to NRFC Fixture')
                 ->htmlTemplate('login/confirmation_email.html.twig');
 
@@ -151,16 +149,16 @@ class UserController extends AbstractController
 
     #[Route('/updatePreferences', name: 'app_update_preferences', methods: ['POST'])]
     public function updatePreferences(
-        Request            $request,
+        Request $request,
         PreferencesService $preferencesService,
-        LoggerInterface    $logger,
-    ): Response
-    {
+        LoggerInterface $logger,
+    ): Response {
         $data = json_decode($request->getContent(), true);
         $logger->debug('Preferences updated', ['data' => $data]);
         foreach ($data as $key => $value) {
             $preferencesService->setPreferences($key, $value);
         }
+
         return new Response(status: 204);
     }
 }
