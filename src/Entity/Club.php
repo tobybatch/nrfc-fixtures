@@ -40,6 +40,9 @@ class Club
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
+    /**
+     * @var array<string>|null
+     */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $aliases = null;
 
@@ -151,11 +154,18 @@ class Club
         return $this;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getAliases(): array
     {
         return $this->aliases;
     }
 
+    /**
+     * @param array<string> $aliases
+     * @return $this
+     */
     public function setAliases(array $aliases): static
     {
         $this->aliases = $aliases;

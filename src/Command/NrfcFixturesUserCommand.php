@@ -60,12 +60,11 @@ class NrfcFixturesUserCommand extends Command
             $io->info('Creating a new user with email of ' . $email);
             $user = new User();
             $user->setEmail($email);
-            $user->setPassword(sha1(rand()));
+            $user->setPassword(strval(sha1(rand())));
         }
-        if ($user) {
-            $io->info('Updating user with email of ' . $email);
-            $user->setRoles($roles);
-        }
+        $io->info('Updating user with email of ' . $email);
+        $user->setRoles($roles);
+
         $this->em->persist($user);
         $this->em->flush();
 

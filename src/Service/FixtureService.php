@@ -22,12 +22,10 @@ class FixtureService
     ): string {
         if (null != $fixture->getClub()) {
             $text = $fixture->getClub()->getName();
-            if ($fixture->getTeam()) {
-                if ($this->teamService->isSenior($fixture->getTeam())) {
-                    $text .= ' ' . substr($fixture->getTeam()->value, 0, 1);
-                } else {
-                    $text .= " " . $fixture->getTeam()->value;
-                }
+            if ($this->teamService->isSenior($fixture->getTeam())) {
+                $text .= ' ' . substr($fixture->getTeam()->value, 0, 1);
+            } else {
+                $text .= " " . $fixture->getTeam()->value;
             }
         } elseif (!empty($fixture->getName())) {
             $text = $fixture->getName();

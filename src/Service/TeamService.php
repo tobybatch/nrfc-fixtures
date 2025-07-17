@@ -6,6 +6,9 @@ use App\Config\Team;
 
 class TeamService
 {
+    /**
+     * @return array<Team>
+     */
     public function getBoys(): array {
         return array(
             Team::Minis,
@@ -17,6 +20,9 @@ class TeamService
         );
     }
 
+    /**
+     * @return array<Team>
+     */
     public function getGirls(): array {
         return array(
             Team::Minis,
@@ -27,6 +33,9 @@ class TeamService
         );
     }
 
+    /**
+     * @return array<Team>
+     */
     public function getSeniors(): array {
         return array(
             Team::FIRST_XV_MEN,
@@ -35,6 +44,9 @@ class TeamService
         );
     }
 
+    /**
+     * @return array<Team>
+     */
     public function getYouth(): array {
         return array(
             Team::Minis,
@@ -70,7 +82,7 @@ class TeamService
         };
     }
 
-    public function isSenior(Team $team)
+    public function isSenior(Team $team): bool
     {
         return in_array($team, $this->getSeniors());
     }

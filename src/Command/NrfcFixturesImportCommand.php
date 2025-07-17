@@ -33,7 +33,6 @@ class NrfcFixturesImportCommand extends Command
 {
     private ObjectManager $em;
     private ClubRepository $clubRepository;
-    private SymfonyStyle $io;
     private TeamService $teamService;
 
     public function __construct(EntityManagerInterface $em, TeamService $teamService, ClubRepository $clubRepository)
@@ -57,7 +56,7 @@ class NrfcFixturesImportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $filePath = $input->getArgument('file');
         $type = $input->getOption('type');
         // $delimiter = $input->getOption('delimiter');
@@ -70,7 +69,7 @@ class NrfcFixturesImportCommand extends Command
         }
 
         if ($type != 'fixture' && $type != 'club') {
-            $this->io->error('Invalid type');
+            $io->error('Invalid type');
             return Command::FAILURE;
         }
 
@@ -79,7 +78,7 @@ class NrfcFixturesImportCommand extends Command
             throw new FileNotFoundException(sprintf('File "%s" not found', $filePath));
         }
 
-        $this->io->title(sprintf('Starting import from %s', $filePath));
+        $io->title(sprintf('Starting import from %s', $filePath));
 
         $file = fopen($filePath, 'r');
         $importedCount = 0;
@@ -92,7 +91,7 @@ class NrfcFixturesImportCommand extends Command
             foreach ($row as $column => $team) {
                 $t = $this->teamService->getBy(trim($team));
                 if (!$t) {
-                    $this->io->warning(sprintf('Team "%s" not found', $team));
+                    $io->warning(sprintf('Team "%s" not found', $team));
                     continue;
                 }
                 $teamList[$t->value] = $column;
@@ -106,18 +105,18 @@ class NrfcFixturesImportCommand extends Command
                 try {
                     if ($type == 'fixture') {
                         if (empty($row[0])) {
-                            $this->io->warning(sprintf("Row %d, has no date: %s", $rowNumber, implode(", ", $row)));
+                            $io->warning(sprintf("Row %d, has no date: %s", $rowNumber, implode(", ", $row)));
                         }
                         $_date = DateTime::createFromFormat('j-M-y', $row[0]);
                         if (!$_date) {
-                            $this->io->warning(sprintf("Row %d has an invalid date: %s", $rowNumber, implode(", ", $row)));
+                            $io->warning(sprintf("Row %d has an invalid date: %s", $rowNumber, implode(", ", $row)));
                             continue;
                         }
                         $date = DateTimeImmutable::createFromMutable($_date)->setTime(0, 0);
-                        foreach ($teamList as $team => $column) {
-                            $team = $this->teamService->getBy($team);
+                        foreach ($teamList as $t => $column) {
+                            $team = $this->teamService->getBy($t);
                             if (!$team) {
-                                $this->io->warning(sprintf('Team "%s" not found', $team->value));
+                                $io->warning(sprintf('Team "%s" not found', $t));
                                 continue;
                             }
                             $this->createFixture($team, $date, $row[$column]);
@@ -132,10 +131,10 @@ class NrfcFixturesImportCommand extends Command
                     if (0 === $importedCount % $batchSize) {
                         $this->em->flush();
                         $this->em->clear(); // Detaches all objects from Doctrine
-                        $this->io->comment(sprintf('Processed %d records', $importedCount));
+                        $io->comment(sprintf('Processed %d records', $importedCount));
                     }
                 } catch (Exception $e) {
-                    $this->io->warning(sprintf(
+                    $io->warning(sprintf(
                         'Error processing row %d: %s. Row data: %s',
                         $rowNumber,
                         $e->getMessage(),
@@ -151,11 +150,11 @@ class NrfcFixturesImportCommand extends Command
 
             fclose($file);
 
-            $this->io->success(sprintf('Successfully imported %d records', $importedCount));
+            $io->success(sprintf('Successfully imported %d records', $importedCount));
 
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $this->io->error(sprintf('Import failed: %s', $e->getMessage()));
+            $io->error(sprintf('Import failed: %s', $e->getMessage()));
 
             return Command::FAILURE;
         }
@@ -205,7 +204,7 @@ class NrfcFixturesImportCommand extends Command
     private function parseDetail(string $detail): array
     {
         if (in_array(strtolower(trim($detail)), ['training', 'skills session'])) {
-            return ['Training', Competition::Training, HomeAway::Home, null];
+            return ['Training', Competition::Training, HomeAway::Home, null, null];
         }
 
         // is CB or Pathway
@@ -214,7 +213,7 @@ class NrfcFixturesImportCommand extends Command
             || str_contains(strtolower(trim($detail)), 'pathway')
             || str_contains(strtolower(trim($detail)), 'academy')
         ) {
-            return [ucwords($detail), Competition::Pathway, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::Pathway, HomeAway::TBA, null, null];
         }
         // is county cup / colts cup
         if (
@@ -225,27 +224,27 @@ class NrfcFixturesImportCommand extends Command
             || str_contains(strtolower(trim($detail)), 'cup semi')
             || str_contains(strtolower(trim($detail)), 'cup final')
         ) {
-            return [ucwords($detail), Competition::CountyCup, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::CountyCup, HomeAway::TBA, null, null];
         }
         // is festival
         if (str_contains(strtolower(trim($detail)), 'festival')) {
-            return [ucwords($detail), Competition::Festival, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::Festival, HomeAway::TBA, null, null];
         }
         // is national cup
         if (str_contains(strtolower(trim($detail)), 'nat cup')) {
-            return [ucwords($detail), Competition::NationalCup, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::NationalCup, HomeAway::TBA, null, null];
         }
         // is norfolk 10s
         if (str_contains(trim($detail), 'Norfolk10s')) {
-            return [$detail, Competition::Norfolk10s, HomeAway::TBA, null];
+            return [$detail, Competition::Norfolk10s, HomeAway::TBA, null, null];
         }
         // is Conference
         if (str_contains(strtolower(trim($detail)), 'conference')) {
-            return [ucwords($detail), Competition::Conference, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::Conference, HomeAway::TBA, null, null];
         }
         // is special day
         if (in_array(strtolower(trim($detail)), ['mothering sunday', 'christmas', 'easter', 'out of season'])) {
-            return [ucwords($detail), Competition::None, HomeAway::TBA, null];
+            return [ucwords($detail), Competition::None, HomeAway::TBA, null, null];
         }
 
         // we've got this far, we think it's a club game

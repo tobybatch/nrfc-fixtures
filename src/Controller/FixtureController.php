@@ -299,7 +299,7 @@ final class FixtureController extends AbstractController
 
     // This will be removed when we get to the new website
     #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
-    public function forOldWebsite(Request $request, TeamService $teamService, SerializerInterface $serializer): Response|JsonResponse
+    public function forOldWebsite(Request $request, TeamService $teamService, FixtureService $fixtureService, SerializerInterface $serializer): Response|JsonResponse
     {
         $team = $teamService->getBy($request->query->get('team'));
         $fixtures = [];
@@ -310,7 +310,7 @@ final class FixtureController extends AbstractController
                 $fixture = $_fixtures[0];
                 $fixtures[] = [
                     "id" => $fixture->getId(),
-                    "opponent" => $fixture->format(false),
+                    "opponent" => $fixtureService->format($fixture, false),
                     "competition" => $this->translateCompetition($fixture->getCompetition()),
                     "venue" => $fixture->getHomeAway() == HomeAway::Home ? 'home' : 'away',
                     "date" => $date,
@@ -327,7 +327,7 @@ final class FixtureController extends AbstractController
         return new Response("Unsupported accept type", 400);
     }
 
-    private function translateCompetition($competition): string|null
+    private function translateCompetition(Competition $competition): string|null
     {
         return match ($competition) {
             Competition::CountyCup, Competition::NationalCup => 'cup',

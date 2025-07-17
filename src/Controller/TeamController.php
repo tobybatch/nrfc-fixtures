@@ -33,10 +33,10 @@ final class TeamController extends AbstractController
             "Under 14s Girls" => new JsonResponse(['name' => Team::U14G]),
             "Under 16s Girls" => new JsonResponse(['name' => Team::U16G]),
             "Under 18s Girls" => new JsonResponse(['name' => Team::U18G]),
-            "1st XV" => new JsonResponse(['name' => Team::FIRST_XV]),
-            "2nd XV Team (Lions)" => new JsonResponse(['name' => Team::LIONS]),
-            "3rd XV (AXV)" => new JsonResponse(['name' => Team::AXV]),
-            "Senior Women" => new JsonResponse(['name' => Team::SENIOR_WOMEN]),
+            "1st XV" => new JsonResponse(['name' => Team::FIRST_XV_MEN]),
+            "2nd XV Team (Lions)" => new JsonResponse(['name' => Team::SECOND_XV_MEN]),
+            "3rd XV (AXV)" => new JsonResponse(['name' => Team::THIRD_XV_MEN]),
+            "Senior Women" => new JsonResponse(['name' => Team::FIRST_XV_WOMEN]),
             default => (function () use ($name, $logger) {
                 $logger->error("Unsupported team name: $name");
                 return new JsonResponse(
@@ -47,6 +47,10 @@ final class TeamController extends AbstractController
         };
     }
 
+    /**
+     * @param string $message
+     * @return string[]
+     */
     private function error(string $message): array
     {
         return [
