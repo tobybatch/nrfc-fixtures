@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+    <h1 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {{ include('admin/components/admin_lozenge.html.twig', {
+            link_path: path('admin_export_clubs'),
+            link_title: 'Export Club Data',
+            link_description: 'Download a CSV of club data.'
+        }) }}
+
+        {{ include('admin/components/admin_lozenge.html.twig', {
+            link_path: path('admin_export_fixtures'),
+            link_title: 'Export Fixture Data',
+            link_description: 'Download a CSV of fixture data.'
+        }) }}
+
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {{ include('admin/components/import.html.twig', { title: 'Club', form: club_form }) }}
+
+        {{ include('admin/components/import.html.twig', { title: 'Fixture', form: fixture_form }) }}
+
+    </div>
+{% endblock %}

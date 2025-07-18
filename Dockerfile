@@ -63,7 +63,7 @@ RUN apk add --no-cache \
     libpng-dev \
     # icu
     icu-dev \
-    icu-data-full \
+    icu-admin-full \
     # ldap
     openldap-dev \
     libldap \
@@ -129,7 +129,7 @@ RUN apk add --no-cache \
         freetype \
         haveged \
         icu \
-        icu-data-full \
+        icu-admin-full \
         libldap \
         libpng \
         libpq-dev \
@@ -197,7 +197,7 @@ ENV TIMEZONE=${TIMEZONE}
 RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone && \
     # make composer home dir
     mkdir /composer  && \
-    chown -R www-data:www-data /composer
+    chown -R www-admin:www-admin /composer
 
 # copy composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
@@ -264,7 +264,7 @@ ENV VERSION=${VERSION}
 ENV TIMEZONE=${TIMEZONE}
 RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone && \
     mkdir -p /composer  && \
-    chown -R www-data:www-data /composer
+    chown -R www-admin:www-admin /composer
 
 # copy startup script & DB checking script
 COPY .docker/dbtest.php /dbtest.php
@@ -309,11 +309,11 @@ RUN \
     composer --no-ansi install --working-dir=/opt/nrfcfixtures --optimize-autoloader && \
     composer --no-ansi clearcache && \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
+    chown -R www-admin:www-admin /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
+    chown -R www-admin:www-admin /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     yarn --cwd /opt/nrfcfixtures && \
     yarn --cwd /opt/nrfcfixtures build && \
     curl -sS https://get.symfony.com/cli/installer | bash && \
@@ -345,7 +345,7 @@ RUN composer --no-ansi clearcache && \
     sed -i "s/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 604800/g" /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
+    chown -R www-admin:www-admin /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     yarn --cwd /opt/nrfcfixtures && \
     yarn --cwd /opt/nrfcfixtures build && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt

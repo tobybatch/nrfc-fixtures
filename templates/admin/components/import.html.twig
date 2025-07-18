@@ -1,0 +1,10 @@
+{% block body %}
+    <div class="block p-6 bg-white rounded-2xl mt-4 shadow hover:shadow-md transition">
+        <h2 class="text-xl font-semibold text-secondary mb-2">Import {{ title }} from CSV</h2>
+
+        {{ form_start(form) }}
+        {{ form(form) }}
+        <button class="btn btn-primary">Upload</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

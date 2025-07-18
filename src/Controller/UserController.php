@@ -154,7 +154,7 @@ class UserController extends AbstractController
         LoggerInterface $logger,
     ): Response {
         $data = json_decode($request->getContent(), true);
-        $logger->debug('Preferences updated', ['data' => $data]);
+        $logger->debug('Preferences updated', ['admin' => $data]);
         foreach ($data as $key => $value) {
             $preferencesService->setPreferences($key, $value);
         }

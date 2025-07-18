@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 #[AsCommand(
     name: 'nrfc:fixtures:import',
-    description: 'Import data from CSV file and create entities'
+    description: 'Import admin from CSV file and create entities'
 )]
 class NrfcFixturesImportCommand extends Command
 {
@@ -43,8 +43,8 @@ class NrfcFixturesImportCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Import data from CSV file and create entities')
-            ->setHelp('This command allows you to import fixture data from a CSV file and create corresponding entities in the database.')
+            ->setDescription('Import admin from CSV file and create entities')
+            ->setHelp('This command allows you to import fixture admin from a CSV file and create corresponding entities in the database.')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the CSV file')
             ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'club/fixture', 'fixture')
             // ->addOption('delimiter', 'd', InputOption::VALUE_OPTIONAL, 'CSV delimiter', ',')
@@ -133,7 +133,7 @@ class NrfcFixturesImportCommand extends Command
                     }
                 } catch (\Exception $e) {
                     $io->warning(sprintf(
-                        'Error processing row %d: %s. Row data: %s',
+                        'Error processing row %d: %s. Row admin: %s',
                         $rowNumber,
                         $e->getMessage(),
                         implode(',', $row)

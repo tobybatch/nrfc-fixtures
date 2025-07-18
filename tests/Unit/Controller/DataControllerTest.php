@@ -10,7 +10,7 @@ final class DataControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/data');
+        $client->request('GET', '/admin');
 
         self::assertResponseIsSuccessful();
     }

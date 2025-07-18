@@ -50,7 +50,7 @@ class NrfcFixturesImportCommandTest extends TestCase
         $command = new NrfcFixturesImportCommand($this->entityManager, $this->teamService, $this->clubRepository);
         $application->add($command);
 
-        $this->assertEquals('Import data from CSV file and create entities', $command->getDescription());
+        $this->assertEquals('Import admin from CSV file and create entities', $command->getDescription());
         $this->assertNotEmpty($command->getHelp());
 
         $definition = $command->getDefinition();
