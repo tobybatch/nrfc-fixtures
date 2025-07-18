@@ -28,4 +28,13 @@ class ClubRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findOneByNameInsensitive(string $name): ?Club
+    {
+        return $this->createQueryBuilder('c')
+            ->where('LOWER(c.name) = :name')
+            ->setParameter('name', mb_strtolower($name))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
