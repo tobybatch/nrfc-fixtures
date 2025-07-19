@@ -7,3 +7,13 @@ import './bootstrap.js';
  */
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
+
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+
+flatpickr(".js-datepicker", {
+    dateFormat: "d/m/Y", // matches 'dd/MM/yyyy' in PHP
+    allowInput: true,
+    altInput: true,
+    altFormat: "d/m/Y",
+});

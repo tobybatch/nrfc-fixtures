@@ -23,7 +23,7 @@ class Users extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->makeUser($manager, self::BASIC_USER);
-        $this->makeUser($manager, self::ADMIN_USER, ['ROLE_ADMIN']);
+        $this->makeUser($manager, self::ADMIN_USER, ['ROLE_ADMIN', 'ROLE_EDITOR']);
         $this->makeUser($manager, self::EDITOR_USER, ['ROLE_EDITOR']);
     }
 
