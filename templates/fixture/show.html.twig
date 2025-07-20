@@ -14,6 +14,10 @@
         {% endif %}
         <tbody>
         <tr>
+            <th class="text-left pr-2">Display Name</th>
+            <td class="text-left">{{ fixture.name }}</td>
+        </tr>
+        <tr>
             <th class="text-left pr-2">Date</th>
             <td class="text-left">{{ fixture.date ? fixture.date|date('Y-m-d') : 'TBA' }}</td>
         </tr>
