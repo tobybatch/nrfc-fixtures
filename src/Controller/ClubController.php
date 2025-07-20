@@ -26,7 +26,9 @@ final class ClubController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $club = new Club();
-        $form = $this->createForm(ClubType::class, $club);
+        $form = $this->createForm(ClubType::class, $club, [
+        'csrf_protection' => false,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -51,7 +53,9 @@ final class ClubController extends AbstractController
     #[Route('/{id}/edit', name: 'app_club_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Club $club, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ClubType::class, $club);
+        $form = $this->createForm(ClubType::class, $club, [
+        'csrf_protection' => false,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

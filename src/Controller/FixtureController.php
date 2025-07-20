@@ -126,7 +126,9 @@ final class FixtureController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $fixture = new Fixture();
-        $form = $this->createForm(FixtureType::class, $fixture);
+        $form = $this->createForm(FixtureType::class, $fixture, [
+        'csrf_protection' => false,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -153,7 +155,9 @@ final class FixtureController extends AbstractController
     #[Route('/{id}/edit', name: 'app_fixture_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Fixture $fixture, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(FixtureType::class, $fixture);
+        $form = $this->createForm(FixtureType::class, $fixture,  [
+            'csrf_protection' => false,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

@@ -30,7 +30,9 @@ final class PreferencesController extends AbstractController
     {
         $this->logger->debug('Preferences', ['preferences' => $request->request->all()]);
         $displayOptions = new FixturesDisplayOptionsDTO();
-        $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions);
+        $teamsForm = $this->createForm(FixturesDisplayOptionsForm::class, $displayOptions,  [
+            'csrf_protection' => false,
+        ]);
         $teamsForm->handleRequest($request);
         if ($teamsForm->isSubmitted() && $teamsForm->isValid()) {
             $this->logger->warning('is valid');
