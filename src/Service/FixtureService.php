@@ -16,15 +16,16 @@ class FixtureService
 
     public function format(
         Fixture $fixture,
-        bool $incHA = true,
-        bool $incComp = false,
-    ): string {
+        bool    $incHA = true,
+        bool    $incComp = false,
+    ): string
+    {
         if (null != $fixture->getClub()) {
             $text = $fixture->getClub()->getName();
             if ($this->teamService->isSenior($fixture->getTeam())) {
-                $text .= ' '.substr($fixture->getTeam()->value, 0, 1);
+                $text .= ' ' . substr($fixture->getTeam()->value, 0, 1);
             } else {
-                $text .= ' '.$fixture->getTeam()->value;
+                $text .= ' ' . $fixture->getTeam()->value;
             }
         } elseif (!empty($fixture->getName())) {
             $text = $fixture->getName();
@@ -34,12 +35,14 @@ class FixtureService
             $text = 'Training?';
         }
 
-        if ($incHA) {
-            $text .= ' ('.$fixture->getHomeAway()->value.')';
-        }
+        if ($text != 'Training?') {
+            if ($incHA) {
+                $text .= ' (' . $fixture->getHomeAway()->value . ')';
+            }
 
-        if ($incComp && $fixture->getCompetition() !== Competition::None) {
-            $text .= ' ['.$fixture->getCompetition()->shortValue().']';
+            if ($incComp && $fixture->getCompetition() !== Competition::None) {
+                $text .= ' [' . $fixture->getCompetition()->shortValue() . ']';
+            }
         }
 
         return $text;

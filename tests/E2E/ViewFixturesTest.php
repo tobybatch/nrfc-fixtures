@@ -67,7 +67,7 @@ class ViewFixturesTest extends PantherTestCase
     // Data table
     public function testDataTable()
     {
-        $crawler = $this->client->request('GET', '/'); // Adjust URL as needed
+        $crawler = $this->client->request('GET', '/?team=boys'); // Adjust URL as needed
 
         // Target the table headers
         $rows = $crawler->filter('table tbody tr');
@@ -133,7 +133,7 @@ class ViewFixturesTest extends PantherTestCase
         $this->assertCount(1, $headers, 'Incorrect number of table headers.');
 
         $rows = $crawler->filter('table tbody tr');
-        $this->assertCount(6, $rows, 'Incorrect number of table rows.');
+        $this->assertCount(7, $rows, 'Incorrect number of table rows.');
 
         $headers = $crawler->filter('table tbody tr th');
         $headers->each(function ($node, $index) {

@@ -61,7 +61,7 @@ class FixtureRepository extends ServiceEntityRepository
         $fixtures = [];
 
         foreach ($teams as $team) {
-            $fixtures[$team->value] = $this->$this->getFixturesForTeam($team, $date);
+            $fixtures[$team->value] = $this->getFixturesForTeam($team, $date);
         }
 
         return $fixtures;

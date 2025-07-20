@@ -87,7 +87,7 @@ class CrudFixturesTest extends PantherTestCase
         $club = $this->randomClub();
         $notes = 'I\'m a shade tree mechanic, got a one-ton truck';
 
-        $fixtureAsText = sprintf('%s (%s)', $club->getName(), $homeAway);
+        $fixtureAsText = sprintf('%s %s (%s)', $club->getName(), $team, $homeAway);
 
         $this->client->submitForm('Save', [
             'fixture[date]' => $dateIn,

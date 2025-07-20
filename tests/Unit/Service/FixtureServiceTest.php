@@ -74,7 +74,7 @@ class FixtureServiceTest extends TestCase
         $fixture->method('getCompetition')->willReturn(Competition::None);
         $fixture->method('getHomeAway')->willReturn(HomeAway::Home);
 
-        $expected = 'Friendly Match';
+        $expected = 'Friendly Match (H)';
         $this->assertSame($expected, $this->fixtureService->format($fixture));
     }
 
