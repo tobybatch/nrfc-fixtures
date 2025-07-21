@@ -156,9 +156,9 @@ class Club
     }
 
     /**
-     * @return array<string>
+     * @return array<string>|null
      */
-    public function getAliases(): array
+    public function getAliases(): ?array
     {
         return $this->aliases;
     }

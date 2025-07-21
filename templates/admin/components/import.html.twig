@@ -1,0 +1,13 @@
+{% block body %}
+    <div class="block p-6 bg-white rounded-2xl mt-4 shadow hover:shadow-md transition">
+        <h2 class="text-xl font-semibold text-secondary mb-2">Import {{ title }} from CSV</h2>
+
+        {{ form_start(form) }}
+        {{ form_row(form.csv) }}
+        {{ form_widget(form._token) }}
+        <button class="btn btn-primary inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Upload
+        </button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

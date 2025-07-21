@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+    <h1 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {{ include('admin/components/admin_lozenge.html.twig', {
+            link_path: path('admin_import_export'),
+            link_title: 'Import/Export Data',
+            link_description: 'Upload/Download a CSV files to import fixture or club data.'
+        }) }}
+
+        {{ include('admin/components/admin_lozenge.html.twig', {
+            link_path: path('admin_index'),
+            link_title: 'Manage Users',
+            link_description: 'View, create, edit or delete users.'
+        }) }}
+
+    </div>
+{% endblock %}

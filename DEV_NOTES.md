@@ -52,3 +52,12 @@ git-cliff --latest -o CHANGELOG.md
 git-cliff v1.0.0..HEAD -o CHANGELOG.md
 
 ```
+
+## Dev bare bones tear up
+
+```
+docker compose down
+docker compose up -d
+./bin/console doctrine:schema:create
+
+```

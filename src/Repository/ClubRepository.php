@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Club>
+ * @method findOneByNameInsensitive(string $name)
  */
 class ClubRepository extends ServiceEntityRepository
 {
