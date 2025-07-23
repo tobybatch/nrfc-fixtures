@@ -5,11 +5,15 @@ namespace App\Controller;
 use App\Config\Competition;
 use App\Config\HomeAway;
 use App\Config\Team;
+use App\DTO\ImportExportDTO;
 use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Form\CsvUploadType;
 use App\Repository\ClubRepository;
 use App\Repository\FixtureRepository;
+use App\Service\ImportExportService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,7 +42,8 @@ final class AdminController extends AbstractController
     public function importExport(
         Request                $request,
         EntityManagerInterface $em,
-        ClubRepository         $clubRepository
+        ImportExportService    $importExportService,
+        ClubRepository         $clubRepository,
     ): Response
     {
         // Instantiate forms
@@ -48,142 +53,51 @@ final class AdminController extends AbstractController
         $clubForm->handleRequest($request);
         $fixtureForm->handleRequest($request);
 
-        $messages = [];
-        $errors = [];
+        $result = null;
 
         // Handle Club CSV
         if ($clubForm->isSubmitted() && $clubForm->isValid()) {
-            $result = $this->handleClubCsv($clubForm->get('csv')->getData(), $em, $clubRepository);
-            $messages[] = $result['message'];
-            $errors = array_merge($errors, $result['errors']);
+            $handle = fopen($clubForm->get('csv')->getData(), 'r');
+            $result = $importExportService->readClubsFromCsvFile($handle);
+            fclose($handle);
+            $em->flush();
         }
 
         // Handle Fixture CSV
         if ($fixtureForm->isSubmitted() && $fixtureForm->isValid()) {
-            $result = $this->handleFixtureCsv($fixtureForm->get('csv')->getData(), $em, $clubRepository);
-            $messages[] = $result['message'];
-            $errors = array_merge($errors, $result['errors']);
+            $handle = fopen($clubForm->get('csv')->getData(), 'r');
+            $result = $importExportService->readFixturesFromCsvFile($handle);
+            fclose($handle);
+            $em->flush();
         }
 
         return $this->render('admin/import_export.html.twig', [
             'club_form' => $clubForm->createView(),
             'fixture_form' => $fixtureForm->createView(),
-            'messages' => $messages,
-            'errors' => $errors,
+            'result' => $result,
         ]);
     }
 
-    private function handleClubCsv($file, EntityManagerInterface $em, ClubRepository $clubRepo): array
+    #[Route('/clubs/initialise', name: 'admin_clubs_initialise')]
+    public function initialiseClubs(ParameterBagInterface $bag, ImportExportService $importExportService, LoggerInterface $logger): Response
     {
-        $errors = [];
-        $successCount = 0;
+        $pathFromPublicFolder = '../' . $bag->get('asset_path_clubs');
+        $logger->info($pathFromPublicFolder);
+        $handle = fopen($pathFromPublicFolder, 'r+');
+        $result = $importExportService->readClubsFromCsvFile($handle);
+        fclose($handle);
 
-        $handle = fopen($file->getPathname(), 'r');
-        $header = fgetcsv($handle);
-        $rowNum = 1;
-
-        while (($data = fgetcsv($handle)) !== false) {
-            $rowNum++;
-            try {
-                $row = array_combine($header, $data);
-                $name = trim($row['Name'] ?? '');
-                if ($name === '') {
-                    $errors[] = "Club row $rowNum: Missing name.";
-                    continue;
-                }
-
-                $club = $clubRepo->findOneByNameInsensitive($name) ?? new Club();
-                $club->setName($name);
-                $club->setAddress($row['Address'] ?? null);
-                $club->setLatitude(isset($row['Latitude']) ? (float)$row['Latitude'] : null);
-                $club->setLongitude(isset($row['Longitude']) ? (float)$row['Longitude'] : null);
-                $club->setNotes($row['Notes'] ?? null);
-
-                if (!empty($row['Aliases'])) {
-                    $aliases = json_decode($row['Aliases'], true);
-                    if (json_last_error() === JSON_ERROR_NONE && is_array($aliases)) {
-                        $club->setAliases($aliases);
-                    } else {
-                        $errors[] = "Club row $rowNum: Invalid JSON in 'Aliases'.";
-                    }
-                }
-
-                $em->persist($club);
-                $successCount++;
-            } catch (\Throwable $e) {
-                $errors[] = "Club row $rowNum: " . $e->getMessage();
-            }
+        // This should never error but just in case
+        foreach ($result->getErrors() as $error) {
+            $logger->error($error);
+            $this->addFlash('danger', $error);
         }
 
-        fclose($handle);
-        $em->flush();
-
-        return [
-            'message' => "$successCount clubs processed.",
-            'errors' => $errors,
-        ];
+        $this->addFlash('success', sprintf('%d Clubs imported successfully', $result->getSuccessCount()));
+        return $this->redirectToRoute('app_club_index');
     }
 
-    private function handleFixtureCsv($file, EntityManagerInterface $em, ClubRepository $clubRepo): array
-    {
-        $errors = [];
-        $successCount = 0;
-
-        $handle = fopen($file->getPathname(), 'r');
-        $header = fgetcsv($handle);
-        $rowNum = 1;
-
-        while (($data = fgetcsv($handle)) !== false) {
-            $rowNum++;
-            try {
-                $row = array_combine($header, $data);
-
-                $club = $clubRepo->findOneByNameInsensitive(trim($row['Club'] ?? ''));
-                if (!$club) {
-                    $errors[] = "Fixture row $rowNum: Club '{$row['Club']}' not found.";
-                    continue;
-                }
-
-                $name = new \DateTimeImmutable($row['Name'] ?? '');
-                $date = new \DateTimeImmutable($row['Date'] ?? 'now');
-                $homeAway = HomeAway::tryFrom($row['HomeAway'] ?? '');
-                $competition = Competition::tryFrom($row['Competition'] ?? '');
-                $team = Team::tryFrom($row['Team'] ?? '');
-                $opponent = isset($row['Opponent']) ? Team::tryFrom($row['Opponent']) : null;
-
-                if (!$homeAway || !$competition || !$team) {
-                    $errors[] = "Fixture row $rowNum: Invalid enum value.";
-                    continue;
-                }
-
-                $fixture = new Fixture();
-                $fixture->setName($name);
-                $fixture->setDate($date);
-                $fixture->setClub($club);
-                $fixture->setHomeAway($homeAway);
-                $fixture->setCompetition($competition);
-                $fixture->setTeam($team);
-                $fixture->setOpponent($opponent);
-                $fixture->setName($row['Name'] ?? null);
-                $fixture->setNotes($row['Notes'] ?? null);
-
-                $em->persist($fixture);
-                $successCount++;
-            } catch (\Throwable $e) {
-                $errors[] = "Fixture row $rowNum: " . $e->getMessage();
-            }
-        }
-
-        fclose($handle);
-        $em->flush();
-
-        return [
-            'message' => "$successCount fixtures imported.",
-            'errors' => $errors,
-        ];
-    }
-
-    #[Route('/clubs/export', name: 'admin_export_clubs')]
+    #[Route('/clubs/export', name: 'admin_clubs_export')]
     public function exportClubs(): Response
     {
         $clubs = $this->clubRepository->findAll();
@@ -219,7 +133,7 @@ final class AdminController extends AbstractController
         );
     }
 
-    #[Route('/fixtures/export', name: 'admin_export_fixtures')]
+    #[Route('/fixtures/export', name: 'admin_fixtures_export')]
     public function fixtures(FixtureRepository $fixtureRepository): Response
     {
         $fixtures = $fixtureRepository->findAll();

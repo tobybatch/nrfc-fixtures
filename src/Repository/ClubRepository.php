@@ -10,7 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Club>
- * @method findOneByNameInsensitive(string $name)
  */
 class ClubRepository extends ServiceEntityRepository
 {
@@ -28,5 +27,14 @@ class ClubRepository extends ServiceEntityRepository
             ->orderBy('c.name', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneByNameInsensitive(string $name): ?Club
+    {
+        return $this->createQueryBuilder('c')
+            ->where('LOWER(c.name) = :name')
+            ->setParameter('name', mb_strtolower($name))
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

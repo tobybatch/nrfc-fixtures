@@ -123,10 +123,12 @@ RUN docker-php-ext-install -j$(nproc) opcache
 
 FROM php:8.3-fpm-alpine AS fpm-base
 ARG TIMEZONE
+# TODO get rid of git from the final image, we'll need to the compose install and stuff in a new image
 RUN apk add --no-cache \
         bash \
         coreutils \
         freetype \
+        git \
         haveged \
         icu \
         icu-data-full \
@@ -159,9 +161,11 @@ HEALTHCHECK --interval=20s --timeout=10s --retries=3 \
 
 FROM php:8.3-apache-bookworm AS apache-base
 ARG TIMEZONE
+# TODO get rid of git from the final image, we'll need to the compose install and stuff in a new image
 RUN apt-get update && \
     apt-get install -y \
         bash \
+        git \
         haveged \
         libicu72 \
         libldap-common \
