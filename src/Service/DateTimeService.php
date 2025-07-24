@@ -31,9 +31,9 @@ class DateTimeService
                 $month = intval($matches['month']);
                 $year = intval($matches['year']);
 
-                $hour = intval($matches['hour']);
-                $minute = intval($matches['minute']);
-                $second = intval($matches['second']);
+                $hour = in_array('hour', $matches) ? intval($matches['hour']) : 0;
+                $minute = in_array('minute', $matches) ? intval($matches['minute']) : 0;
+                $second = in_array('second', $matches) ? intval($matches['second']) : 0;
 
                 // Validate the date components
                 if (!checkdate($month, $day, $year)) {

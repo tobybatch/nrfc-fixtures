@@ -10,6 +10,8 @@ use App\DTO\TeamImportDTO;
 use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Repository\ClubRepository;
+use App\Repository\FixtureRepository;
+use App\Service\TeamService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\InvalidArgumentException;
@@ -23,14 +25,15 @@ class ImportExportService
     private DateTimeService $datetimeService;
     private LoggerInterface $logger;
     private CompetitionService $competitionService;
+    private FixtureRepository $fixtureRepository;
 
     public function __construct(
         EntityManagerInterface $em,
-        ClubRepository $clubRepo,
-        TeamService $teamService,
-        DateTimeService $datetimeService,
-        CompetitionService $competitionService,
-        LoggerInterface $logger
+        ClubRepository         $clubRepo,
+        TeamService            $teamService,
+        DateTimeService        $datetimeService,
+        CompetitionService     $competitionService,
+        LoggerInterface        $logger, FixtureRepository $fixtureRepository,
     )
     {
         $this->entityManager = $em;
@@ -39,6 +42,7 @@ class ImportExportService
         $this->datetimeService = $datetimeService;
         $this->competitionService = $competitionService;
         $this->logger = $logger;
+        $this->fixtureRepository = $fixtureRepository;
     }
 
     /**
@@ -77,7 +81,12 @@ class ImportExportService
                     continue;
                 }
 
-                $club = $this->clubRepo->findOneByNameInsensitive($name) ?? new Club();
+                $isUpdate = true;
+                $club = $this->clubRepo->findOneByNameInsensitive($name);
+                if ($club === null) {
+                    $club = new Club();
+                    $isUpdate = false;
+                }
                 $club->setName($name);
                 $club->setAddress($row['Address'] ?? null);
                 $club->setLatitude(isset($row['Latitude']) ? (float)$row['Latitude'] : null);
@@ -92,11 +101,13 @@ class ImportExportService
                         $status->addError("Club row $rowNum: Invalid JSON in 'Aliases'.");
                     }
                 }
-                
-                $this->logger->info($club);
 
                 $this->entityManager->persist($club);
-                $status->incrementSuccessCount();
+                if ($isUpdate) {
+                    $status->incrementUpdateCount();
+                } else {
+                    $status->incrementSuccessCount();
+                }
             } catch (\Throwable $e) {
                 $status->addError("Club row $rowNum: " . $e->getMessage());
             }
@@ -156,14 +167,14 @@ class ImportExportService
         return $status;
     }
 
-    public function importFixtures($handle): ImportExportDTO
+    public function importFixtures(mixed $handle): ImportExportDTO
     {
         $status = new ImportExportDTO();
         $headers = fgetcsv($handle);
         $teams = [];
 
         // Headers should be Date, Team name, Team name, ....
-        for ($i = 1; $i <= count($headers); $i++) {
+        for ($i = 1; $i < count($headers); $i++) {
             $team = $this->teamService->getBy(trim($headers[$i]));
             if ($team) {
                 $teams[] = new TeamImportDTO($team, $i);
@@ -192,28 +203,46 @@ class ImportExportService
             foreach ($teams as $teamDto) {
                 $team = $teamDto->getTeam();
                 $col = $teamDto->getColumn();
-                $fixture = new Fixture();
-                $fixture->setName($row[$col]);
+                $name = $row[$col];
+                if (empty($name)) {
+                    continue;
+                }
+                $fixture = $this->fixtureRepository->findOneBy(['date' => $date, 'name' => $name]);
+                if (!$fixture) {
+                    $fixture = new Fixture();
+                }
+                $fixture->setName($name);
                 $fixture->setDate($date);
                 $fixture->setTeam($team);
                 // early check for training
-                if (strtolower($fixture->getName()) === 'training') {
+                if (strtolower($name) === 'training') {
                     $fixture->setCompetition(Competition::Training);
                     $this->entityManager->persist($fixture);
+                    continue;
                 }
+                // early check for minis festival
+                if (strtolower($name) === 'norwich mini festival') {
+                    if ($team->value === Team::Minis) {
+                        $fixture->setCompetition(Competition::Festival);
+                        $this->entityManager->persist($fixture);
+                        continue;
+                    } else {
+                        continue;
+                    }
+                }
+
                 // try and do club and opponent
-                $clubAndTeam = trim(strtok($fixture->getName(), '('));
-                $club = $this->clubRepo->findByNameStartingWith($clubAndTeam);
-                if ($club) {
-                    $fixture->setClub($club);
-                    $oppo = $this->clubRepo->findOpponent($clubAndTeam, $club);
-                    if ($oppo) {
+                $clubAndTeam = trim(substr($name, 0, strpos($name, '(')));
+                if (!empty($clubAndTeam)) {
+                    $club = $this->clubRepo->findByNameStartingWith($clubAndTeam);
+                    if ($club) {
+                        $fixture->setClub($club);
+                        $oppo = $this->teamService->findOpponent($clubAndTeam, $team);
                         $fixture->setOpponent($oppo);
                     }
                 }
                 // try and do home/away
-                $string = "Beccles (A)";
-                if (preg_match('/\(([A-Za-z])\)/', $fixture->getName(), $matches)) {
+                if (preg_match('/\(([A-Za-z])\)/', $name, $matches)) {
                     $letter = $matches[1];
                     if ($letter === 'A') {
                         $fixture->setHomeAway(HomeAway::Away);
@@ -222,12 +251,11 @@ class ImportExportService
                     } else {
                         $fixture->setHomeAway(HomeAway::TBA);
                     }
+                } else {
+                    $fixture->setHomeAway(HomeAway::TBA);
                 }
                 // try and find competition
-                $comp = $this->competitionService->parseCompetition($team, $club, $fixture->getName());
-                if ($comp) {
-                    $fixture->setCompetition($comp);
-                }
+                $fixture->setCompetition($this->competitionService->parseCompetition($team, $name));
                 $this->entityManager->persist($fixture);
             }
         }

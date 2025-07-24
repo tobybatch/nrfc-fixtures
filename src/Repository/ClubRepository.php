@@ -4,6 +4,7 @@
 
 namespace App\Repository;
 
+use App\Config\Team;
 use App\Entity\Club;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -38,17 +39,12 @@ class ClubRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findByNameStartingWith(string $searchTerm)
+    public function findByNameStartingWith(string $searchTerm): ?Club
     {
         return $this->createQueryBuilder('c')
             ->where('LOWER(c.name) LIKE LOWER(:searchTerm)')
             ->setParameter('searchTerm', $searchTerm.'%')
             ->getQuery()
-            ->getResult()
             ->getOneOrNullResult();
-    }
-
-    public function findOpponent(string $clubAndTeam, $club)
-    {
     }
 }

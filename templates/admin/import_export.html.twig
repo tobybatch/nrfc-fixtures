@@ -8,13 +8,13 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {{ include('admin/components/admin_lozenge.html.twig', {
-            link_path: path('admin_export_clubs'),
+            link_path: path('admin_clubs_export'),
             link_title: 'Export Club Data',
             link_description: 'Download a CSV of club data.'
         }) }}
 
         {{ include('admin/components/admin_lozenge.html.twig', {
-            link_path: path('admin_export_fixtures'),
+            link_path: path('admin_fixtures_export'),
             link_title: 'Export Fixture Data',
             link_description: 'Download a CSV of fixture data.'
         }) }}

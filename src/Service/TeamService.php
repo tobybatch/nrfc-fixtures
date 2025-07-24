@@ -90,4 +90,20 @@ class TeamService
     {
         return in_array($team, $this->getSeniors());
     }
+
+    public function findOpponent(string $clubAndTeam, Team $team): ?Team
+    {
+        $words = explode(' ', $clubAndTeam);
+        if (count($words) < 2) {
+            return null;
+        }
+        $lastWord = $words[count($words) - 1];
+        return match ($lastWord) {
+            '1', 'I' => ($team === Team::FIRST_XV_WOMEN) ? Team::FIRST_XV_WOMEN : Team::FIRST_XV_MEN,
+            '2', 'II' => Team::SECOND_XV_MEN,
+            '3', 'III' => Team::THIRD_XV_MEN,
+            '4', 'IV' => Team::FOURTH_XV_MEN,
+            default => null,
+        };
+    }
 }

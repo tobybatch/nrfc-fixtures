@@ -9,6 +9,24 @@ final class ImportExportDTO
      */
     private array $errors = array();
     private int $successCount = 0;
+    private int $updateCount = 0;
+
+    public function getUpdateCount(): int
+    {
+        return $this->updateCount;
+    }
+
+    public function incrementUpdateCount(): int
+    {
+        $this->updateCount++;
+        return $this->updateCount;
+    }
+
+    public function decrementUpdateCount(): int
+    {
+        $this->updateCount--;
+        return $this->updateCount;
+    }
 
     /**
      * @return string[]

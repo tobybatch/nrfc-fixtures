@@ -2,35 +2,32 @@
 
 namespace App\Controller;
 
-use App\Config\Competition;
-use App\Config\HomeAway;
-use App\Config\Team;
-use App\DTO\ImportExportDTO;
-use App\Entity\Club;
-use App\Entity\Fixture;
 use App\Form\CsvUploadType;
 use App\Repository\ClubRepository;
 use App\Repository\FixtureRepository;
 use App\Service\ImportExportService;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Throwable;
 
 
 #[Route('/admin')]
 final class AdminController extends AbstractController
 {
-    private ClubRepository $clubRepository;
-
-    public function __construct(ClubRepository $clubRepository)
-    {
-        $this->clubRepository = $clubRepository;
-    }
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly KernelInterface        $kernel,
+        private readonly FixtureRepository $fixtureRepository,
+        private readonly ClubRepository         $clubRepository,
+        private readonly ParameterBagInterface  $bag,
+        private readonly ImportExportService    $importExportService,
+        private readonly LoggerInterface        $logger
+    ){}
 
     #[Route('/', name: 'admin_index')]
     public function index(): Response
@@ -39,11 +36,7 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/importExport', name: 'admin_import_export')]
-    public function importExport(
-        Request                $request,
-        EntityManagerInterface $em,
-        ImportExportService    $importExportService,
-    ): Response
+    public function importExport(Request                $request): Response
     {
         // Instantiate forms
         $clubForm = $this->createForm(CsvUploadType::class, null, ['attr' => ['id' => 'club-form']]);
@@ -57,17 +50,29 @@ final class AdminController extends AbstractController
         // Handle Club CSV
         if ($clubForm->isSubmitted() && $clubForm->isValid()) {
             $handle = fopen($clubForm->get('csv')->getData(), 'r');
-            $result = $importExportService->readClubsFromCsvResource($handle);
+            $result = $this->importExportService->readClubsFromCsvResource($handle);
             fclose($handle);
-            $em->flush();
+            $this->em->flush();
+            if ($result->getErrors()) {
+                foreach ($result->getErrors() as $error) {
+                    $this->addFlash('danger', $error);
+                }
+            }
+            if ($result->getSuccessCount()) {
+                $this->addFlash('success', sprintf('%d Clubs imported successfully', $result->getSuccessCount()));
+            }
+            if ($result->getUpdateCount()) {
+                $this->addFlash('success', sprintf('%d Clubs updated successfully', $result->getUpdateCount()));
+            }
+            return $this->redirectToRoute('admin_import_export');
         }
 
         // Handle Fixture CSV
         if ($fixtureForm->isSubmitted() && $fixtureForm->isValid()) {
             $handle = fopen($clubForm->get('csv')->getData(), 'r');
-            $result = $importExportService->readFixturesFromCsvResource($handle);
+            $result = $this->importExportService->readFixturesFromCsvResource($handle);
             fclose($handle);
-            $em->flush();
+            $this->em->flush();
         }
 
         return $this->render('admin/import_export.html.twig', [
@@ -78,17 +83,16 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/clubs/initialise', name: 'admin_clubs_initialise')]
-    public function initialiseClubs(ParameterBagInterface $bag, ImportExportService $importExportService, LoggerInterface $logger): Response
+    public function initialiseClubs(): Response
     {
-        $pathFromPublicFolder = '../' . $bag->get('asset_path_clubs');
-        $logger->info($pathFromPublicFolder);
-        $handle = fopen($pathFromPublicFolder, 'r+');
-        $result = $importExportService->readClubsFromCsvResource($handle);
+        $clubsSrc = $this->kernel->getProjectDir() . '/' . $this->bag->get('asset_path_clubs');
+        $handle = fopen($clubsSrc, 'r+');
+        $result = $this->importExportService->readClubsFromCsvResource($handle);
         fclose($handle);
 
         // This should never error but just in case
         foreach ($result->getErrors() as $error) {
-            $logger->error($error);
+            $this->logger->error($error);
             $this->addFlash('danger', $error);
         }
 
@@ -97,11 +101,11 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/clubs/export', name: 'admin_clubs_export')]
-    public function exportClubs(ImportExportService $importExportService,): Response
+    public function exportClubs(): Response
     {
         $clubs = $this->clubRepository->findAll();
         $handle = fopen('php://temp', 'r+');
-        $importExportService->writeClubsToCsvResource($handle, $clubs);
+        $this->importExportService->writeClubsToCsvResource($handle, $clubs);
         rewind($handle);
         $csvContent = stream_get_contents($handle);
         fclose($handle);
@@ -117,9 +121,9 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/fixtures/export', name: 'admin_fixtures_export')]
-    public function fixtures(FixtureRepository $fixtureRepository): Response
+    public function fixtures(): Response
     {
-        $fixtures = $fixtureRepository->findAll();
+        $fixtures = $this->fixtureRepository->findAll();
 
         $handle = fopen('php://temp', 'r+');
         fputcsv($handle, ['Name', 'Date', 'Club', 'HomeAway', 'Competition', 'Team', 'Name', 'Notes', 'Opponent']);
