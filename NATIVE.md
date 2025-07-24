@@ -20,7 +20,7 @@ composer install
 yarn
 yarn watch
 docker compose up -d
-symfony serve --listen-ip=0.0.0.0 --port=7000
+XDEBUG_MODE=debug symfony serve --listen-ip=0.0.0.0 --port=7000
 ./bin/console doctrine:schema:create -n
 ./bin/console doctrine:fixtures:load -n
 ```

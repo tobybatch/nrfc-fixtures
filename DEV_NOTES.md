@@ -23,7 +23,8 @@ docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixture
 
 ```shell
 ./bin/console make:migration
-./bin/console doctrine:migrations:migrate
+./bin/console doctrine:migrations:migrate 
+./bin/console doctrine:fixtures:load --group=users 
 ```
 
 ## Panther
