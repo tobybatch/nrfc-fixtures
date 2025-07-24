@@ -6,26 +6,62 @@ use App\Config\Competition;
 use App\Config\HomeAway;
 use App\Config\Team;
 use App\DTO\ImportExportDTO;
+use App\DTO\TeamImportDTO;
 use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Repository\ClubRepository;
+use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 class ImportExportService
 {
     private EntityManagerInterface $entityManager;
     private ClubRepository $clubRepo;
+    private TeamService $teamService;
+    private DateTimeService $datetimeService;
     private LoggerInterface $logger;
+    private CompetitionService $competitionService;
 
-    public function __construct(EntityManagerInterface $em, ClubRepository $clubRepo, LoggerInterface $logger)
+    public function __construct(
+        EntityManagerInterface $em,
+        ClubRepository $clubRepo,
+        TeamService $teamService,
+        DateTimeService $datetimeService,
+        CompetitionService $competitionService,
+        LoggerInterface $logger
+    )
     {
         $this->entityManager = $em;
         $this->clubRepo = $clubRepo;
+        $this->teamService = $teamService;
+        $this->datetimeService = $datetimeService;
+        $this->competitionService = $competitionService;
         $this->logger = $logger;
     }
 
-    public function readClubsFromCsvFile(mixed $handle): ImportExportDTO {
+    /**
+     * @param mixed $handle
+     * @param array<Club> $clubs
+     * @return void
+     */
+    public function writeClubsToCsvResource(mixed $handle, array $clubs) : void
+    {
+        fputcsv($handle, ['Name', 'Address', 'Latitude', 'Longitude', 'Notes', 'Aliases']);
+        foreach ($clubs as $club) {
+            fputcsv($handle, [
+                $club->getName(),
+                $club->getAddress(),
+                $club->getLatitude(),
+                $club->getLongitude(),
+                $club->getNotes(),
+                $club->getAliases() ? json_encode($club->getAliases()) : '',
+            ]);
+        }
+    }
+
+    public function readClubsFromCsvResource(mixed $handle): ImportExportDTO {
         $status = new ImportExportDTO();
 
         $header = fgetcsv($handle);
@@ -70,7 +106,7 @@ class ImportExportService
         return $status;
     }
 
-    public function readFixturesFromCsvFile(mixed $handle): ImportExportDTO
+    public function readFixturesFromCsvResource(mixed $handle): ImportExportDTO
     {
         $status = new ImportExportDTO();
 
@@ -88,7 +124,7 @@ class ImportExportService
                     continue;
                 }
 
-                $name = new \DateTimeImmutable($row['Name'] ?? '');
+                $name = $row['Name'] ?? '';
                 $date = new \DateTimeImmutable($row['Date'] ?? 'now');
                 $homeAway = HomeAway::tryFrom($row['HomeAway'] ?? '');
                 $competition = Competition::tryFrom($row['Competition'] ?? '');
@@ -117,6 +153,86 @@ class ImportExportService
                 $status->addError("Fixture row $rowNum: " . $e->getMessage());
             }
         }
+        return $status;
+    }
+
+    public function importFixtures($handle): ImportExportDTO
+    {
+        $status = new ImportExportDTO();
+        $headers = fgetcsv($handle);
+        $teams = [];
+
+        // Headers should be Date, Team name, Team name, ....
+        for ($i = 1; $i <= count($headers); $i++) {
+            $team = $this->teamService->getBy(trim($headers[$i]));
+            if ($team) {
+                $teams[] = new TeamImportDTO($team, $i);
+            } else {
+                $status->addError(sprintf("Fixture header $i: Team '%s' could not be found.", $i));
+            }
+        }
+
+        // Training
+        // Team (H)
+        // Team (H) [Comp]
+        while (($row = fgetcsv($handle)) !== false) {
+            // date
+            if (empty($row[0])) {
+                $status->addError(sprintf("Fixture row %d: Date is empty.", $i));
+                continue;
+            }
+            try {
+                $date = $this->datetimeService->parseUkDateWithOptionalTime($row[0]);
+            } catch (InvalidArgumentException|DateMalformedStringException $e) {
+                $this->logger->error($e->getMessage());
+                $status->addError(sprintf("Fixture row %d: Date must be in the format dd/mm/yyyy, %s provided.", $i, $row[0]));
+                continue;
+            }
+
+            foreach ($teams as $teamDto) {
+                $team = $teamDto->getTeam();
+                $col = $teamDto->getColumn();
+                $fixture = new Fixture();
+                $fixture->setName($row[$col]);
+                $fixture->setDate($date);
+                $fixture->setTeam($team);
+                // early check for training
+                if (strtolower($fixture->getName()) === 'training') {
+                    $fixture->setCompetition(Competition::Training);
+                    $this->entityManager->persist($fixture);
+                }
+                // try and do club and opponent
+                $clubAndTeam = trim(strtok($fixture->getName(), '('));
+                $club = $this->clubRepo->findByNameStartingWith($clubAndTeam);
+                if ($club) {
+                    $fixture->setClub($club);
+                    $oppo = $this->clubRepo->findOpponent($clubAndTeam, $club);
+                    if ($oppo) {
+                        $fixture->setOpponent($oppo);
+                    }
+                }
+                // try and do home/away
+                $string = "Beccles (A)";
+                if (preg_match('/\(([A-Za-z])\)/', $fixture->getName(), $matches)) {
+                    $letter = $matches[1];
+                    if ($letter === 'A') {
+                        $fixture->setHomeAway(HomeAway::Away);
+                    } elseif ($letter === 'H') {
+                        $fixture->setHomeAway(HomeAway::Home);
+                    } else {
+                        $fixture->setHomeAway(HomeAway::TBA);
+                    }
+                }
+                // try and find competition
+                $comp = $this->competitionService->parseCompetition($team, $club, $fixture->getName());
+                if ($comp) {
+                    $fixture->setCompetition($comp);
+                }
+                $this->entityManager->persist($fixture);
+            }
+        }
+
+        $this->entityManager->flush();
         return $status;
     }
 }

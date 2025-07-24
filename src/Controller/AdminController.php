@@ -43,7 +43,6 @@ final class AdminController extends AbstractController
         Request                $request,
         EntityManagerInterface $em,
         ImportExportService    $importExportService,
-        ClubRepository         $clubRepository,
     ): Response
     {
         // Instantiate forms
@@ -58,7 +57,7 @@ final class AdminController extends AbstractController
         // Handle Club CSV
         if ($clubForm->isSubmitted() && $clubForm->isValid()) {
             $handle = fopen($clubForm->get('csv')->getData(), 'r');
-            $result = $importExportService->readClubsFromCsvFile($handle);
+            $result = $importExportService->readClubsFromCsvResource($handle);
             fclose($handle);
             $em->flush();
         }
@@ -66,7 +65,7 @@ final class AdminController extends AbstractController
         // Handle Fixture CSV
         if ($fixtureForm->isSubmitted() && $fixtureForm->isValid()) {
             $handle = fopen($clubForm->get('csv')->getData(), 'r');
-            $result = $importExportService->readFixturesFromCsvFile($handle);
+            $result = $importExportService->readFixturesFromCsvResource($handle);
             fclose($handle);
             $em->flush();
         }
@@ -84,7 +83,7 @@ final class AdminController extends AbstractController
         $pathFromPublicFolder = '../' . $bag->get('asset_path_clubs');
         $logger->info($pathFromPublicFolder);
         $handle = fopen($pathFromPublicFolder, 'r+');
-        $result = $importExportService->readClubsFromCsvFile($handle);
+        $result = $importExportService->readClubsFromCsvResource($handle);
         fclose($handle);
 
         // This should never error but just in case
@@ -98,27 +97,11 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/clubs/export', name: 'admin_clubs_export')]
-    public function exportClubs(): Response
+    public function exportClubs(ImportExportService $importExportService,): Response
     {
         $clubs = $this->clubRepository->findAll();
-
         $handle = fopen('php://temp', 'r+');
-
-        // CSV header
-        fputcsv($handle, ['ID', 'Name', 'Address', 'Latitude', 'Longitude', 'Notes', 'Aliases']);
-
-        foreach ($clubs as $club) {
-            fputcsv($handle, [
-                $club->getId(),
-                $club->getName(),
-                $club->getAddress(),
-                $club->getLatitude(),
-                $club->getLongitude(),
-                $club->getNotes(),
-                $club->getAliases() ? json_encode($club->getAliases()) : '',
-            ]);
-        }
-
+        $importExportService->writeClubsToCsvResource($handle, $clubs);
         rewind($handle);
         $csvContent = stream_get_contents($handle);
         fclose($handle);

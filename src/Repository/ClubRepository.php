@@ -37,4 +37,18 @@ class ClubRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findByNameStartingWith(string $searchTerm)
+    {
+        return $this->createQueryBuilder('c')
+            ->where('LOWER(c.name) LIKE LOWER(:searchTerm)')
+            ->setParameter('searchTerm', $searchTerm.'%')
+            ->getQuery()
+            ->getResult()
+            ->getOneOrNullResult();
+    }
+
+    public function findOpponent(string $clubAndTeam, $club)
+    {
+    }
 }
