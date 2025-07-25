@@ -14,9 +14,16 @@ class ClubControllerTest extends WebTestCase
 
         $this->client = static::createClient();
         $this->container = static::getContainer();
+        $this->hasher = $this->container->get('security.password_hasher');
+        $this->em = $this->container->get('doctrine')->getManager();
 
-        // You can fetch a user from DB, or create one dynamically
-        $this->user = $this->container->get('doctrine')->getRepository(User::class)->findOneBy(['email' => 'editor_user@example.com']);
+        $this->user = new User();
+        $this->user->setEmail('editor_user@example.com');
+        $this->user->setRoles(['ROLE_EDITOR']);
+        $this->user->setPassword($this->hasher->hashPassword($this->user, 'testpass'));
+
+        $this->em->persist($this->user);
+        $this->em->flush();
     }
 
     public function testIndexPageLoadsSuccessfully(): void

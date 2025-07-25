@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -33,9 +34,17 @@ class FixtureTypeTest extends TestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $formBuilder
-            ->expects($this->exactly(7))
+            ->expects($this->exactly(8))
             ->method('add')
             ->withConsecutive(
+                [
+                    'name',
+                    TextType::class,
+                    $this->callback(function (array $options) {
+                        return 'Display Name' === $options['label']
+                            && false === $options['required'];
+                    }),
+                ],
                 [
                     'date',
                     DateType::class,

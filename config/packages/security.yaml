@@ -46,8 +46,8 @@ security:
         - { path: .*/new\b$, roles: ROLE_EDITOR }
         - { path: .*/edit\b$, roles: ROLE_EDITOR }
         - { path: ^.*$, roles: ROLE_EDITOR, methods: [DELETE] }
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

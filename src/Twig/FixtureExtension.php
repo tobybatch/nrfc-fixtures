@@ -122,6 +122,10 @@ class FixtureExtension extends AbstractExtension
 
     public function fixtureToString(Fixture $fixture): string
     {
+        $name = $fixture->getName();
+        if ($name) {
+            return $name;
+        }
         return $this->fixtureService->format($fixture);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -24,11 +25,6 @@ class ClubsAndFixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
-        $this->runCommand([
-            'file' => 'assets/clubs.csv',
-            '--type' => 'club',
-        ]);
-
         $this->runCommand([
             'file' => 'assets/fixtures-youth-2025-6.csv',
         ]);
