@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -22,9 +23,10 @@ final class AdminController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly KernelInterface        $kernel,
-        private readonly FixtureRepository $fixtureRepository,
+        private readonly FixtureRepository      $fixtureRepository,
         private readonly ClubRepository         $clubRepository,
         private readonly ParameterBagInterface  $bag,
+        private readonly FormFactoryInterface   $formFactory,
         private readonly ImportExportService    $importExportService,
         private readonly LoggerInterface        $logger
     ){}
@@ -36,11 +38,21 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/importExport', name: 'admin_import_export')]
-    public function importExport(Request                $request): Response
+    public function importExport(Request $request): Response
     {
         // Instantiate forms
-        $clubForm = $this->createForm(CsvUploadType::class, null, ['attr' => ['id' => 'club-form']]);
-        $fixtureForm = $this->createForm(CsvUploadType::class, null, ['attr' => ['id' => 'fixture-form']]);
+        $clubForm = $this->formFactory->createNamed(
+            "clubs_form",
+            CsvUploadType::class,
+            null,
+            ['attr' => ['id' => 'club-form']]
+        );
+        $fixtureForm = $this->formFactory->createNamed(
+            "fixtures_form",
+            CsvUploadType::class,
+            null,
+            ['attr' => ['id' => 'fixture-form']]
+        );
 
         $clubForm->handleRequest($request);
         $fixtureForm->handleRequest($request);
@@ -69,10 +81,22 @@ final class AdminController extends AbstractController
 
         // Handle Fixture CSV
         if ($fixtureForm->isSubmitted() && $fixtureForm->isValid()) {
-            $handle = fopen($clubForm->get('csv')->getData(), 'r');
+            $handle = fopen($fixtureForm->get('csv')->getData(), 'r');
             $result = $this->importExportService->readFixturesFromCsvResource($handle);
             fclose($handle);
             $this->em->flush();
+            if ($result->getErrors()) {
+                foreach ($result->getErrors() as $error) {
+                    $this->addFlash('danger', $error);
+                }
+            }
+            if ($result->getSuccessCount()) {
+                $this->addFlash('success', sprintf('%d Fixtures imported successfully', $result->getSuccessCount()));
+            }
+            if ($result->getUpdateCount()) {
+                $this->addFlash('success', sprintf('%d Fixtures updated successfully', $result->getUpdateCount()));
+            }
+            return $this->redirectToRoute('admin_import_export');
         }
 
         return $this->render('admin/import_export.html.twig', [
@@ -126,19 +150,18 @@ final class AdminController extends AbstractController
         $fixtures = $this->fixtureRepository->findAll();
 
         $handle = fopen('php://temp', 'r+');
-        fputcsv($handle, ['Name', 'Date', 'Club', 'HomeAway', 'Competition', 'Team', 'Name', 'Notes', 'Opponent']);
+        fputcsv($handle, ['Name', 'Date', 'Club', 'HomeAway', 'Competition', 'Team', 'Notes', 'Opponent']);
 
         foreach ($fixtures as $fixture) {
             fputcsv($handle, [
                 $fixture->getName(),
                 $fixture->getDate()?->format('Y-m-d'),
                 $fixture->getClub()?->getName(),
-                $fixture->getHomeAway()->name,
-                $fixture->getCompetition()->name,
-                $fixture->getTeam()->name,
-                $fixture->getName(),
+                $fixture->getHomeAway()->value,
+                $fixture->getCompetition()->value,
+                $fixture->getTeam()->value,
                 $fixture->getNotes(),
-                $fixture->getOpponent()?->name,
+                $fixture->getOpponent()?->value,
             ]);
         }
 

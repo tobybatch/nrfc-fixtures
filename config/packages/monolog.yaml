@@ -27,8 +27,13 @@ when@dev:
             main:
                 type: stream
                 path: php://stderr
-                level: info
+                level: debug
                 channels: ["!event"]
+            dev:
+                type: stream
+                path: '%kernel.logs_dir%/dev.log'
+                level: debug
+                channels: ["app"]
             console:
                 type: console
                 process_psr_3_messages: false

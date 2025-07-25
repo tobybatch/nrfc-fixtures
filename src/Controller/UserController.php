@@ -32,7 +32,9 @@ class UserController extends AbstractController
         // TODO - pass this in
         // $lastUsername = $authenticationUtils->getLastUsername();
 
-        $loginForm = $this->createForm(LoginFormType::class);
+        $loginForm = $this->createForm(LoginFormType::class, null, [
+            'csrf_protection' => false,
+        ]);
 
         return $this->render('login/index.html.twig', [
             'hide_top_login' => true,

@@ -145,4 +145,15 @@ class Fixture
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            'Fixture #%d: %s vs %s on %s',
+            $this->id ?? 0,
+            $this->team->name ?? 'Unknown',
+            $this->opponent?->name ?? 'Unknown',
+            $this->date?->format('Y-m-d') ?? 'Unknown Date'
+        );
+    }
 }

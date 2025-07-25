@@ -79,9 +79,11 @@ class FixtureRepository extends ServiceEntityRepository
             ->setParameter('team', $team);
 
         if ($date) {
+            $start = $date->setTime(0, 0);
+            $end = $date->setTime(23, 59, 59);
             $statement->andWhere('f.date BETWEEN :start AND :end')
-                ->setParameter('start', $date)
-                ->setParameter('end', $date);
+                ->setParameter('start', $start)
+                ->setParameter('end', $end);
         }
 
         return $statement->orderBy('f.date', 'ASC')

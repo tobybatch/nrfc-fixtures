@@ -126,14 +126,11 @@ class ImportExportService
 
         while (($data = fgetcsv($handle)) !== false) {
             $rowNum++;
+            $this->logger->debug("Row $rowNum", ['data' => $data]);
             try {
                 $row = array_combine($header, $data);
 
                 $club = $this->clubRepo->findOneByNameInsensitive(trim($row['Club'] ?? ''));
-                if (!$club) {
-                    $status->addError("Fixture row $rowNum: Club '{$row['Club']}' not found.");
-                    continue;
-                }
 
                 $name = $row['Name'] ?? '';
                 $date = new \DateTimeImmutable($row['Date'] ?? 'now');
@@ -141,11 +138,6 @@ class ImportExportService
                 $competition = Competition::tryFrom($row['Competition'] ?? '');
                 $team = Team::tryFrom($row['Team'] ?? '');
                 $opponent = isset($row['Opponent']) ? Team::tryFrom($row['Opponent']) : null;
-
-                if (!$homeAway || !$competition || !$team) {
-                    $status->addError("Fixture row $rowNum: Invalid enum value.");
-                    continue;
-                }
 
                 $fixture = new Fixture();
                 $fixture->setName($name);
@@ -158,12 +150,16 @@ class ImportExportService
                 $fixture->setName($row['Name'] ?? null);
                 $fixture->setNotes($row['Notes'] ?? null);
 
+                $this->logger->debug("Fixture", ['fixture' => $fixture]);
+
                 $this->entityManager->persist($fixture);
                 $status->incrementSuccessCount();
             } catch (\Throwable $e) {
+                $this->logger->error($e->getMessage());
                 $status->addError("Fixture row $rowNum: " . $e->getMessage());
             }
         }
+        $this->entityManager->flush();
         return $status;
     }
 
@@ -217,6 +213,7 @@ class ImportExportService
                 // early check for training
                 if (strtolower($name) === 'training') {
                     $fixture->setCompetition(Competition::Training);
+                    $fixture->setHomeAway(HomeAway::Home);
                     $this->entityManager->persist($fixture);
                     continue;
                 }

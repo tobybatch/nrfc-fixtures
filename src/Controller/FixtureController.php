@@ -26,25 +26,19 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/')]
 final class FixtureController extends AbstractController
 {
-    private FixtureRepository $fixtureRepository;
-    private PreferencesService $preferencesService;
-    private LoggerInterface $logger;
-    private TeamService $teamService;
-
     public function __construct(
-        FixtureRepository $fixtureRepository,
-        PreferencesService $preferencesService,
-        TeamService $teamService,
-        LoggerInterface $logger,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FixtureRepository $fixtureRepository,
+        private readonly PreferencesService $preferencesService,
+        private readonly TeamService $teamService,
+        private readonly LoggerInterface $logger,
+        private readonly FixtureService $fixtureService,
+        private readonly SerializerInterface $serializer
     ) {
-        $this->fixtureRepository = $fixtureRepository;
-        $this->preferencesService = $preferencesService;
-        $this->teamService = $teamService;
-        $this->logger = $logger;
     }
 
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, SerializerInterface $serializer): Response|JsonResponse
+    public function index(Request $request): Response|JsonResponse
     {
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
@@ -114,7 +108,7 @@ final class FixtureController extends AbstractController
 
         // This could be done in an event listener
         if ('application/json' === $request->getAcceptableContentTypes()[0]) {
-            $json = $serializer->serialize($context, 'json');
+            $json = $this->serializer->serialize($context, 'json');
 
             return new JsonResponse($json, 200, [], true);
         }
@@ -123,7 +117,7 @@ final class FixtureController extends AbstractController
     }
 
     #[Route('/new', name: 'app_fixture_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $fixture = new Fixture();
         $form = $this->createForm(FixtureType::class, $fixture, [
@@ -132,8 +126,8 @@ final class FixtureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($fixture);
-            $entityManager->flush();
+            $this->entityManager->persist($fixture);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('app_fixture_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -153,7 +147,7 @@ final class FixtureController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_fixture_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Fixture $fixture, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Fixture $fixture): Response
     {
         $form = $this->createForm(FixtureType::class, $fixture,  [
             'csrf_protection' => false,
@@ -161,7 +155,7 @@ final class FixtureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('app_fixture_show', ['id' => $fixture->getId()], Response::HTTP_SEE_OTHER);
         }
@@ -173,12 +167,12 @@ final class FixtureController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_fixture_delete', methods: ['POST'])]
-    public function delete(Request $request, Fixture $fixture, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Fixture $fixture): Response
     {
         $id = $fixture->getId();
         if ($this->isCsrfTokenValid('delete'.$fixture->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($fixture);
-            $entityManager->flush();
+            $this->entityManager->remove($fixture);
+            $this->entityManager->flush();
             $this->addFlash('success', 'Fixture '.$id.' deleted');
         }
 
@@ -249,13 +243,13 @@ final class FixtureController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('spond/{team}', name: 'app_fixture_spond', defaults: ['team' => null], methods: ['GET'])]
-    public function spond(FixtureRepository $fixtureRepository, FixtureService $fixtureService, ?Team $team = null): Response|JsonResponse
+    public function spond(?Team $team = null): Response|JsonResponse
     {
         if (!$team) {
             return $this->render('fixture/spond.html.twig');
         }
 
-        $fixtures = $fixtureRepository->findByTeam($team);
+        $fixtures = $this->fixtureRepository->findByTeam($team);
         $handle = fopen('php://memory', 'r+');
         /**
          * @var Fixture $fixture
@@ -274,7 +268,7 @@ final class FixtureController extends AbstractController
                     HomeAway::Home == $fixture->getHomeAway() ? 'Home match' : 'Away match',
                     HomeAway::Home == $fixture->getHomeAway() ? 'Norwich '.$team->value : $fixture->getClub()?->getName().$team->value,
                     HomeAway::Home == $fixture->getHomeAway() ? $fixture->getClub()?->getName().' '.$team->value : 'Norwich '.$team->value,
-                    $fixtureService->format($fixture),
+                    $this->fixtureService->format($fixture),
                     $fixture->getClub()?->getAddress(),
                 ]);
             }
@@ -297,9 +291,9 @@ final class FixtureController extends AbstractController
 
     // This will be removed when we get to the new website
     #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
-    public function forOldWebsite(Request $request, TeamService $teamService, FixtureService $fixtureService, SerializerInterface $serializer): Response|JsonResponse
+    public function forOldWebsite(Request $request): Response|JsonResponse
     {
-        $team = $teamService->getBy($request->query->get('team'));
+        $team = $this->teamService->getBy($request->query->get('team'));
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
@@ -308,7 +302,7 @@ final class FixtureController extends AbstractController
                 $fixture = $_fixtures[0];
                 $fixtures[] = [
                     'id' => $fixture->getId(),
-                    'opponent' => $fixtureService->format($fixture, false),
+                    'opponent' => $this->fixtureService->format($fixture, false),
                     'competition' => $this->translateCompetition($fixture->getCompetition()),
                     'venue' => HomeAway::Home == $fixture->getHomeAway() ? 'home' : 'away',
                     'date' => $date,
@@ -318,7 +312,7 @@ final class FixtureController extends AbstractController
 
         // This could be done in an event listener
         if ('application/json' === $request->getAcceptableContentTypes()[0]) {
-            $json = $serializer->serialize($fixtures, 'json');
+            $json = $this->serializer->serialize($fixtures, 'json');
 
             return new JsonResponse($json, 200, [], true);
         }
@@ -335,33 +329,3 @@ final class FixtureController extends AbstractController
         };
     }
 }
-/*
-    competition: 'cup',
-    competition: 'friendly',
-    competition: 'league',
-    competition: 'null',
-[
-  {
-      id: '1624',
-    relatedMatchReport: null,
-    opponent: 'Fakenham (Senior Squad)',
-    competition: 'friendly',
-    venue: 'home',
-    result: '47:5',
-    date: '2024-08-17',
-    __typename: 'fixtures'
-  },
-  {
-      id: '1535',
-    relatedMatchReport: {
-      slug: 'norwich-39-north-walsham-raiders-24',
-      __typename: 'matchReports'
-    },
-    opponent: 'North Walsham 2',
-    competition: 'league',
-    venue: 'home',
-    result: '39:24',
-    date: '2024-09-21',
-    __typename: 'fixtures'
-  }
-*/
