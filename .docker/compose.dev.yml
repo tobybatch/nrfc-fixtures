@@ -13,6 +13,7 @@ services:
       start_period: 60s
     volumes:
       - database_data:/var/lib/postgresql/data:rw
+    restart: unless-stopped
 
   nrfcfixtures:
     image: ghcr.io/tobybatch/nrfc-fixtures:apache-dev
@@ -26,7 +27,7 @@ services:
     ports:
       - 8001:8001 # If you change the external port the debug toolbar will break
     depends_on: [sqldb]
-    restart: unless-stopped
+#     restart: unless-stopped
 
   encore:
     image: node
@@ -39,6 +40,7 @@ services:
     working_dir: /opt/nrfcfixtures
     entrypoint: "/opt/nrfcfixtures/bin/watch.sh"
     depends_on: [nrfcfixtures]
+#     restart: unless-stopped
 
 
 volumes:

@@ -27,7 +27,7 @@ echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
 echo "NRFC Fixtures is ready"
 rm -f .in_startup
 if [ -e /use_apache ]; then
-  exec /usr/sbin/apache2 -D FOREGROUND
+  exec apache2-foreground
 elif [ -e /use_fpm ]; then
   exec php-fpm
 else

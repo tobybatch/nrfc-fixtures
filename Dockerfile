@@ -10,6 +10,8 @@
 # docker exec -ti nrfrc-fixtures-apache-app /bin/bash
 # docker exec -ti nrfrc-fixtures-apache-app symfony serve --port=7000 --listen-ip=0.0.0.0
 
+# For dev
+# docker build -t ghcr.io/tobybatch/nrfc-fixtures:apache-dev --target=dev --build-arg BASE=apache .
 # For testing prod
 # docker build -t ghcr.io/tobybatch/nrfc-fixtures:fpm-prod .
 # cp .docker/sample.prod.env .docker/prod.env
@@ -201,9 +203,7 @@ ARG TIMEZONE
 ENV TIMEZONE=${TIMEZONE}
 RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone && \
     # make composer home dir
-    mkdir /composer  && \
-    chown -R www-data:www-data /composer
-
+    mkdir /composer
 # copy composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
@@ -268,9 +268,7 @@ LABEL org.opencontainers.image.title="NRFC Fixtures" \
 ENV VERSION=${VERSION}
 ENV TIMEZONE=${TIMEZONE}
 RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone && \
-    mkdir -p /composer  && \
-    chown -R www-data:www-data /composer
-
+    mkdir -p /composer
 # copy startup script & DB checking script
 COPY .docker/dbtest.php /dbtest.php
 COPY .docker/entrypoint.sh /entrypoint.sh
@@ -305,7 +303,7 @@ CMD [ "/entrypoint.sh" ]
 # development build
 FROM base AS dev
 # copy nrfcfixtures develop source
-COPY --from=git-prod --chown=www-data:www-data /opt/nrfcfixtures /opt/nrfcfixtures
+COPY --from=git-prod /opt/nrfcfixtures /opt/nrfcfixtures
 COPY .docker /assets
 # do the composer deps installation
 RUN \
@@ -314,24 +312,23 @@ RUN \
     composer --no-ansi install --working-dir=/opt/nrfcfixtures --optimize-autoloader && \
     composer --no-ansi clearcache && \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     yarn --cwd /opt/nrfcfixtures && \
     yarn --cwd /opt/nrfcfixtures build && \
     curl -sS https://get.symfony.com/cli/installer | bash && \
     mv /root/.symfony5/bin/symfony /usr/local/bin/symfony && \
+    rm -rf /opt/nrfcfixtures/var/* && \
+    chmod 777 /opt/nrfcfixtures/var && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
-ENV memory_limit=512M
 
 # the "prod" stage (production build) is configured as last stage in the file, as this is the default target in BuildKit
 FROM base AS prod
 # copy nrfcfixtures production source
-COPY --from=git-prod --chown=www-data:www-data /opt/nrfcfixtures /opt/nrfcfixtures
+COPY --from=git-prod /opt/nrfcfixtures /opt/nrfcfixtures
 COPY .docker /assets
 ENV APP_ENV=prod
 WORKDIR /opt/nrfcfixtures
@@ -350,10 +347,11 @@ RUN export COMPOSER_HOME=/composer && \
     sed -i "s/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 604800/g" /usr/local/etc/php/php.ini && \
     mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
-    chown -R www-data:www-data /opt/nrfcfixtures /usr/local/etc/php/php.ini && \
     yarn --cwd /opt/nrfcfixtures && \
     yarn --cwd /opt/nrfcfixtures build && \
+    rm -rf /opt/nrfcfixtures/var/* && \
+    chmod 777 /opt/nrfcfixtures/var && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
 ENV APP_ENV=prod
 ENV DATABASE_URL=""
-ENV memory_limit=512M
+
