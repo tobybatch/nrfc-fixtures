@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}All{% endblock %}
+{% block title %}
+    {% if teams|length == 1 %}{{ teams.0.value }} {% endif %}
+    Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}
+{% endblock %}
 
 {% block body %}
     <div data-controller="collapsible">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-primary text-2xl font-bold">{% if teams|length == 1 %}{{ teams.0.name }} {% endif %}
+            <h1 class="text-primary text-2xl font-bold">
+                {% if teams|length == 1 %}{{ teams.0.value }} {% endif %}
                 Fixtures for {{ "now"|date('Y') }}/{{ ("now"|date('y')) + 1 }}
             </h1>
 
