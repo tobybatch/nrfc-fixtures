@@ -7,6 +7,7 @@ use App\Config\HomeAway;
 use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture;
+use App\Repository\ClubRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -61,6 +62,10 @@ class FixtureType extends AbstractType
                 'required' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'N/A',
+                'query_builder' => function (ClubRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->orderBy('LOWER(c.name)', 'ASC');
+                },
             ])
             ->add('opponent', EnumType::class, [
                 'class' => Team::class,

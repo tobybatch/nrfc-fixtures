@@ -25,7 +25,7 @@ class ClubRepository extends ServiceEntityRepository
     public function findAll(): array
     {
         return $this->createQueryBuilder('c')
-            ->orderBy('c.name', 'ASC')
+            ->orderBy('LOWER(c.name)', 'ASC')
             ->getQuery()
             ->getResult();
     }
