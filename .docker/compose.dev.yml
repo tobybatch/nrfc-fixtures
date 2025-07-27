@@ -22,6 +22,7 @@ services:
         required: true
     volumes:
       - ..:/opt/nrfcfixtures
+    user: "${UID}:${GID}"
     ports:
       - 8001:8001 # If you change the external port the debug toolbar will break
     depends_on: [sqldb]
@@ -34,6 +35,7 @@ services:
     env_file:
       - path: ./dev.env
         required: true
+    user: "${UID}:${GID}"
     working_dir: /opt/nrfcfixtures
     entrypoint: "/opt/nrfcfixtures/bin/watch.sh"
     depends_on: [nrfcfixtures]

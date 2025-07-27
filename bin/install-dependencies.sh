@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 OPDIR="$(dirname "$0")"
 OS_TYPE="$(uname -s)"
@@ -28,21 +28,22 @@ esac
 
 DOCKER_DIR=$(realpath "$OPDIR"/../.docker)
 DOCKER_ENV="$DOCKER_DIR/dev.env"
+COMPOSE_ENV="$DOCKER_DIR/.env"
 
 if [ ! -e "$DOCKER_ENV" ]; then
   cp "$DOCKER_DIR/sample.dev.env" "$DOCKER_ENV"
 fi
 
-USER_ID=$(id -u)
-GROUP_ID=$(id -g)
+UID=$(id -u)
+GID=$(id -g)
 
-if ! grep -q "\bUSER_ID\b" "$DOCKER_ENV"; then
-    echo "USER_ID=$USER_ID" >> "$DOCKER_ENV"
+if [ ! -e "$COMPOSE_ENV" ]; then
+  echo "UID=$UID" > "$COMPOSE_ENV"
+  echo "GID=$GID" >> "$COMPOSE_ENV"
 fi
 
-if ! grep -q "\bGROUP_ID\b" "$DOCKER_ENV"; then
-    echo "GROUP_ID=$GROUP_ID" >> "$DOCKER_ENV"
-fi
+sed -i 's/^UID=$/UID=$(id -u)/' "$COMPOSE_ENV"
+sed -i 's/^GID=$/GID=$(id -g)/' "$COMPOSE_ENV"
 
 touch .env
 echo "Dependencies installed"
