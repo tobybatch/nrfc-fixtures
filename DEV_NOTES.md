@@ -14,7 +14,6 @@ xdebug.client_host=127.0.0.1
 docker compose down
 docker volume rm nrfc-fixtures-prod-dbdata
 docker compose up -d
-docker compose exec fixtures ./bin/console nrfc:fixtures:import -t club ./assets/clubs.csv
 docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixtures-youth-2025-6.csv
 docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixtures-senior-2025-6.csv
 ```
@@ -23,8 +22,8 @@ docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixture
 
 ```shell
 ./bin/console make:migration
-./bin/console doctrine:migrations:migrate 
-./bin/console doctrine:fixtures:load --group=users 
+./bin/console doctrine:migrations:migrate
+./bin/console doctrine:fixtures:load --group=users
 ```
 
 ## Panther

@@ -10,7 +10,7 @@
 
 {%- block widget_attributes -%}
     {%- set attr = attr|default({})|merge({
-        class: (attr.class|default('') ~ ' bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500')|trim
+        class: (attr.class|default('') ~ ' bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5')|trim
     }) -%}
     {{- parent() -}}
 {%- endblock widget_attributes -%}
@@ -24,12 +24,12 @@
 
 {%- block form_help -%}
     {%- set help_attr = help_attr|default({})|merge({
-        class: (help_attr.class|default('') ~ ' mt-1 text-sm text-gray-500 dark:text-gray-400')|trim
+        class: (help_attr.class|default('') ~ ' mt-1 text-sm text-gray-500')|trim
     }) -%}
     {{- parent() -}}
 {%- endblock form_help -%}
 
 {%- block form_errors -%}
-    {%- set error_item_class = 'mt-2 text-sm text-red-600 dark:text-red-500' -%}
+    {%- set error_item_class = 'mt-2 text-sm text-red-600' -%}
     {{- parent() -}}
 {%- endblock form_errors -%}
