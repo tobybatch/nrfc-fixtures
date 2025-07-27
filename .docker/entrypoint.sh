@@ -21,6 +21,8 @@ if [ "$APP_ENV" == "dev" ]; then
     bin/console doctrine:fixtures:load -n
 fi
 
+yarn build
+
 echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
 echo "NRFC Fixtures is ready"
 rm -f .in_startup
