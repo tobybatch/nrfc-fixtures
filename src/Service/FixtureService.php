@@ -22,11 +22,14 @@ class FixtureService
     {
         if (null != $fixture->getClub()) {
             $text = $fixture->getClub()->getName();
-            if ($this->teamService->isSenior($fixture->getTeam())) {
-                $text .= ' ' . substr($fixture->getTeam()->value, 0, 1);
-            } else {
-                $text .= ' ' . $fixture->getTeam()->value;
+            if ($fixture->getOpponent()) {
+                if ($this->teamService->isSenior($fixture->getTeam())) {
+                    $text .= ' ' . substr($fixture->getOpponent()->value, 0, 1);
+                } else {
+                    $text .= ' ' . $fixture->getOpponent()->value;
+                }
             }
+            $text = trim($text);
         } elseif (!empty($fixture->getName())) {
             $text = $fixture->getName();
         } elseif (Competition::None != $fixture->getCompetition()) {

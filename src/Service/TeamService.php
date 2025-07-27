@@ -86,7 +86,7 @@ class TeamService
         };
     }
 
-    public function isSenior(Team $team): bool
+    public function isSenior(?Team $team): bool
     {
         return in_array($team, $this->getSeniors());
     }
