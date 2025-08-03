@@ -40,3 +40,4 @@ phpstan.neon
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 /.docker/prod.yml
+initdb.d

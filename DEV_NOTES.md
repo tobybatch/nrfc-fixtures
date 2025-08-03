@@ -61,3 +61,9 @@ docker compose up -d
 ./bin/console doctrine:schema:create
 
 ```
+
+## Get remote DB
+
+```shell
+docker compose exec sqldb pg_dump -Unrfc -W -dnrfc > dump.sql
+```
