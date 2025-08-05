@@ -27,6 +27,7 @@ class FixtureType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Display Name',
+                'help' => 'This is the text displayed in the fixture list. If you leave this blank, the name will be generated from the fixture, e.g. Beccles (A).',
                 'required' => false,
             ])
             ->add('date', DateType::class, [
@@ -53,7 +54,7 @@ class FixtureType extends AbstractType
             ->add('team', EnumType::class, [
                 'class' => Team::class,
                 'placeholder' => '-- choose team --',
-                'label' => 'Team/Age group',
+                'label' => 'Team/Age group (Norwich)',
                 'choice_label' => fn (Team $team) => $team->value,
             ])
             ->add('club', EntityType::class, [
