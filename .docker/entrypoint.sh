@@ -17,7 +17,6 @@ fi
 
 if [ "$APP_ENV" == "dev" ]; then
     composer install
-    yarn build
 fi
 
 /opt/nrfcfixtures/bin/console cache:clear
