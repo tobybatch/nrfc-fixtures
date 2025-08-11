@@ -18,7 +18,6 @@ fi
 if [ "$APP_ENV" == "dev" ]; then
     composer install
     yarn build
-    /opt/nrfcfixtures/bin/console doctrine:schema:create -n
 fi
 
 /opt/nrfcfixtures/bin/console cache:clear
