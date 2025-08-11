@@ -42,8 +42,14 @@ if [ ! -e "$COMPOSE_ENV" ]; then
   echo "GID=$GID" >> "$COMPOSE_ENV"
 fi
 
-sed -i 's/^UID=$/UID=$(id -u)/' "$COMPOSE_ENV"
-sed -i 's/^GID=$/GID=$(id -g)/' "$COMPOSE_ENV"
+# sed -i.bak "s/^UID=/UID=$(id -u)/" "$DOCKER_ENV" && rm "$DOCKER_ENV".bak
+# sed -i.bak "s/^GID=/GID=$(id -g)/" "$DOCKER_ENV" && rm "$DOCKER_ENV".bak
+sed -i '' "/^UID=/c\\
+UID=$UID
+" /Users/toby.batch/Desktop/nrfc-fixtures/.docker/dev.env
+sed -i '' "/^GID=/c\\
+GID=$GID
+" /Users/toby.batch/Desktop/nrfc-fixtures/.docker/dev.env
 
 touch .env
 echo "Dependencies installed"

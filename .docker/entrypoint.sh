@@ -11,17 +11,22 @@ done
 echo "Connection established"
 
 cp /assets/monolog.yaml /opt/nrfcfixtures/config/packages/monolog.yaml
-touch .env
+if [ ! -e .env ]; then
+  touch .env
+fi
+
+if [ "$APP_ENV" == "dev" ]; then
+    composer install
+    yarn build
+    /opt/nrfcfixtures/bin/console doctrine:schema:create -n
+fi
+
 /opt/nrfcfixtures/bin/console cache:clear
-composer install
 /opt/nrfcfixtures/bin/console doctrine:migrations:migrate --no-interaction
 
 if [ "$APP_ENV" == "dev" ]; then
-    bin/console doctrine:schema:create -n
-    bin/console doctrine:fixtures:load -n
+    /opt/nrfcfixtures/bin/console doctrine:fixtures:load -n
 fi
-
-yarn build
 
 echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed
 echo "NRFC Fixtures is ready"

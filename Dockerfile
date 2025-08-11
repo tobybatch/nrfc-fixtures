@@ -292,8 +292,6 @@ ENV GROUP_ID=""
 ENV COMPOSER_MEMORY_LIMIT=-1
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-VOLUME [ "/opt/nrfcfixtures/var" ]
-
 CMD [ "/entrypoint.sh" ]
 
 ###########################
@@ -309,19 +307,12 @@ COPY .docker /assets
 RUN \
     export COMPOSER_HOME=/composer && \
     touch /opt/nrfcfixtures/.env && \
-    composer --no-ansi install --working-dir=/opt/nrfcfixtures --optimize-autoloader && \
-    composer --no-ansi clearcache && \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
-    mkdir -p /opt/nrfcfixtures/var/logs && chmod 777 /opt/nrfcfixtures/var/logs && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     sed -i "s/env php/env -S php -c \/opt\/nrfcfixtures\/php-cli.ini/g" /opt/nrfcfixtures/bin/console && \
-    yarn --cwd /opt/nrfcfixtures && \
-    yarn --cwd /opt/nrfcfixtures build && \
     curl -sS https://get.symfony.com/cli/installer | bash && \
-    mv /root/.symfony5/bin/symfony /usr/local/bin/symfony && \
-    rm -rf /opt/nrfcfixtures/var/* && \
-    chmod 777 /opt/nrfcfixtures/var && \
-    /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
+    rm -rf /opt/nrfcfixtures/var && \
+    mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
 
@@ -349,9 +340,8 @@ RUN export COMPOSER_HOME=/composer && \
     sed "s/128M/-1/g" /usr/local/etc/php/php.ini-development > /opt/nrfcfixtures/php-cli.ini && \
     yarn --cwd /opt/nrfcfixtures && \
     yarn --cwd /opt/nrfcfixtures build && \
-    rm -rf /opt/nrfcfixtures/var/* && \
-    chmod 777 /opt/nrfcfixtures/var && \
     /opt/nrfcfixtures/bin/console nrfc:fixtures:version > /opt/nrfcfixtures/version.txt
+VOLUME [ "/opt/nrfcfixtures/var" ]
 ENV APP_ENV=prod
 ENV DATABASE_URL=""
 
