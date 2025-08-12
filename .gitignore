@@ -41,3 +41,4 @@ phpstan.neon
 ###< friendsofphp/php-cs-fixer ###
 /.docker/prod.yml
 initdb.d
+.home
