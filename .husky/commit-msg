@@ -1,1 +1,20 @@
-yarn commitlint --edit $1
+#!/bin/sh
+
+COMMIT_MSG_FILE=$1
+
+# First try local yarn
+if command -v yarn >/dev/null 2>&1; then
+  yarn commitlint --edit "$COMMIT_MSG_FILE"
+  exit $?
+fi
+
+# If no local yarn, try docker
+if docker ps --format '{{.Names}}' | grep -q '^nrfc-fixtures-dev-encore$'; then
+  docker exec -i nrfc-fixtures-dev-encore yarn commitlint --edit "/opt/nrfcfixtures/.git/COMMIT_EDITMSG"
+  exit $?
+fi
+
+# If neither available
+echo "❌ Error: yarn not found locally, and container 'nrfc-fixtures-dev-encore' not running."
+echo "Please install yarn locally or start the dev container."
+exit 1
