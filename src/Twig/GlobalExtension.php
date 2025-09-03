@@ -23,8 +23,14 @@ class GlobalExtension extends AbstractExtension
         return [
             new TwigFunction('pageHasHelp', [$this, 'pageHasHelp']),
             new TwigFunction('pageHelpIsVisible', [$this, 'pageHelpIsVisible']),
+            new TwigFunction('getPreferences', [$this, 'getPreferences']),
             new TwigFunction('getPreference', [$this, 'getPreference']),
         ];
+    }
+
+    public function getPreferences(): array
+    {
+        return $this->preferencesService->getPreferences();
     }
 
     public function getPreference(string $path): bool
