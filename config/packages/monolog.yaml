@@ -1,12 +1,13 @@
 when@prod:
     monolog:
-        channels: ["deprecation"]
+        channels: ["deprecation", "silenced"]
         handlers:
             main:
                 type: fingers_crossed
                 action_level: error
                 handler: nested
                 excluded_http_codes: [403, 404]
+                channels: ["!silenced"]   # exclude silenced channel
             nested:
                 type: stream
                 level: info
@@ -14,35 +15,45 @@ when@prod:
             console:
                 type: console
                 process_psr_3_messages: false
-                channels: ["!event", "!doctrine"]
+                channels: ["!event", "!doctrine", "!silenced"]
             deprecation:
                 type: stream
                 channels: ["deprecation"]
                 path: php://stderr
+            silence_endpoint:
+                type: null
+                channels: ["silenced"]
 
 when@dev:
     monolog:
-        channels: ["deprecation"]
+        channels: ["deprecation", "silenced"]
         handlers:
             main:
                 type: stream
                 path: php://stderr
                 level: info
-                channels: ["!event"]
+                channels: ["!event", "!silenced"]
             console:
                 type: console
                 process_psr_3_messages: false
-                channels: ["!event", "!doctrine", "!console"]
+                channels: ["!event", "!doctrine", "!console", "!silenced"]
             deprecation:
                 type: stream
                 channels: ["deprecation"]
                 path: php://stderr
+            silence_endpoint:
+                type: null
+                channels: ["silenced"]
 
 when@test:
     monolog:
+        channels: ["silenced"]
         handlers:
             main:
                 type: stream
                 path: php://stderr
                 level: info
-                channels: ["!event"]
+                channels: ["!event", "!silenced"]
+            silence_endpoint:
+                type: null
+                channels: ["silenced"]

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -14,15 +15,18 @@ class MagicLinkService
     protected LoginLinkHandlerInterface $loginLinkHandler;
     private MailerInterface $mailer;
     private UserRepository $userRepository;
+    private LoggerInterface $logger;
 
     public function __construct(
         LoginLinkHandlerInterface $loginLinkHandler,
         UserRepository $userRepository,
         MailerInterface $mailer,
+        LoggerInterface $logger,
     ) {
         $this->loginLinkHandler = $loginLinkHandler;
         $this->userRepository = $userRepository;
         $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
     /**
@@ -35,6 +39,7 @@ class MagicLinkService
         if ($user) {
             $loginLinkDetails = $this->loginLinkHandler->createLoginLink($user);
             $loginLink = $loginLinkDetails->getUrl();
+            $this->logger->debug('Login link', ['loginLink' => $loginLink, 'email' => $user->getEmail()]);
             $email = (new TemplatedEmail())
                 ->from(new Address('no-reply@norwichrugby.com', 'Norwich Rugby admin bot'))
                 ->to((string) $user->getEmail())

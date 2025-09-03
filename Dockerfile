@@ -191,7 +191,7 @@ COPY .docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 EXPOSE 8001
 
 HEALTHCHECK --interval=20s --timeout=10s --retries=3 \
-    CMD curl -f http://127.0.0.1:8001 || exit 1
+    CMD curl -f http://127.0.0.1:8001/health || exit 1
 
 ###########################
 # global base build
