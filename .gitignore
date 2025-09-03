@@ -42,3 +42,4 @@ phpstan.neon
 /.docker/prod.yml
 initdb.d
 .home
+.yarn
