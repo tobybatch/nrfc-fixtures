@@ -1,0 +1,58 @@
+services:
+
+  sqldb:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    container_name: nrfc-fixtures-dev-db
+    env_file:
+      - path: .env
+        required: true
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+#       - database_data:/var/lib/postgresql/data:rw
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+  nrfcfixtures:
+    image: ghcr.io/tobybatch/nrfc-fixtures:apache-dev
+    container_name: nrfc-fixtures-dev
+    env_file:
+      - path: .env
+        required: true
+    volumes:
+      - .:/opt/nrfcfixtures
+    user: "${UID}:${GID}"
+    ports:
+      - 8001:8001 # If you change the external port the debug toolbar will break
+    depends_on: [sqldb]
+#     restart: unless-stopped
+
+  encore:
+    image: node
+    container_name: nrfc-fixtures-dev-encore
+    volumes:
+      - .:/opt/nrfcfixtures
+    env_file:
+      - path: .env
+        required: true
+    user: "${UID}:${GID}"
+    working_dir: /opt/nrfcfixtures
+    entrypoint: "/opt/nrfcfixtures/bin/watch.sh"
+    depends_on: [nrfcfixtures]
+#     restart: unless-stopped
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+# volumes:
+#   database_data:
+#     name: nrfc-fixtures-dev-dbdata

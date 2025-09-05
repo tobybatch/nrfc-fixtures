@@ -22,8 +22,10 @@ fi
 /opt/nrfcfixtures/bin/console cache:clear
 /opt/nrfcfixtures/bin/console doctrine:migrations:migrate --no-interaction
 
-if [ "$APP_ENV" == "dev" ]; then
+if [ "$APP_ENV" == "dev" ]  && [ "$LOAD_FIXTURES" == 'true' ]; then
     /opt/nrfcfixtures/bin/console doctrine:fixtures:load -n
+else
+    echo "skipping fixtures as LOAD_FIXTURES is absent"
 fi
 
 echo "$NRFCFIXTURES" > /opt/nrfcfixtures/var/installed

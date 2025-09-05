@@ -26,4 +26,9 @@ services:
         tags: ['twig.extension']
 
     # add more service definitions when explicit configuration is needed
+    App\Service\DirectusClient:
+        arguments:
+            $apiUrl: '%env(DIRECTUS_API_URL)%'
+            $apiToken: '%env(DIRECTUS_API_TOKEN)%'
+
     # please note that last definitions always *replace* previous ones

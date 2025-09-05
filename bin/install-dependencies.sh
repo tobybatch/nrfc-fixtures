@@ -27,29 +27,34 @@ esac
 # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 
 DOCKER_DIR=$(realpath "$OPDIR"/../.docker)
-DOCKER_ENV="$DOCKER_DIR/dev.env"
-COMPOSE_ENV="$DOCKER_DIR/.env"
+ENV_FILE="$DOCKER_DIR/../.env"
 
-if [ ! -e "$DOCKER_ENV" ]; then
-  cp "$DOCKER_DIR/sample.dev.env" "$DOCKER_ENV"
+if [ -e "$ENV_FILE" ]; then
+  mv "$ENV_FILE" "$ENV_FILE.$(date +%Y%m%m-%H%M%S)"
+fi
+cp "$DOCKER_DIR/sample.dev.env" "$ENV_FILE"
+
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+
+echo "Detected UID: $USER_UID"
+echo "Detected GID: $USER_GID"
+
+# Update or add UID in .env
+if grep -q "^UID=" "$ENV_FILE"; then
+    sed -i "s/^UID=.*/UID=$USER_UID/" "$ENV_FILE"
+else
+    echo "UID=$USER_UID" >> "$ENV_FILE"
 fi
 
-UID=$(id -u)
-GID=$(id -g)
-
-if [ ! -e "$COMPOSE_ENV" ]; then
-  echo "UID=$UID" > "$COMPOSE_ENV"
-  echo "GID=$GID" >> "$COMPOSE_ENV"
+# Update or add GID in .env
+if grep -q "^GID=" "$ENV_FILE"; then
+    sed -i "s/^GID=.*/GID=$USER_GID/" "$ENV_FILE"
+else
+    echo "GID=$USER_GID" >> "$ENV_FILE"
 fi
 
-# sed -i.bak "s/^UID=/UID=$(id -u)/" "$DOCKER_ENV" && rm "$DOCKER_ENV".bak
-# sed -i.bak "s/^GID=/GID=$(id -g)/" "$DOCKER_ENV" && rm "$DOCKER_ENV".bak
-sed -i '' "/^UID=/c\\
-UID=$UID
-" /Users/toby.batch/Desktop/nrfc-fixtures/.docker/dev.env
-sed -i '' "/^GID=/c\\
-GID=$GID
-" /Users/toby.batch/Desktop/nrfc-fixtures/.docker/dev.env
+echo "✅ UID and GID have been updated in $ENV_FILE"
 
 touch .env
 echo "Dependencies installed"
