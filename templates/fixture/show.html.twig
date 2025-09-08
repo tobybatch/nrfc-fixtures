@@ -61,13 +61,25 @@
                 {{ fixture.club }} {% if fixture.opponent %}{{ fixture.opponent.value }}{% endif %}
             </td>
         </tr>
+        {% if fixture.matchReportExternalId %}
+            <tr>
+                <th class="text-left pr-2">Match Report</th>
+                <td class="text-left">
+                    <a href="https://www.norwichrugby.com/match-reports/{{ fixture.matchReportExternalId }}"
+                       class="underline font-bold text-blue-600"
+                       target="_blank">
+                        {{ fixture.matchReportExternalId }}
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
         {% if fixture.notes %}
-        <tr>
-            <th class="text-left pr-2">Notes</th>
-            <td class="text-left">
-                {{ fixture.notes }}
-            </td>
-        </tr>
+            <tr>
+                <th class="text-left pr-2">Notes</th>
+                <td class="text-left">
+                    {{ fixture.notes }}
+                </td>
+            </tr>
         {% endif %}
         {% if fixture.homeAway.value == "A" %}
         <tr>

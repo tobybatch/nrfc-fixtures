@@ -9,6 +9,7 @@ use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Repository\ClubRepository;
 use App\Service\DirectusClient;
+use DateTime;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -31,17 +32,26 @@ class FixtureType extends AbstractType
         $this->directus = $directus;
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // fetch match reports from Directus
         $reports = $this->directus->fetchCollection('matchReports', [
-            'fields' => 'id,title',
-            'sort'   => '-date_created',
+            'fields' => 'id,slug,title,createdAt',
+            'sort'   => '-createdAt',
         ]);
 
         $matchReportsOptions = [];
         foreach ($reports as $report) {
-            $matchReportsOptions[$report['title']] = $report['id'];
+            $date = new DateTime($report['createdAt']);
+            $optionLabel = sprintf(
+                "%s (%s)",
+                $report['title'],
+                $date->format('d/m/Y')
+            );
+            $matchReportsOptions[$optionLabel] = $report['slug'];
         }
 
         $builder
