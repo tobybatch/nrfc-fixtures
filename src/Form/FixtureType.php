@@ -8,8 +8,10 @@ use App\Config\Team;
 use App\Entity\Club;
 use App\Entity\Fixture;
 use App\Repository\ClubRepository;
+use App\Service\DirectusClient;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -22,8 +24,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FixtureType extends AbstractType
 {
+    private DirectusClient $directus;
+
+    public function __construct(DirectusClient $directus)
+    {
+        $this->directus = $directus;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // fetch match reports from Directus
+        $reports = $this->directus->fetchCollection('matchReports', [
+            'fields' => 'id,title',
+            'sort'   => '-date_created',
+        ]);
+
+        $matchReportsOptions = [];
+        foreach ($reports as $report) {
+            $matchReportsOptions[$report['title']] = $report['id'];
+        }
+
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Display Name',
@@ -75,6 +95,12 @@ class FixtureType extends AbstractType
                 'choice_label' => fn (Team $team) => $team->value,
                 'required' => false,
                 'help' => 'For youth fixtures you can leave this blank.',
+            ])
+            ->add('matchReportExternalId', ChoiceType::class, [
+                'label' => 'Match Report',
+                'choices' => $matchReportsOptions,
+                'placeholder' => '-- choose report --',
+                'required' => false,
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes',

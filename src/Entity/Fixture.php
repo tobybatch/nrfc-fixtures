@@ -45,6 +45,9 @@ class Fixture
     #[ORM\Column(nullable: true, enumType: Team::class)]
     private ?Team $opponent = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $matchReportExternalId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -142,6 +145,18 @@ class Fixture
     public function setOpponent(?Team $opponent): static
     {
         $this->opponent = $opponent;
+
+        return $this;
+    }
+
+    public function getMatchReportExternalId(): ?int
+    {
+        return $this->matchReportExternalId;
+    }
+
+    public function setMatchReportExternalId(int $matchReportExternalId): static
+    {
+        $this->matchReportExternalId = $matchReportExternalId;
 
         return $this;
     }

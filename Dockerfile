@@ -120,6 +120,14 @@ RUN docker-php-ext-install -j$(nproc) xsl
 FROM ${BASE}-php-ext-base AS php-ext-opcache
 RUN docker-php-ext-install -j$(nproc) opcache
 
+## php extension xdebug
+#FROM ${BASE}-php-ext-base AS php-ext-xdebug
+#RUN docker-php-ext-install -j$(nproc) xdebug
+
+# Build stage for Xdebug
+FROM ${BASE}-php-ext-base AS php-ext-xdebug
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
 ###########################
 # fpm base build
 ###########################
@@ -313,6 +321,9 @@ RUN \
     curl -sS https://get.symfony.com/cli/installer | bash && \
     rm -rf /opt/nrfcfixtures/var && \
     mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+# Copy Xdebug files from the build stage
+COPY --from=php-ext-xdebug /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY --from=php-ext-xdebug /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xdebug.so
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
 
