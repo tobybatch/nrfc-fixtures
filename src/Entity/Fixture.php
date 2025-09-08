@@ -46,7 +46,7 @@ class Fixture
     private ?Team $opponent = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $matchReportExternalId = null;
+    private ?string $matchReportExternalId = null;
 
     public function getId(): ?int
     {
@@ -149,12 +149,12 @@ class Fixture
         return $this;
     }
 
-    public function getMatchReportExternalId(): ?int
+    public function getMatchReportExternalId(): ?string
     {
         return $this->matchReportExternalId;
     }
 
-    public function setMatchReportExternalId(int $matchReportExternalId): static
+    public function setMatchReportExternalId(string $matchReportExternalId): static
     {
         $this->matchReportExternalId = $matchReportExternalId;
 

@@ -306,6 +306,7 @@ final class FixtureController extends AbstractController
                     'competition' => $this->translateCompetition($fixture->getCompetition()),
                     'venue' => HomeAway::Home == $fixture->getHomeAway() ? 'home' : 'away',
                     'date' => $date,
+                    'slug' => $fixture->getMatchReportExternalId(),
                 ];
             }
         }
