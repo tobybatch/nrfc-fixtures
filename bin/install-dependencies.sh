@@ -40,21 +40,26 @@ USER_GID=$(id -g)
 echo "Detected UID: $USER_UID"
 echo "Detected GID: $USER_GID"
 
+# Determine sed command based on OS
+if [[ "$OS_TYPE" == "Darwin" ]]; then
+    SED_IN_PLACE=(-i '')
+else
+    SED_IN_PLACE=(-i)
+fi
+
 # Update or add UID in .env
 if grep -q "^UID=" "$ENV_FILE"; then
-    sed -i "s/^UID=.*/UID=$USER_UID/" "$ENV_FILE"
+    sed "${SED_IN_PLACE[@]}" "s/^UID=.*/UID=$USER_UID/" "$ENV_FILE"
 else
     echo "UID=$USER_UID" >> "$ENV_FILE"
 fi
 
 # Update or add GID in .env
 if grep -q "^GID=" "$ENV_FILE"; then
-    sed -i "s/^GID=.*/GID=$USER_GID/" "$ENV_FILE"
+    sed "${SED_IN_PLACE[@]}" "s/^GID=.*/GID=$USER_GID/" "$ENV_FILE"
 else
     echo "GID=$USER_GID" >> "$ENV_FILE"
 fi
 
 echo "✅ UID and GID have been updated in $ENV_FILE"
-
-touch .env
 echo "Dependencies installed"

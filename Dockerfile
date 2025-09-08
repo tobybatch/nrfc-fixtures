@@ -322,7 +322,7 @@ RUN \
     rm -rf /opt/nrfcfixtures/var && \
     mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 # Copy Xdebug files from the build stage
-COPY --from=php-ext-xdebug /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY .docker/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 COPY --from=php-ext-xdebug /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xdebug.so
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
