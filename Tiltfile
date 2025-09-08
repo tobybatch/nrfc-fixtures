@@ -1,3 +1,3 @@
-dc = docker_compose(['.docker/compose.dev.yml'])
+dc = docker_compose(['compose.yml'])
 
 print(dc)
