@@ -80,7 +80,7 @@ class TeamService
             'U16G' => Team::U16G,
             'U18G' => Team::U18G,
             '1st Team (Mens)', 'FIRST_XV_MEN', '1st XV Fixture' => Team::FIRST_XV_MEN,
-            '2nd Team (Mens)', 'SECOND_XV_MEN', 'Lions Fixture' => Team::SECOND_XV_MEN,
+            '2nd Team (Mens)', 'SECOND_XV_MEN', 'Lions Fixture', '2nd XV (Lions)' => Team::SECOND_XV_MEN,
             '1st Team (Women)', 'FIRST_XV_WOMEN' => Team::FIRST_XV_WOMEN,
             default => null,
         };
