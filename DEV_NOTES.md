@@ -23,10 +23,15 @@ docker compose exec fixtures ./bin/console nrfc:fixtures:import ./assets/fixture
 ```shell
 ./bin/console make:migration
 ./bin/console doctrine:migrations:migrate
+```
+
+## Set up default dev users
+
+```
 ./bin/console doctrine:fixtures:load --group=users
 ```
 
-## Panther
+## Panther (E2E) setup
 
 ```shell
 sudo apt install chromium-browser chromium-chromedriver firefox
@@ -53,17 +58,11 @@ git-cliff v1.0.0..HEAD -o CHANGELOG.md
 
 ```
 
-## Dev bare bones tear up
-
-```
-docker compose down
-docker compose up -d
-./bin/console doctrine:schema:create
-
-```
-
 ## Get remote DB
 
 ```shell
-docker compose exec sqldb pg_dump -Unrfc -W -dnrfc > dump.sql
+export PGPASSWORD=??????
+ssh $USER@dev.norwichrugby.com docker exec -t nrfc-fixtures-db pg_dump -U nrfc -d nrfc > initdb.d/dump.sql 
+docker compose down
+tilt up
 ```

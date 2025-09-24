@@ -24,31 +24,25 @@ tilt up
 
 ### Quick commands
 
-**You must provide a compose file to run the following commands**
-
-```shell
-export COMPOSE_FILE=" -f .docker/compose.dev.yml"
-```
-
 Open a shell in the containers:
 
 ```shell
-docker compose ${COMPOSE_FILE} exec nrfcfixtures bash
+docker compose exec nrfcfixtures bash
 ```
 
 Reset the database (soft):
 
 ```shell
-docker compose ${COMPOSE_FILE} exec nrfcfixtures bin/console doctrine:schema:drop --force
-docker compose ${COMPOSE_FILE} exec nrfcfixtures bin/console doctrine:schema:create -n
-docker compose ${COMPOSE_FILE} exec nrfcfixtures bin/console doctrine:fixtures:load -n
+docker compose exec nrfcfixtures bin/console doctrine:schema:drop --force
+docker compose exec nrfcfixtures bin/console doctrine:schema:create -n
+docker compose exec nrfcfixtures bin/console doctrine:fixtures:load -n
 ```
 
 Reset the whole stack, keeps files, removes _all_ data/cache/etc:
 
 ```shell
-docker compose ${COMPOSE_FILE} down
-docker compose ${COMPOSE_FILE} volume rm nrfc-fixtures-dev-dbdata
+docker compose down
+docker compose volume rm nrfc-fixtures-dev-dbdata
 rm -rf var/cache
 tilt up # OR docker compose ${COMPOSE_FILE} up
 ```

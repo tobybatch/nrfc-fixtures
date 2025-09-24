@@ -43,3 +43,4 @@ phpstan.neon
 initdb.d
 .home
 .yarn
+nohup.out
