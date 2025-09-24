@@ -326,6 +326,7 @@ COPY .docker/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-
 COPY --from=php-ext-xdebug /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/xdebug.so
 ENV APP_ENV=dev
 ENV DATABASE_URL=""
+ENV ASSET_PATH_CLUBS="assets/clubs.csv"
 
 # the "prod" stage (production build) is configured as last stage in the file, as this is the default target in BuildKit
 FROM base AS prod
