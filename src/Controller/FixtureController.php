@@ -40,6 +40,8 @@ final class FixtureController extends AbstractController
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
     public function index(Request $request): Response|JsonResponse
     {
+        $isJson = 'application/json' === $request->getAcceptableContentTypes()[0];
+
         if ($request->isMethod('GET')) {
             $team = $request->query->get('team');
             $this->logger->debug('Team param', ['team' => $team]);
@@ -78,7 +80,7 @@ final class FixtureController extends AbstractController
 
         $this->logger->debug('Teams', ['teams' => $teams]);
 
-        $showPastDates = $this->preferencesService->getPreferences()['showPastDates'] ?? false;
+        $showPastDates = $this->preferencesService->getPreferences()['showPastDates'] ?? $isJson;
 
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
@@ -107,7 +109,7 @@ final class FixtureController extends AbstractController
         ];
 
         // This could be done in an event listener
-        if ('application/json' === $request->getAcceptableContentTypes()[0]) {
+        if ($isJson) {
             $json = $this->serializer->serialize($context, 'json');
 
             return new JsonResponse($json, 200, [], true);

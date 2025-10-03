@@ -46,3 +46,12 @@ docker compose volume rm nrfc-fixtures-dev-dbdata
 rm -rf var/cache
 tilt up # OR docker compose ${COMPOSE_FILE} up
 ```
+
+
+```
+# Generate tests by recording your actions
+npx playwright codegen website.com
+
+# Or for a specific browser
+npx playwright codegen --target javascript website.com
+```
