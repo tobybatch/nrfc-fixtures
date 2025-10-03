@@ -37,7 +37,7 @@ class PreferencesService
     {
         $targetArray = $this->getPreferences();
         $targetArray[$key] = $value;
-        $this->logger->debug('Setting preferences ' . $key, $value);
+        $this->logger->debug('Setting preferences ', [$key => $value]);
         $this->getSession()->set('preferences', $targetArray);
     }
 
