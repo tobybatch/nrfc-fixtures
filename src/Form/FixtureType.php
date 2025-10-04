@@ -10,9 +10,12 @@ use App\Entity\Fixture;
 use App\Repository\ClubRepository;
 use App\Service\DirectusClient;
 use DateTime;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -27,7 +30,9 @@ class FixtureType extends AbstractType
 {
     private DirectusClient $directus;
 
-    public function __construct(DirectusClient $directus)
+    public function __construct(
+        DirectusClient $directus,
+        private readonly LoggerInterface $logger)
     {
         $this->directus = $directus;
     }
@@ -60,11 +65,11 @@ class FixtureType extends AbstractType
                 'help' => 'This is the text displayed in the fixture list. If you leave this blank, the name will be generated from the fixture, e.g. Beccles (A).',
                 'required' => false,
             ])
-            ->add('date', DateType::class, [
+            ->add('date', DateTimeType::class, [
                 'widget' => 'single_text',
-                'html5' => false, // allows custom format
-                'format' => 'dd/MM/yyyy',
-                'placeholder' => 'dd/mm/yyyy',
+                'html5' => false,
+                'format' => 'dd/MM/yyyy HH:mm',
+                'placeholder' => 'dd/mm/yyyy hh:mm',
                 'attr' => [
                     'class' => 'js-datepicker',
                     'autocomplete' => 'off',
@@ -117,6 +122,18 @@ class FixtureType extends AbstractType
                 'required' => false,
             ])
         ;
+
+        $builder->get('date')
+            ->addModelTransformer(new CallbackTransformer(
+            // Transform from entity to form
+                function (?\DateTimeImmutable $date): ?\DateTime {
+                    return $date ? \DateTime::createFromImmutable($date) : null;
+                },
+                // Transform from form to entity
+                function (?\DateTime $date): ?\DateTimeImmutable {
+                    return $date ? \DateTimeImmutable::createFromMutable($date) : null;
+                }
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -12,8 +12,9 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
 flatpickr(".js-datepicker", {
-    dateFormat: "d/m/Y", // matches 'dd/MM/yyyy' in PHP
-    allowInput: true,
-    altInput: true,
-    altFormat: "d/m/Y",
+    enableTime: true,
+    dateFormat: "d-m-Y H:i",
+    time_24hr: true,
+    defaultHour: 11,
+    defaultMinute: 0
 });

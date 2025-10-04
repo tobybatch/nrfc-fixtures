@@ -135,7 +135,7 @@ final class FixtureController extends AbstractController
         if ($date) {
             // Parse the date string if needed (adjust format as necessary)
             try {
-                $dateObject = \DateTimeImmutable::createFromFormat('d-m-Y', $date);
+                $dateObject = \DateTimeImmutable::createFromFormat('d-m-Y H:i', $date);
                 if ($dateObject) {
                     $fixture->setDate($dateObject);
                 }
@@ -144,6 +144,7 @@ final class FixtureController extends AbstractController
             }
         }
 
+        $this->logger->info('fixture', ['fixture' => $fixture]);
         $form = $this->createForm(FixtureType::class, $fixture, [
             'csrf_protection' => false,
         ]);

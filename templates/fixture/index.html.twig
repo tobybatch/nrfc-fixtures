@@ -105,7 +105,7 @@
                                         {% endfor %}
                                     {% else %}
                                         {% if app.user %}
-                                            <a href="{{ path('app_fixture_new', {'team': team.name, 'date': fixture_date|date('d-m-Y')}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                            <a href="{{ path('app_fixture_new', {'team': team.name, 'date': fixture_date|date('d-m-Y 12:00')}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
                                                 +
                                             </a>
                                         {% else %}

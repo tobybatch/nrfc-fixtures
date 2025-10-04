@@ -168,7 +168,7 @@ class Fixture
             $this->id ?? 0,
             $this->team->name ?? 'Unknown',
             $this->opponent?->name ?? 'Unknown',
-            $this->date?->format('Y-m-d') ?? 'Unknown Date'
+            $this->date?->format('Y-m-d H:i') ?? 'Unknown Date'
         );
     }
 }
