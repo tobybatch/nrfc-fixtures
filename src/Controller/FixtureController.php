@@ -80,12 +80,14 @@ final class FixtureController extends AbstractController
         $this->logger->debug('Teams', ['teams' => $teams]);
 
         $showPastDates = $this->preferencesService->getPreferences()['showPastDates'] ?? $isJson;
+        $today = new \DateTimeImmutable('today');
 
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
             // check date is today or later, or force show is set
-            if ($showPastDates || $date >= new \DateTimeImmutable()) {
+            $eventDateNormalized = $date->setTime(0, 0, 0);
+            if ($showPastDates || $eventDateNormalized >= $today) {
                 $fixturesForDate = [];
                 foreach ($teams as $team) {
                     if ($team) {
