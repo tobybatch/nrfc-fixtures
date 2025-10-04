@@ -122,8 +122,29 @@ final class FixtureController extends AbstractController
     public function new(Request $request): Response
     {
         $fixture = new Fixture();
+
+        $team = $request->query->get('team');
+        $date = $request->query->get('date');
+
+        if ($team) {
+            $_team = $this->teamService->getBy($team);
+            $fixture->setTeam($_team);
+        }
+
+        if ($date) {
+            // Parse the date string if needed (adjust format as necessary)
+            try {
+                $dateObject = \DateTimeImmutable::createFromFormat('d-m-Y', $date);
+                if ($dateObject) {
+                    $fixture->setDate($dateObject);
+                }
+            } catch (\Exception $e) {
+                $this->logger->error('Can\'t parse date', ['date' => $date, 'exception' => $e]);
+            }
+        }
+
         $form = $this->createForm(FixtureType::class, $fixture, [
-        'csrf_protection' => false,
+            'csrf_protection' => false,
         ]);
         $form->handleRequest($request);
 

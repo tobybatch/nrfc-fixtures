@@ -93,13 +93,19 @@
                                         {# Each cell can contain multiple fixtures on a day #}
                                         {% set fixtureList = fixtures_on_date[team.value] %}
                                         {% for fixture in fixtureList %}
-                                            <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                            <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900">
                                                 {{ fixture | fixtureToString }}
                                                 {% if not loop.last %}<br />{% endif %}
                                             </a>
                                         {% endfor %}
                                     {% else %}
-                                        --
+                                        {% if app.user %}
+                                            <a href="{{ path('app_fixture_new', {'team': team.name, 'date': fixture_date|date('d-m-Y')}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                                +
+                                            </a>
+                                        {% else %}
+                                            --
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             {% endfor %}
