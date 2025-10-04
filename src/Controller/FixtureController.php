@@ -13,7 +13,6 @@ use App\Repository\FixtureRepository;
 use App\Service\FixtureService;
 use App\Service\PreferencesService;
 use App\Service\TeamService;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

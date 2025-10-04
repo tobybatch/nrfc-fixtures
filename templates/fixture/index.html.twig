@@ -97,6 +97,11 @@
                                                 {{ fixture | fixtureToString }}
                                                 {% if not loop.last %}<br />{% endif %}
                                             </a>
+                                            {% if app.user %}
+                                                <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                                    ✎
+                                                </a>
+                                            {% endif %}
                                         {% endfor %}
                                     {% else %}
                                         {% if app.user %}
