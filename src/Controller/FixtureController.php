@@ -111,7 +111,12 @@ final class FixtureController extends AbstractController
 
         // This could be done in an event listener
         if ($isJson) {
-            $json = $this->serializer->serialize($context, 'json');
+            $json = $this->serializer->serialize(
+                $context,
+                'json', [
+                'groups' => ['fixture:read']
+            ]);
+            $this->logger->info('Context', ['json' => $json]);
 
             return new JsonResponse($json, 200, [], true);
         }

@@ -9,6 +9,7 @@ use App\Config\Team;
 use App\Repository\FixtureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
 #[ORM\Entity(repositoryClass: FixtureRepository::class)]
@@ -53,6 +54,7 @@ class Fixture
         return $this->id;
     }
 
+    #[Groups(['fixture:read'])]
     public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
@@ -65,6 +67,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getClub(): ?Club
     {
         return $this->club;
@@ -77,6 +80,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getHomeAway(): HomeAway
     {
         return $this->homeAway;
@@ -89,6 +93,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getCompetition(): Competition
     {
         return $this->competition;
@@ -101,6 +106,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getTeam(): Team
     {
         return $this->team;
@@ -113,6 +119,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getName(): ?string
     {
         return $this->name;
@@ -125,6 +132,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getNotes(): ?string
     {
         return $this->notes;
@@ -137,6 +145,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getOpponent(): ?Team
     {
         return $this->opponent;
@@ -149,6 +158,7 @@ class Fixture
         return $this;
     }
 
+    #[Groups(['fixture:read'])]
     public function getMatchReportExternalId(): ?string
     {
         return $this->matchReportExternalId;
@@ -159,6 +169,12 @@ class Fixture
         $this->matchReportExternalId = $matchReportExternalId;
 
         return $this;
+    }
+
+    #[Groups(['fixture:read'])]
+    public function getClubName(): ?string
+    {
+        return $this->club?->getName();
     }
 
     public function __toString(): string
