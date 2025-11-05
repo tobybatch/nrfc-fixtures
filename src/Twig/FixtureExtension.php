@@ -76,8 +76,11 @@ class FixtureExtension extends AbstractExtension
     {
         $club = $fixture->getClub();
         $comp = $fixture->getCompetition();
+        $display = $fixture->getName();
 
-        if (Competition::Training == $comp && $club) {
+        if ($display) {
+            return $fixture->getTeam()->name . ' ' . $display;
+        } else if (Competition::Training == $comp && $club) {
             // If there is a club then it may be cluster training
             return sprintf(
                 '%s Training with %s (%s)',
