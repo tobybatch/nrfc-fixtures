@@ -11,10 +11,13 @@ import './styles/app.css';
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
-flatpickr(".js-datepicker", {
-    enableTime: true,
-    dateFormat: "d-m-Y H:i",
-    time_24hr: true,
-    defaultHour: 11,
-    defaultMinute: 0
+document.addEventListener('turbo:load', function() {
+    flatpickr(".js-datepicker", {
+        enableTime: true,
+        dateFormat: "d-m-Y H:i",
+        time_24hr: true,
+        defaultHour: 11,
+        defaultMinute: 0,
+        allowInput: true
+    });
 });

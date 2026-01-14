@@ -68,11 +68,12 @@ class FixtureType extends AbstractType
             ->add('date', DateTimeType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
-                'format' => 'dd/MM/yyyy HH:mm',
-                'placeholder' => 'dd/mm/yyyy hh:mm',
+                'format' => 'dd-MM-yyyy HH:mm',
+                'placeholder' => 'dd-mm-yyyy hh:mm',
                 'attr' => [
                     'class' => 'js-datepicker',
                     'autocomplete' => 'off',
+                    'data-enable-time' => 'true',
                 ],
             ])
             ->add('homeAway', EnumType::class, [
