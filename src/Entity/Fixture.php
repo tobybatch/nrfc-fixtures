@@ -164,7 +164,7 @@ class Fixture
         return $this->matchReportExternalId;
     }
 
-    public function setMatchReportExternalId(string $matchReportExternalId): static
+    public function setMatchReportExternalId(?string $matchReportExternalId): static
     {
         $this->matchReportExternalId = $matchReportExternalId;
 

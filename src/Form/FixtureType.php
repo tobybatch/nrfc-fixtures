@@ -114,8 +114,11 @@ class FixtureType extends AbstractType
             ->add('matchReportExternalId', ChoiceType::class, [
                 'label' => 'Match Report',
                 'choices' => $matchReportsOptions,
-                'placeholder' => '-- choose report --',
+                // Provide an explicit empty option users can pick to clear the association
+                'placeholder' => '-- none (remove association) --',
                 'required' => false,
+                // Ensure empty selection maps to NULL on the entity
+                'empty_data' => null,
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes',

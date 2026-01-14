@@ -20,6 +20,8 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                default_target_path: app_fixture_index
+                always_use_default_target_path: true
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -28,6 +30,8 @@ security:
             login_link:
                 check_route: login_check
                 signature_properties: ['id']
+                default_target_path: app_fixture_index
+                always_use_default_target_path: true
                 # lifetime in seconds
                 # lifetime: 600
                 # check_post_only: true
