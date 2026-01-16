@@ -9,12 +9,14 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="md:col-span-2">
         {{ form_label(form.date, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+                {{ form_label(form.date.date, 'Date', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.date.date, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'}}) }}
                 {{ form_errors(form.date.date) }}
             </div>
-            <div>
+            <div class="flex-1">
+                {{ form_label(form.date.time, 'Time', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.date.time, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'}}) }}
                 {{ form_errors(form.date.time) }}
             </div>
