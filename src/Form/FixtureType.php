@@ -66,15 +66,11 @@ class FixtureType extends AbstractType
                 'required' => false,
             ])
             ->add('date', DateTimeType::class, [
-                'widget' => 'single_text',
-                'html5' => false,
-                'format' => 'dd-MM-yyyy HH:mm',
-                'placeholder' => 'dd-mm-yyyy hh:mm',
-                'attr' => [
-                    'class' => 'js-datepicker',
-                    'autocomplete' => 'off',
-                    'data-enable-time' => 'true',
-                ],
+                'label' => 'Date and Kick off time',
+                'date_widget' => 'single_text',
+                'time_widget' => 'single_text',
+                'html5' => true,
+                'input' => 'datetime_immutable',
             ])
             ->add('homeAway', EnumType::class, [
                 'class' => HomeAway::class,
@@ -127,17 +123,6 @@ class FixtureType extends AbstractType
             ])
         ;
 
-        $builder->get('date')
-            ->addModelTransformer(new CallbackTransformer(
-            // Transform from entity to form
-                function (?\DateTimeImmutable $date): ?\DateTime {
-                    return $date ? \DateTime::createFromImmutable($date) : null;
-                },
-                // Transform from form to entity
-                function (?\DateTime $date): ?\DateTimeImmutable {
-                    return $date ? \DateTimeImmutable::createFromMutable($date) : null;
-                }
-            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

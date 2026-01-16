@@ -23,8 +23,6 @@
     <script>
         window.AppData = {{ app_data.data|json_encode|raw }};
     </script>
-{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">#}
-{#    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>#}
     {% block stylesheets %}{{ encore_entry_link_tags('app') }}{% endblock %}
     {% block javascripts %}{{ encore_entry_script_tags('app') }}{% endblock %}
 </head>
