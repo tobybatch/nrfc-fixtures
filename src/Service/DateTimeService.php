@@ -57,4 +57,55 @@ class DateTimeService
 
         throw new InvalidArgumentException("Invalid UK date format: {$dateString}");
     }
+
+    /**
+     * @return array<DateTimeImmutable>
+     */
+    function getCurrentSeason(DateTimeImmutable $date = null): array
+    {
+        $date = $date ?? new DateTimeImmutable('today');
+
+        // May 7th of the current year
+        $cutoff = $date->setDate((int)$date->format('Y'), 5, 7)->setTime(23, 59, 59);
+
+        if ($date > $cutoff) {
+            // After May 7th: Season starts Aug 1st this year, ends May 7th next year
+            $startYear = (int)$date->format('Y');
+        } else {
+            // On or before May 7th: Season started Aug 1st last year, ends May 7th this year
+            $startYear = (int)$date->format('Y') - 1;
+        }
+
+        return [
+            $date->setDate($startYear, 8, 1)->setTime(0, 0, 0),
+            $date->setDate($startYear + 1, 5, 7)->setTime(23, 59, 59),
+        ];
+    }
+
+    /**
+     * @return array<DateTimeImmutable>
+     * @throws DateMalformedStringException
+     */
+    function getAllThe(int $dayOfWeek, DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        $dates = [];
+
+        // Map numeric day (e.g., 1 for Monday) to string for relative modification
+        $days = [0 => 'Sunday', 1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday'];
+        $dayName = $days[$dayOfWeek] ?? throw new \InvalidArgumentException("Invalid day of week: $dayOfWeek");
+
+        // Move to the first occurrence of the day of the week on or after the start date
+        $current = $start;
+        if ((int)$current->format('N') !== $dayOfWeek) {
+            $current = $current->modify("next $dayName");
+        }
+
+        // Iterate weekly until we pass the end date
+        while ($current <= $end) {
+            $dates[] = $current;
+            $current = $current->modify('+1 week');
+        }
+
+        return $dates;
+    }
 }

@@ -78,45 +78,43 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                 {% for fixture_date, fixtures_on_date in fixtures %}
-                    {% if fixtures_on_date | length > 0 %}
-                        <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
-                            <td class="py-3 px-4 whites`pace-nowrap underline">
-                                <a class="nrfc-date-link"
-                                   href="{{ path('app_fixture_byDate', parameters = {date: fixture_date|date('Ymd')}) }}">
-                                    {{ fixture_date|date('j M y') }}
-                                </a>
-                            </td>
+                    <tr class="hover:bg-gray-50 {{ loop.index is even ? 'bg-gray-50' : '' }}">
+                        <td class="py-3 px-4 whites`pace-nowrap underline">
+                            <a class="nrfc-date-link"
+                               href="{{ path('app_fixture_byDate', parameters = {date: fixture_date|date('Ymd')}) }}">
+                                {{ fixture_date|date('j M y') }}
+                            </a>
+                        </td>
 
-                            {% for team in teams %}
-                                <td class="py-3 px-4">
-                                    {% if team.value in fixtures_on_date|keys %}
-                                        {# Each cell can contain multiple fixtures on a day #}
-                                        {% set fixtureList = fixtures_on_date[team.value] %}
-                                        {% for fixture in fixtureList %}
-                                            <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900">
-                                                {{ fixture | fixtureToString }}
-                                                {% if not loop.last %}<br />{% endif %}
-                                            </a>
-                                            {% if app.user %}
-                                                <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                                                    ✎
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% else %}
+                        {% for team in teams %}
+                            <td class="py-3 px-4">
+                                {% if team.value in fixtures_on_date|keys %}
+                                    {# Each cell can contain multiple fixtures on a day #}
+                                    {% set fixtureList = fixtures_on_date[team.value] %}
+                                    {% for fixture in fixtureList %}
+                                        <a href="{{ path('app_fixture_show', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            {{ fixture | fixtureToString }}
+                                            {% if not loop.last %}<br />{% endif %}
+                                        </a>
                                         {% if app.user %}
-                                            <a href="{{ path('app_fixture_new', {'team': team.name, 'date': fixture_date|date('d-m-Y 12:00')}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                                                +
+                                            <a href="{{ path('app_fixture_edit', {'id': fixture.id}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                                ✎
                                             </a>
-                                        {% else %}
-                                            --
                                         {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% if app.user %}
+                                        <a href="{{ path('app_fixture_new', {'team': team.name, 'date': fixture_date|date('d-m-Y 12:00')}) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                            +
+                                        </a>
+                                    {% else %}
+                                        --
                                     {% endif %}
-                                </td>
-                            {% endfor %}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
 
-                        </tr>
-                    {% endif %}
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>

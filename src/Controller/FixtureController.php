@@ -10,6 +10,7 @@ use App\Form\FixturesDisplayOptionsForm;
 use App\Form\FixtureType;
 use App\Form\Model\FixturesDisplayOptionsDTO;
 use App\Repository\FixtureRepository;
+use App\Service\DateTimeService;
 use App\Service\FixtureService;
 use App\Service\PreferencesService;
 use App\Service\TeamService;
@@ -36,8 +37,11 @@ final class FixtureController extends AbstractController
     ) {
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[Route(name: 'app_fixture_index', methods: ['GET', 'POST'])]
-    public function index(Request $request): Response|JsonResponse
+    public function index(Request $request, TeamService $teamService, DateTimeService $dateTimeService): Response|JsonResponse
     {
         $isJson = 'application/json' === $request->getAcceptableContentTypes()[0];
 
@@ -81,9 +85,19 @@ final class FixtureController extends AbstractController
 
         $showPastDates = $this->preferencesService->getPreferences()['showPastDates'] ?? $isJson;
         $today = new \DateTimeImmutable('today');
+        $season = $dateTimeService->getCurrentSeason($today);
 
         $fixtures = [];
-        $dates = $this->fixtureRepository->getDates();
+        $allSaturdays = [];
+        $allSundays = [];
+        if (array_any($teams, fn($team) => $teamService->isSenior($team))) {
+            $allSaturdays = $dateTimeService->getAllThe(6, $season[0], $season[1]);
+        }
+        if (array_any($teams, fn($team) => !$teamService->isSenior($team))) {
+            $allSundays = $dateTimeService->getAllThe(0, $season[0], $season[1]);
+        }
+        $dates = array_merge($this->fixtureRepository->getDates($teams), $allSaturdays, $allSundays);
+        asort($dates);
         foreach ($dates as $date) {
             // check date is today or later, or force show is set
             $eventDateNormalized = $date->setTime(0, 0, 0);
@@ -91,15 +105,13 @@ final class FixtureController extends AbstractController
                 $fixturesForDate = [];
                 foreach ($teams as $team) {
                     if ($team) {
-                        $_fixturesForTeam = $this->fixtureRepository->getFixturesForTeam($team, $date);
+                        $_fixturesForTeam = $this->fixtureRepository->getFixturesForTeam($team, $date, $teamService->isSenior($team) ? 6 : 0);
                         if (!empty($_fixturesForTeam)) {
                             $fixturesForDate[$team->value] = $_fixturesForTeam;
                         }
                     }
                 }
-                if (!empty($fixturesForDate)) {
-                    $fixtures[$date->format('Y-m-d')] = $fixturesForDate;
-                }
+                $fixtures[$date->format('Y-m-d')] = $fixturesForDate;
             }
         }
 
@@ -321,13 +333,13 @@ final class FixtureController extends AbstractController
 
     // This will be removed when we get to the new website
     #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
-    public function forOldWebsite(Request $request): Response|JsonResponse
+    public function forOldWebsite(Request $request, TeamService $teamService): Response|JsonResponse
     {
         $team = $this->teamService->getBy($request->query->get('team'));
         $fixtures = [];
         $dates = $this->fixtureRepository->getDates();
         foreach ($dates as $date) {
-            $_fixtures = $this->fixtureRepository->getFixturesForTeam($team, $date);
+            $_fixtures = $this->fixtureRepository->getFixturesForTeam($team, $date, $teamService->isSenior($team) ? 6 : 0);
             if (!empty($_fixtures)) {
                 $fixture = $_fixtures[0];
                 $fixtures[] = [

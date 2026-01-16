@@ -24,16 +24,22 @@ class FixtureRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<Team> $teams
+     *
      * @return \DateTimeImmutable[]
+     * @throws \DateMalformedStringException
      */
-    public function getDates(): array
+    public function getDates(array $teams): array
     {
         $results = $this->entityManager->createQueryBuilder()
             ->select('DISTINCT d.date AS date')
             ->from('App\Entity\Fixture', 'd')
+            ->where('d.team IN (:teams)')
             ->orderBy('d.date', 'ASC')
+            ->setParameter('teams', $teams)
             ->getQuery()
-            ->getScalarResult();
+            ->getScalarResult()
+        ;
 
         $dates = [];
         foreach ($results as $row) {
