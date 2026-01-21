@@ -34,6 +34,7 @@ class ResetPasswordController extends AbstractController
 
     /**
      * Display & process form to request a password reset.
+     * @throws TransportExceptionInterface
      */
     #[Route('', name: 'app_forgot_password_request')]
     public function request(Request $request, MailerInterface $mailer, TranslatorInterface $translator): Response
@@ -85,6 +86,16 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_reset_password');
         }
 
+        $this->addFlash('reset_password_error', 'Duff token you muppet');
+        return $this->redirectToRoute('app_forgot_password_request');
+    }
+
+    /**
+     * Validates and process the reset URL that the user clicked in their email.
+     */
+    #[Route('/reset', name: 'app_reset_password_impl')]
+    public function resetImpl(Request $request, UserPasswordHasherInterface $passwordHasher, TranslatorInterface $translator, ?string $token = null): Response
+    {
         $token = $this->getTokenFromSession();
 
         if (null === $token) {
@@ -141,6 +152,7 @@ class ResetPasswordController extends AbstractController
 
         // Do not reveal whether a user account was found or not.
         if (!$user) {
+            $this->addFlash('reset_password_error', 'Mail not sent');
             return $this->redirectToRoute('app_check_email');
         }
 
@@ -151,15 +163,16 @@ class ResetPasswordController extends AbstractController
             // the lines below and change the redirect to 'app_forgot_password_request'.
             // Caution: This may reveal if a user is registered or not.
             //
-            // $this->addFlash('reset_password_error', sprintf(
-            //     '%s - %s',
-            //     $translator->trans(ResetPasswordExceptionInterface::MESSAGE_PROBLEM_HANDLE, [], 'ResetPasswordBundle'),
-            //     $translator->trans($e->getReason(), [], 'ResetPasswordBundle')
-            // ));
+             $this->addFlash('reset_password_error', sprintf(
+                 '%s - %s',
+                 $translator->trans(ResetPasswordExceptionInterface::MESSAGE_PROBLEM_HANDLE, [], 'ResetPasswordBundle'),
+                 $translator->trans($e->getReason(), [], 'ResetPasswordBundle')
+             ));
 
             return $this->redirectToRoute('app_check_email');
         }
 
+        $this->addFlash('reset_password_error', 'Mail sent');
         $email = (new TemplatedEmail())
             ->from(new Address('no-reply@norwichrugby.com', 'NRFC Fixtures'))
             ->to((string) $user->getEmail())

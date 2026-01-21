@@ -4,6 +4,9 @@
       <envFiles>
         <find>$PROJECT_DIR$/.env</find>
       </envFiles>
+      <PhpTestInterpreterSettings>
+        <option name="interpreterName" value="nrfc/fixtures:apache-dev" />
+      </PhpTestInterpreterSettings>
     </CommandLine>
     <option name="envFilePaths">
       <list>
