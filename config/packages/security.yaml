@@ -22,6 +22,8 @@ security:
                 enable_csrf: true
                 default_target_path: app_fixture_index
                 always_use_default_target_path: true
+                csrf_parameter: _csrf_token
+                csrf_token_id: authenticate
             logout:
                 path: app_logout
                 # where to redirect after logout

@@ -23,7 +23,6 @@
             <div class="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
 
                 {{ form_start(loginForm, {attr: {class: 'mb-0 space-y-6'}}) }}
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                 {{ form_row(loginForm._username) }}
                 {{ form_row(loginForm._password, {
