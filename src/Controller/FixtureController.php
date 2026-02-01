@@ -350,6 +350,10 @@ final class FixtureController extends AbstractController
                     'date' => $date,
                     'slug' => $fixture->getMatchReportExternalId(),
                 ];
+            } else {
+                $fixtures[] = [
+                    'date' => $date,
+                ];
             }
         }
 
