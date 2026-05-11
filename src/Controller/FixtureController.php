@@ -332,13 +332,27 @@ final class FixtureController extends AbstractController
     }
 
     // This will be removed when we get to the new website
+
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[Route('forOldWebsite', name: 'app_fixture_for_old_website', methods: ['GET'])]
-    public function forOldWebsite(Request $request, TeamService $teamService): Response|JsonResponse
+    public function forOldWebsite(Request $request, TeamService $teamService, DateTimeService $dateTimeService): Response|JsonResponse
     {
+        [$startSeason, $endSeason] = $dateTimeService->getSeasonDates();
         $team = $this->teamService->getBy($request->query->get('team'));
-        $fixtures = [];
-        $dates = $this->fixtureRepository->getDates();
+        $dates = $this->fixtureRepository->getDates([$team]);
+        $fixtures = [
+//            [
+//                'startSeason' => $startSeason,
+//                'endSeason' => $endSeason,
+//                'dates' => $dates,
+//            ]
+        ];
         foreach ($dates as $date) {
+            if ($date <= $startSeason || $date > $endSeason) {
+                continue;
+            }
             $_fixtures = $this->fixtureRepository->getFixturesForTeam($team, $date, $teamService->isSenior($team) ? 6 : 0);
             if (!empty($_fixtures)) {
                 $fixture = $_fixtures[0];
@@ -357,14 +371,8 @@ final class FixtureController extends AbstractController
             }
         }
 
-        // This could be done in an event listener
-        if ('application/json' === $request->getAcceptableContentTypes()[0]) {
-            $json = $this->serializer->serialize($fixtures, 'json');
-
-            return new JsonResponse($json, 200, [], true);
-        }
-
-        return new Response('Unsupported accept type', 400);
+        $json = $this->serializer->serialize($fixtures, 'json');
+        return new JsonResponse($json, 200, [], true);
     }
 
     private function translateCompetition(Competition $competition): ?string

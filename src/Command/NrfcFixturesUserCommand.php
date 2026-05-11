@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -32,6 +33,7 @@ class NrfcFixturesUserCommand extends Command
     {
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'The email address of the new user')
+            ->addOption('password', 'p', InputOption::VALUE_OPTIONAL, 'The password to update/set')
             ->addArgument('role', InputArgument::OPTIONAL, 'Role to add to the new user, EDITOR, ADMIN')
         ;
     }
@@ -40,6 +42,7 @@ class NrfcFixturesUserCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $email = $input->getArgument('email');
+        $password = $input->getOption('password');
 
         $roles = [];
         if ($input->getArgument('role')) {
@@ -59,7 +62,13 @@ class NrfcFixturesUserCommand extends Command
             $io->info('Creating a new user with email of '.$email);
             $user = new User();
             $user->setEmail($email);
-            $user->setPassword(strval(sha1(rand())));
+            if ($password) {
+                $user->setPassword($password);
+            } else {
+                $user->setPassword(strval(sha1(rand())));
+            }
+        } else if ($password) {
+            $user->setPassword($password);
         }
         $io->info('Updating user with email of '.$email);
         $user->setRoles($roles);

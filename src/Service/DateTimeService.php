@@ -3,7 +3,9 @@
 namespace App\Service;
 
 use DateMalformedStringException;
+use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use InvalidArgumentException;
 
 class DateTimeService
@@ -80,6 +82,54 @@ class DateTimeService
             $date->setDate($startYear, 8, 1)->setTime(0, 0, 0),
             $date->setDate($startYear + 1, 5, 7)->setTime(23, 59, 59),
         ];
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    function getSeasonDates(DateTimeInterface|string|null $currentDate = null): array {
+        // Use current date if none provided
+        if (!$currentDate) {
+            $currentDate = new DateTimeImmutable();
+        } elseif (is_string($currentDate)) {
+            $currentDate = new DateTimeImmutable($currentDate);
+        } elseif ($currentDate instanceof DateTime) {
+            $currentDate = DateTimeImmutable::createFromMutable($currentDate);
+        }
+
+        $currentYear = (int) $currentDate->format('Y');
+        $currentMonth = (int) $currentDate->format('m');
+        $currentDay = (int) $currentDate->format('d');
+
+        // Convert current date to comparable integer (month * 100 + day)
+        $currentMonthDay = $currentMonth * 100 + $currentDay;
+
+        $seasonStartMonthDay = 801;  // August 1st -> 801
+        $seasonEndMonthDay   = 510;  // May 10th   -> 510
+
+        // Scenario 1: May 10th (510) to August 1st (801) of the same year -> both future dates
+        if ($currentMonthDay >= $seasonEndMonthDay && $currentMonthDay < $seasonStartMonthDay) {
+            // Next season starts this coming August 1st
+            $start = new DateTimeImmutable($currentYear . '-08-01');
+            $end = new DateTimeImmutable(($currentYear + 1) . '-05-10');
+        }
+        // Scenario 2: August 1st (801) to May 10th (510) next year -> start in past, end in future
+        else {
+            $seasonStartYear = $currentYear;
+            $seasonEndYear = $currentYear + 1;
+
+            // Adjust if we are between Jan 1st and May 10th (beginning of calendar year)
+            if ($currentMonthDay <= $seasonEndMonthDay) {
+                $seasonStartYear = $currentYear - 1;
+                $seasonEndYear = $currentYear;
+            }
+
+            $start = new DateTimeImmutable($seasonStartYear . '-08-01');
+            $end = new DateTimeImmutable($seasonEndYear . '-05-10');
+        }
+
+        // Return as tuple (strictly ordered array with two elements)
+        return [$start, $end];
     }
 
     /**
