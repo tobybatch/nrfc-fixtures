@@ -5,6 +5,8 @@ namespace App\DataFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use JetBrains\PhpStorm\NoReturn;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -14,24 +16,27 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class ClubsAndFixtures extends Fixture
 {
     private KernelInterface $kernel;
+    private LoggerInterface $logger;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, LoggerInterface $logger)
     {
         $this->kernel = $kernel;
+        $this->logger = $logger;
     }
 
     /**
      * @throws \Exception
      */
+    #[NoReturn]
     public function load(ObjectManager $manager): void
     {
-        $this->runCommand([
-            'file' => 'assets/fixtures-youth-2025-6.csv',
-        ]);
-
-        $this->runCommand([
-            'file' => 'assets/fixtures-senior-2025-6.csv',
-        ]);
+        $files = glob('assets/fixtures-*.csv');
+        foreach ($files as $file) {
+            $this->logger->info("Loading fixtures from " . ($file));
+            $this->runCommand([
+                'file' => $file,
+            ]);
+        }
     }
 
     /**

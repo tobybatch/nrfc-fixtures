@@ -22,7 +22,6 @@ class NrfcFixturesImportCommandTest extends TestCase
     private ImportExportService $importOutputService;
     private KernelInterface $kernel;
     private ParameterBagInterface $parameterBag;
-    private string $tempFixtureFile = __DIR__.'/../../../assets/fixtures-youth-2025-6.csv';
     private string $tempClubFile = __DIR__.'/../../../assets/clubs.csv';
     private CommandTester $commandTester;
 
