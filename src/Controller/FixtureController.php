@@ -331,6 +331,44 @@ final class FixtureController extends AbstractController
         );
     }
 
+    #[Route('export', name: 'app_fixture_export', methods: ['GET'])]
+    public function export(): Response
+    {
+        $fixtures = $this->fixtureRepository->findAll();
+        $handle = fopen('php://memory', 'r+');
+
+        // Add header row
+        fputcsv($handle, ['Date', 'Time', 'Team', 'Opponent', 'Club', 'Venue', 'Competition', 'Notes']);
+
+        /** @var Fixture $fixture */
+        foreach ($fixtures as $fixture) {
+            fputcsv($handle, [
+                $fixture->getDate()?->format('d/m/Y'),
+                $fixture->getDate()?->format('H:i'),
+                $fixture->getTeam()->value,
+                $fixture->getOpponent()?->value ?? $fixture->getName(),
+                $fixture->getClubName(),
+                $fixture->getHomeAway()->value,
+                $fixture->getCompetition()->value,
+                $fixture->getNotes(),
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return new Response(
+            $csv,
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="fixtures.csv"',
+                'Cache-Control' => 'no-store, no-cache',
+            ]
+        );
+    }
+
     // This will be removed when we get to the new website
 
     /**
